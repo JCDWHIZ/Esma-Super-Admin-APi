@@ -1,0 +1,22 @@
+using System;
+using admin_service.Application.Common.Interfaces;
+
+namespace admin_service.Application.School.Commands.RestoreDeletedSchool;
+
+public record RestoreDeletedSchoolCommand(string PublicId) : IRequest; // Ensure SchoolItemDto has an Id property
+public class RestoreDeletedSchoolCommandHandler(IApplicationDbContext context) : IRequestHandler<RestoreDeletedSchoolCommand>
+{
+    private readonly IApplicationDbContext _context = context;
+
+    public async Task Handle(RestoreDeletedSchoolCommand request, CancellationToken cancellationToken)
+    {
+        var entity = await _context.Schools.FirstOrDefaultAsync(x => x.PublicId == request.PublicId); 
+
+        Guard.Against.NotFound(request.PublicId, entity); // Ensure SchoolItemDto has an Id property
+        entity.IsDeleted = false;
+        entity.DeletedAt = null;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+}
+

@@ -1,0 +1,103 @@
+using System.Net.Mail;
+using System.Threading;
+using admin_service.Application.Common.Interfaces;
+using admin_service.Application.Common.Models;
+using Microsoft.Extensions.Configuration;
+
+public interface IKeycloakOrganizationService
+{
+    Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken);
+    Task CreateAdmin(int userId);
+
+}
+
+public class KeycloakOrganizationService : IKeycloakOrganizationService
+{
+    private readonly IApplicationDbContext _dbContext;
+    private readonly KeycloakService _keycloakService;
+    private readonly ITokenService _tokenService;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
+
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, ITokenService tokenService, IEmailService emailService, IConfiguration configuration)
+    {
+        _dbContext = dbContext;
+        _keycloakService = keycloakService;
+        _tokenService = tokenService;
+        _emailService = emailService;
+        _configuration = configuration;
+    }
+    public async Task CreateAdmin(int userId)
+    {
+
+        var user = await _dbContext.Users.FindAsync(userId);
+        if (user == null) return;
+
+        try
+        {
+            var inviteRequest = new InviteUserRequestDto
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+
+            await _keycloakService.InviteUserAsync(inviteRequest);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
+   public async Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken)
+{
+    var school = await _dbContext.Schools
+        .Include(s => s.User)
+        .FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
+    if (school == null) 
+        return;
+
+    try
+    {
+        var organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
+        school.OrganizationId = organizationId;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        var payload = new Dictionary<string, object>
+        {
+            { "schoolId", school.Id },
+            { "schoolPublicId", school.PublicId },
+            { "organizationId", organizationId },
+            { "schoolName", school.SchoolName },
+            { "email", school.EmailAddress },
+            { "firstName", school.User.FirstName },
+            { "lastName",  school.User.LastName },
+            { "role",      school.User.Role.ToString() },
+            { "username",  school.User.Username },
+            { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
+        };
+
+        var token = _tokenService.GenerateToken(payload);
+        var message = new EmailMessage
+        {
+            Email       = school.EmailAddress,
+            Title       = "Your School Organization is Ready",
+            SchoolName  = school.SchoolName,
+            Description = "We've successfully onboarded your school to our platform. We’re excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we’re looking forward to growing with you.",
+            EmailButton = true,
+            ButtonLink  = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
+            ButtonText  = "Complete Your Setup"
+        };
+        await _emailService.SendEmailAsync(message);
+    }
+    catch (Exception ex)
+    {
+        // log the NRE or any other
+        Console.WriteLine($"[Error] CreateOrgForSchool failed: {ex}");
+        throw;
+    }
+}
+
+}
+
+

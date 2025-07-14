@@ -1,0 +1,18 @@
+using System;
+using admin_service.Application.Common.Interfaces;
+
+namespace admin_service.Application.SoftDelete.Commands.RestoreDeleteCommand;
+
+ public record RestoreEntityCommand<T>(T Entity) : IRequest where T : class, ISoftDelete;
+
+public class RestoreEntityCommandHandler<T>(IApplicationDbContext context) : IRequestHandler<RestoreEntityCommand<T>> where T : class, ISoftDelete
+    {
+        private readonly IApplicationDbContext _context = context;
+
+    public async Task Handle(RestoreEntityCommand<T> request, CancellationToken cancellationToken)
+        {
+            request.Entity.IsDeleted = false;
+            request.Entity.DeletedAt = null;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
