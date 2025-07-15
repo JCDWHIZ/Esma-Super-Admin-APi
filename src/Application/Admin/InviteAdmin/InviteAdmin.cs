@@ -3,76 +3,33 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using admin_service.Application.Admin.Queries;
-using admin_service.Application.Common.Exceptions;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Domain.Entities;
-using admin_service.Domain.Enums;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
+using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 
 
-namespace admin_service.Application.Admin.Commands.InviteAdmin;
+namespace Application.Admin.InviteAdmin;
 
-public class InviteAdminValidator : AbstractValidator<InviteUserCommand>
+public sealed class InviteUserCommandHandler(IApplicationDbContext _context) : ICommandHandler<InviteUserCommand, UserDto>
 {
-    public InviteAdminValidator()
+    async Task<Result<UserDto>> ICommandHandler<InviteUserCommand, UserDto>.Handle(InviteUserCommand command, CancellationToken cancellationToken)
     {
-        RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Invalid email format.");
+        User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 
-        RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("First name is required.");
-
-        RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Last name is required.");
-
-        RuleFor(x => x.Role)
-            .IsInEnum().WithMessage("Invalid role.");
-    }
-};
-
-
-
-public class InviteUserCommand : IRequest<UserDto>
-{
-    public string Email { get; set; } = string.Empty;
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public Roles Role { get; set; }
-}
-
-public class InviteUserCommandHandler : IRequestHandler<InviteUserCommand, UserDto>
-{
-    private readonly IApplicationDbContext _context;
-
-    private readonly IMapper _mapper;
-
-    public InviteUserCommandHandler(IApplicationDbContext context, IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-
-    }
-
-    public async Task<UserDto> Handle(InviteUserCommand request, CancellationToken cancellationToken)
-    {
-        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
-
-        if (existingUser != null)
+        if (existingUser is null)
         {
-            throw new AlreadyExistsException("User with this email already exists.");
+            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }
 
         var newUser = new User
         {
-            Email = request.Email,
-            Role = request.Role,
-            Username = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
+            Email = command.Email,
+            Role = command.Role,
+            Username = command.Email,
+            FirstName = command.FirstName,
+            LastName = command.LastName,
         };
 
         _context.Users.Add(newUser);
@@ -92,23 +49,23 @@ public class InviteUserCommandHandler : IRequestHandler<InviteUserCommand, UserD
     }
 }
 
-// public class InviteAdminRequestHandler(IApplicationDbContext context, IEmailService emailService, HttpClient httpClient, IConfiguration configuration) : IRequestHandler<InviteUserCommand, bool>
+// public class InviteAdmincommandHandler(IApplicationDbContext context, IEmailService emailService, HttpClient httpClient, IConfiguration configuration) : ICommandHandler<InviteUserCommand, bool>
 // {
 //     private readonly IApplicationDbContext _context = context;
 //     private readonly IEmailService _emailService = emailService;
 //     private readonly HttpClient _httpClient = httpClient;
 //     private readonly IConfiguration _configuration = configuration;
 
-//     async Task<bool> IRequestHandler<InviteUserCommand, bool>.Handle(InviteUserCommand request, CancellationToken cancellationToken)
+//     async Task<bool> ICommandHandler<InviteUserCommand, bool>.Handle(InviteUserCommand command, CancellationToken cancellationToken)
 // {
 //     var adminToken = await GetAdminTokenAsync();
 //     if(adminToken != null){
-//         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+//         _httpClient.DefaultcommandHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
 //         using var formData = new MultipartFormDataContent
 //     {
-//         { new StringContent(request.Email), "email" },
-//         { new StringContent(request.FirstName), "firstName" },
-//         { new StringContent(request.LastName), "lastName" }
+//         { new StringContent(command.Email), "email" },
+//         { new StringContent(command.FirstName), "firstName" },
+//         { new StringContent(command.LastName), "lastName" }
 //     };
 
 //     var keycloakUrl = $"{_configuration["Keycloak:BaseUrl"]}/admin/realms/{_configuration["Keycloak:Realm"]}/organizations/8de4abf4-46b6-4e48-82e8-ad0ed8e5e797/members/invite-user";
@@ -164,9 +121,9 @@ public class InviteUserCommandHandler : IRequestHandler<InviteUserCommand, UserD
 //     }
 
 
-// public async Task<UserDto> Handle(InviteUserCommand request, CancellationToken cancellationToken)
+// public async Task<UserDto> Handle(InviteUserCommand command, CancellationToken cancellationToken)
 // {
-// var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+// var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 // if (existingUser != null)
 // {
 //     throw new InvalidOperationException("User with this email already exists.");
@@ -174,10 +131,10 @@ public class InviteUserCommandHandler : IRequestHandler<InviteUserCommand, UserD
 
 // var newUser = new User
 // {
-//     Email = request.Email,
-//     Role = request.Role,
-//     FirstName = request.FirstName,
-//     LastName = request.LastName,
+//     Email = command.Email,
+//     Role = command.Role,
+//     FirstName = command.FirstName,
+//     LastName = command.LastName,
 // };
 
 // _context.Users.Add(newUser);

@@ -1,7 +1,7 @@
 using System;
 using admin_service.Application.Common.Interfaces;
 using admin_service.Application.Common.Mappings;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 using admin_service.Domain.Entities;
 using admin_service.Domain.Enums;
@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace admin_service.Application.School.Queries.GetSchoolsWithPagination;
 
 
-public record GetSchoolsWithPaginationQuery : IRequest<PaginatedList<SchoolItemDto>>
+public record GetSchoolsWithPaginationQuery : ICommand<PaginatedList<SchoolItemDto>>
 {
     public string? SchoolName { get; set; }
     public string? LogoUrl { get; set; }
@@ -29,7 +29,7 @@ public record GetSchoolsWithPaginationQuery : IRequest<PaginatedList<SchoolItemD
     public int? PageSize { get; set; } = 10;
 }
 
-public class GetShoolsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<GetSchoolsWithPaginationQuery,
+public class GetShoolsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper) : ICommandHandler<GetSchoolsWithPaginationQuery,
     PaginatedList<SchoolItemDto>>
 {
 
@@ -74,25 +74,25 @@ public class GetShoolsWithPaginationQueryHandler(IApplicationDbContext context, 
             query = query.Where(x => x.LogoUrl.Contains(request.LogoUrl));
         }
 
-         if (!string.IsNullOrEmpty(request.AddressCountry))
-            {
-                query = query.Where(x => x.Address.Country == request.AddressCountry);
-            }
+        if (!string.IsNullOrEmpty(request.AddressCountry))
+        {
+            query = query.Where(x => x.Address.Country == request.AddressCountry);
+        }
 
-            if (!string.IsNullOrEmpty(request.AddressState))
-            {
-                query = query.Where(x => x.Address.State == request.AddressState);
-            }
+        if (!string.IsNullOrEmpty(request.AddressState))
+        {
+            query = query.Where(x => x.Address.State == request.AddressState);
+        }
 
-            if (!string.IsNullOrEmpty(request.AddressLga))
-            {
-                query = query.Where(x => x.Address.LGA == request.AddressLga);
-            }
+        if (!string.IsNullOrEmpty(request.AddressLga))
+        {
+            query = query.Where(x => x.Address.LGA == request.AddressLga);
+        }
 
-            if (!string.IsNullOrEmpty(request.AddressStreetAddress))
-            {
-                query = query.Where(x => x.Address.StreetAddress == request.AddressStreetAddress);
-            }
+        if (!string.IsNullOrEmpty(request.AddressStreetAddress))
+        {
+            query = query.Where(x => x.Address.StreetAddress == request.AddressStreetAddress);
+        }
 
 
         if (request.Subscribed.HasValue)

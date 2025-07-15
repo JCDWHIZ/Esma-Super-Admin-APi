@@ -6,14 +6,14 @@ using admin_service.Domain.Entities;
 
 namespace admin_service.Application.HelpRequest.Commands.CreateHelpReqestMessage;
 
-public record AddHelpRequestMessageCommand : IRequest<HelpRequestMessageDto>
+public record AddHelpRequestMessageCommand : ICommand<HelpRequestMessageDto>
 {
     public int HelpRequestId { get; init; }
     public string Title { get; init; } = string.Empty;
-    public ICollection<string> Attachments { get; init; }= new List<string>();
+    public ICollection<string> Attachments { get; init; } = new List<string>();
 }
 
-public class AddHelpRequestMessageCommandHandler : IRequestHandler<AddHelpRequestMessageCommand, HelpRequestMessageDto>
+public class AddHelpRequestMessageCommandHandler : ICommandHandler<AddHelpRequestMessageCommand, HelpRequestMessageDto>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

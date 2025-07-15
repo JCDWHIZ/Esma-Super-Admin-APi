@@ -11,7 +11,7 @@ using MediatR;
 
 namespace admin_service.Application.BlogModule.Commands.EditBlog;
 
-public record EditBlogRequestCommand : IRequest<BlogItemDto>
+public record EditBlogRequestCommand : ICommand<BlogItemDto>
 {
     public string PublicId { get; init; } = string.Empty;
     public string Title { get; set; } = string.Empty;
@@ -21,7 +21,7 @@ public record EditBlogRequestCommand : IRequest<BlogItemDto>
     public DateTime? PublishDate { get; set; }
 }
 
-public class EditBlogRequestHandler : IRequestHandler<EditBlogRequestCommand, BlogItemDto>
+public class EditBlogRequestHandler : ICommandHandler<EditBlogRequestCommand, BlogItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -60,11 +60,12 @@ public class EditBlogRequestHandler : IRequestHandler<EditBlogRequestCommand, Bl
     {
         var blog = _dbContext.Blog.FirstOrDefault(x => x.Id == blogId);
         Guard.Against.NotFound(blogId, blog);
-        if (blog != null){
-        blog.Status = BlogStatus.PUBLISHED;
-        blog.PublishDate = DateTime.UtcNow;
+        if (blog != null)
+        {
+            blog.Status = BlogStatus.PUBLISHED;
+            blog.PublishDate = DateTime.UtcNow;
         }
-        
+
         await _dbContext.SaveChangesAsync(default);
     }
 }

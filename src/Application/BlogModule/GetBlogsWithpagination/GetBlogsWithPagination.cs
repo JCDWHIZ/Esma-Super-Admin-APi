@@ -1,6 +1,6 @@
 using System;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Domain.Enums;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -14,11 +14,11 @@ namespace admin_service.Application.BlogModule.Queries.GetBlogsWithpagination;
 
 
 
-public record GetBlogWithPaginationQuery : IRequest<PaginatedList<BlogItemDto>>
+public record GetBlogWithPaginationQuery : ICommand<PaginatedList<BlogItemDto>>
 {
     public string? Title { get; set; }
     public string? Content { get; set; }
-    public string? BackdropUrl {get; set;}
+    public string? BackdropUrl { get; set; }
     public BlogStatus? Status { get; set; }
     public DateTime? PublishDate { get; set; }
     public int? PageNumber { get; set; } = 1;
@@ -26,7 +26,7 @@ public record GetBlogWithPaginationQuery : IRequest<PaginatedList<BlogItemDto>>
 }
 
 
-public class GetBlogsWithPaginationQueryHandler : IRequestHandler<GetBlogWithPaginationQuery, PaginatedList<BlogItemDto>>
+public class GetBlogsWithPaginationQueryHandler : ICommandHandler<GetBlogWithPaginationQuery, PaginatedList<BlogItemDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -38,7 +38,7 @@ public class GetBlogsWithPaginationQueryHandler : IRequestHandler<GetBlogWithPag
     public Task<PaginatedList<BlogItemDto>> Handle(GetBlogWithPaginationQuery request, CancellationToken cancellationToken)
     {
         var query = _context.Blog.AsQueryable();
-         if (!string.IsNullOrEmpty(request.Title))
+        if (!string.IsNullOrEmpty(request.Title))
         {
             query = query.Where(b => b.Title.Contains(request.Title));
         }

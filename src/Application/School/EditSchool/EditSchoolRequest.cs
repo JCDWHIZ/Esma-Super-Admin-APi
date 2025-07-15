@@ -8,27 +8,27 @@ using admin_service.Domain.Enums;
 namespace admin_service.Application.School.Commands.EditSchool;
 
 
-public record IntiateEditSchoolRequestCommand: IRequest<SchoolItemDto>
+public record IntiateEditSchoolRequestCommand : ICommand<SchoolItemDto>
 {
     public string PublicId { get; init; } = string.Empty;
     [Required]
     public string SchoolName { get; init; } = string.Empty;
-    
+
     public string LogoUrl { get; init; } = string.Empty;
-    
+
     [Required]
     public AddressDto Address { get; init; } = new();
-    
+
     [EmailAddress]
     public string EmailAddress { get; init; } = string.Empty;
-    
+
     [Phone]
     public string PhoneNumber { get; init; } = string.Empty;
-    
+
     public List<string> DocumentUrl { get; init; } = new();
-    
+
     public List<Modules> Modules { get; init; } = new();
-    
+
     [Required]
     public SubscriptionDto Subscriptions { get; init; } = new();
 }
@@ -52,12 +52,12 @@ public record SubscriptionDto
 
 
 
-public class EditSchoolRequestCommandHandler : IRequestHandler<IntiateEditSchoolRequestCommand, SchoolItemDto>
+public class EditSchoolRequestCommandHandler : ICommandHandler<IntiateEditSchoolRequestCommand, SchoolItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
     private readonly IMapper _mapper;
-    public EditSchoolRequestCommandHandler(IApplicationDbContext dbContext,  IMapper mapper)
+    public EditSchoolRequestCommandHandler(IApplicationDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -65,12 +65,12 @@ public class EditSchoolRequestCommandHandler : IRequestHandler<IntiateEditSchool
 
     public async Task<SchoolItemDto> Handle(IntiateEditSchoolRequestCommand request, CancellationToken cancellationToken)
     {
-    var entity = await _dbContext.Schools
-            .Include(s => s.Subscriptions) // Explicitly include subscriptions
-            .FirstOrDefaultAsync(s => s.PublicId == request.PublicId, cancellationToken);
+        var entity = await _dbContext.Schools
+                .Include(s => s.Subscriptions) // Explicitly include subscriptions
+                .FirstOrDefaultAsync(s => s.PublicId == request.PublicId, cancellationToken);
 
         Guard.Against.NotFound(request.PublicId, entity);
-    
+
         entity.SchoolName = request.SchoolName;
         entity.LogoUrl = request.LogoUrl;
         entity.Address = new Address

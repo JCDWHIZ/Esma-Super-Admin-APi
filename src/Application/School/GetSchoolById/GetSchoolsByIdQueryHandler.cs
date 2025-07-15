@@ -5,8 +5,8 @@ using admin_service.Domain.Entities;
 namespace admin_service.Application.School.Queries.GetSchoolsWithById;
 
 
-public record GetSchoolByIdQuery(string PublicId) : IRequest<SchoolItemDto>;
-public class GetSchoolsWithByIdQueryHandler : IRequestHandler<GetSchoolByIdQuery, SchoolItemDto>
+public record GetSchoolByIdQuery(string PublicId) : ICommand<SchoolItemDto>;
+public class GetSchoolsWithByIdQueryHandler : ICommandHandler<GetSchoolByIdQuery, SchoolItemDto>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

@@ -1,13 +1,13 @@
 // using System;
 // using System.ComponentModel.DataAnnotations;
 // using admin_service.Application.Common.Interfaces;
-// using admin_service.Application.Common.Models;
+// using Application.Abstractions.Models;
 // using Microsoft.Extensions.Logging;
 
 // namespace admin_service.Application.Email;
 
 
-// public record InitiateEmailCommand : IRequest<EmailRequestDto>
+// public record InitiateEmailCommand : ICommand<EmailRequestDto>
 // {
 //     public required string Email { get; set; }
 
@@ -34,7 +34,7 @@
 //         public bool EmailButton { get; set; }
 //     }
 
-// public class InitiateEmailRequestHandler(IEmailService emailService, ILogger logger) : IRequestHandler<InitiateEmailCommand>
+// public class InitiateEmailRequestHandler(IEmailService emailService, ILogger logger) : ICommandHandler<InitiateEmailCommand>
 // {
 //     private readonly IEmailService _emailService = emailService;
 //     private readonly ILogger _logger = logger;
@@ -63,11 +63,11 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 
 namespace admin_service.Application.Email
 {
-    public record InitiateEmailCommand : IRequest<EmailRequestDto>
+    public record InitiateEmailCommand : ICommand<EmailRequestDto>
     {
         public required string Email { get; init; }
         public required string SchoolName { get; init; }
@@ -90,7 +90,7 @@ namespace admin_service.Application.Email
     }
 
     public class InitiateEmailRequestHandler
-        : IRequestHandler<InitiateEmailCommand, EmailRequestDto>
+        : ICommandHandler<InitiateEmailCommand, EmailRequestDto>
     {
         private readonly IEmailService _emailService;
         private readonly ILogger<InitiateEmailRequestHandler> _logger;

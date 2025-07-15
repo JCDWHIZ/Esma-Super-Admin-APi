@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Text.Json;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 
 namespace admin_service.Infrastructure.Services;
 
@@ -12,7 +12,7 @@ public class EmailServices(HttpClient httpClient) : IEmailService
 
     public async Task SendEmailAsync(string recipient, string subject, string body)
     {
-        var payload = new 
+        var payload = new
         {
             to = recipient,
             subject = subject,

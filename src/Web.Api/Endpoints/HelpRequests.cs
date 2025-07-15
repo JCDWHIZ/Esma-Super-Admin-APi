@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Application.HelpRequest.Commands.CreateHelpReqestMessage;
 using admin_service.Application.HelpRequest.Commands.CreateHelpRequest;
 using admin_service.Application.HelpRequest.Commands.UpdateHelpRequestStatus;

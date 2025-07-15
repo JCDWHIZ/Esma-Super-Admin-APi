@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 
 namespace admin_service.Web.Middleware;
 

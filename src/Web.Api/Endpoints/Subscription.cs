@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Application.Email;
 using admin_service.Application.Subscription.Queries;
 using admin_service.Application.Subscription.Queries.GetSubscriptionStats;

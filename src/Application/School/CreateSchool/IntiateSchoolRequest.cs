@@ -7,7 +7,7 @@ using admin_service.Domain.Enums;
 
 namespace Microsoft.Extensions.DependencyInjection.School.Commands;
 
-public record InitiateSchoolRequestCommand : IRequest<SchoolItemDto>
+public record InitiateSchoolRequestCommand : ICommand<SchoolItemDto>
 {
     [Required]
     public string SchoolName { get; init; } = string.Empty;
@@ -61,7 +61,7 @@ public record SubscriptionDto
 }
 
 
-public class InitiateSchoolRequestHandler : IRequestHandler<InitiateSchoolRequestCommand, SchoolItemDto>
+public class InitiateSchoolRequestHandler : ICommandHandler<InitiateSchoolRequestCommand, SchoolItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly KeycloakService _keycloakService;
@@ -129,7 +129,7 @@ public class InitiateSchoolRequestHandler : IRequestHandler<InitiateSchoolReques
         return _mapper.Map<SchoolItemDto>(schoolEntity);
     }
 
-    // async Task<SchoolItemDto> IRequestHandler<IntiateSchoolRequestCommand, SchoolItemDto>.Handle(IntiateSchoolRequestCommand request, CancellationToken cancellationToken)
+    // async Task<SchoolItemDto> ICommandHandler<IntiateSchoolRequestCommand, SchoolItemDto>.Handle(IntiateSchoolRequestCommand request, CancellationToken cancellationToken)
     // {
     //     var entity = new Schools {
     //         SchoolName = request.SchoolName,

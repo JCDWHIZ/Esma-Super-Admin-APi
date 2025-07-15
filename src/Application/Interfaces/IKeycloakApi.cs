@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Refit;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using admin_service.Application.Admin.Commands.InviteAdmin;
+using Application.Admin.InviteAdmin;
 
 public interface IKeycloakApi
 {

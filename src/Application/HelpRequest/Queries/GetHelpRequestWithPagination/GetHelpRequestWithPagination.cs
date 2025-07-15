@@ -1,7 +1,7 @@
 using System;
 using admin_service.Application.Common.Interfaces;
 using admin_service.Application.Common.Mappings;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Domain.Entities;
 using admin_service.Domain.Enums;
 using AutoMapper;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace admin_service.Application.HelpRequest.Queries.GetHelpRequestWithPagination;
 
-public record GetHelpRequestWithPaginationQuery : IRequest<PaginatedList<HelpRequestItemDto>>
+public record GetHelpRequestWithPaginationQuery : ICommand<PaginatedList<HelpRequestItemDto>>
 {
     public string? TicketId { get; set; }
     public HelpStatus? Status { get; set; }
@@ -19,7 +19,7 @@ public record GetHelpRequestWithPaginationQuery : IRequest<PaginatedList<HelpReq
     public int? PageSize { get; set; } = 10;
 }
 
-public class GetHelpRequestWithPaginationQueryHandler : IRequestHandler<GetHelpRequestWithPaginationQuery, PaginatedList<HelpRequestItemDto>>
+public class GetHelpRequestWithPaginationQueryHandler : ICommandHandler<GetHelpRequestWithPaginationQuery, PaginatedList<HelpRequestItemDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

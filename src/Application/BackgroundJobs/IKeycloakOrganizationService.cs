@@ -1,7 +1,7 @@
 using System.Net.Mail;
 using System.Threading;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using Microsoft.Extensions.Configuration;
 
 public interface IKeycloakOrganizationService
@@ -31,7 +31,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     {
 
         var user = await _dbContext.Users.FindAsync(userId);
-        if (user == null) return;
+        if (user == null)
+            return;
 
         try
         {
@@ -50,20 +51,20 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
     }
 
-   public async Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken)
-{
-    var school = await _dbContext.Schools
-        .Include(s => s.User)
-        .FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
-    if (school == null) 
-        return;
-
-    try
+    public async Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken)
     {
-        var organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
-        school.OrganizationId = organizationId;
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        var payload = new Dictionary<string, object>
+        var school = await _dbContext.Schools
+            .Include(s => s.User)
+            .FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
+        if (school == null)
+            return;
+
+        try
+        {
+            var organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
+            school.OrganizationId = organizationId;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            var payload = new Dictionary<string, object>
         {
             { "schoolId", school.Id },
             { "schoolPublicId", school.PublicId },
@@ -77,26 +78,26 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
         };
 
-        var token = _tokenService.GenerateToken(payload);
-        var message = new EmailMessage
+            var token = _tokenService.GenerateToken(payload);
+            var message = new EmailMessage
+            {
+                Email = school.EmailAddress,
+                Title = "Your School Organization is Ready",
+                SchoolName = school.SchoolName,
+                Description = "We've successfully onboarded your school to our platform. We’re excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we’re looking forward to growing with you.",
+                EmailButton = true,
+                ButtonLink = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
+                ButtonText = "Complete Your Setup"
+            };
+            await _emailService.SendEmailAsync(message);
+        }
+        catch (Exception ex)
         {
-            Email       = school.EmailAddress,
-            Title       = "Your School Organization is Ready",
-            SchoolName  = school.SchoolName,
-            Description = "We've successfully onboarded your school to our platform. We’re excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we’re looking forward to growing with you.",
-            EmailButton = true,
-            ButtonLink  = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
-            ButtonText  = "Complete Your Setup"
-        };
-        await _emailService.SendEmailAsync(message);
+            // log the NRE or any other
+            Console.WriteLine($"[Error] CreateOrgForSchool failed: {ex}");
+            throw;
+        }
     }
-    catch (Exception ex)
-    {
-        // log the NRE or any other
-        Console.WriteLine($"[Error] CreateOrgForSchool failed: {ex}");
-        throw;
-    }
-}
 
 }
 

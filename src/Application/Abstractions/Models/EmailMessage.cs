@@ -1,6 +1,6 @@
 using System;
 
-namespace admin_service.Application.Common.Models;
+namespace Application.Abstractions.Models;
 
 public class EmailMessage
 {

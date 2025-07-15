@@ -7,7 +7,7 @@ using admin_service.Domain.Enums;
 namespace admin_service.Application.HelpRequest.Commands.CreateHelpRequest;
 
 
-public record IntiateHelpRequestCommand: IRequest<HelpRequestItemDto>
+public record IntiateHelpRequestCommand : ICommand<HelpRequestItemDto>
 {
     public string? TicketId { get; set; } = Math.Abs(Guid.NewGuid().GetHashCode()).ToString();
     public HelpStatus Status { get; set; } = HelpStatus.OPEN_REQUEST;
@@ -15,18 +15,18 @@ public record IntiateHelpRequestCommand: IRequest<HelpRequestItemDto>
 }
 
 
-public class CreateHelpRequestHandler : IRequestHandler<IntiateHelpRequestCommand, HelpRequestItemDto>
+public class CreateHelpRequestHandler : ICommandHandler<IntiateHelpRequestCommand, HelpRequestItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
     private readonly IMapper _mapper;
-    public CreateHelpRequestHandler(IApplicationDbContext dbContext,  IMapper mapper)
+    public CreateHelpRequestHandler(IApplicationDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
 
-    async Task<HelpRequestItemDto> IRequestHandler<IntiateHelpRequestCommand, HelpRequestItemDto>.Handle(IntiateHelpRequestCommand request, CancellationToken cancellationToken)
+    async Task<HelpRequestItemDto> ICommandHandler<IntiateHelpRequestCommand, HelpRequestItemDto>.Handle(IntiateHelpRequestCommand request, CancellationToken cancellationToken)
     {
         var entity = new HelpRequests
         {
@@ -34,8 +34,8 @@ public class CreateHelpRequestHandler : IRequestHandler<IntiateHelpRequestComman
             Category = request.Category,
             Status = request.Status,
         };
-    _dbContext.HelpRequests.Add(entity);
-    await _dbContext.SaveChangesAsync(cancellationToken);
-    return _mapper.Map<HelpRequestItemDto>(entity);
+        _dbContext.HelpRequests.Add(entity);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _mapper.Map<HelpRequestItemDto>(entity);
     }
 }

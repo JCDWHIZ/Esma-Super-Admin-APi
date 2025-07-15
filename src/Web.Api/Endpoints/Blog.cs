@@ -7,7 +7,7 @@ using admin_service.Application.BlogModule.Commands.DeleteCommand;
 using admin_service.Application.BlogModule.Commands.EditBlog;
 using admin_service.Application.BlogModule.Queries.GetBlogById;
 using admin_service.Application.BlogModule.Queries.GetBlogsWithpagination;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Domain.Constants;
 using admin_service.Web.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -91,7 +91,7 @@ public class Blog : EndpointGroupBase
 
         return TypedResults.Ok();
     }
-    
+
     public async Task<Ok<BlogItemDto>> GetBlogById(
         ISender sender,
         string publicId
@@ -109,7 +109,7 @@ public class Blog : EndpointGroupBase
         return TypedResults.Ok(result);
     }
     [Authorize(Policy = "CanDeleteBlog")]
-    public async Task<Results<Ok, NotFound>>  DeleteBlogById(
+    public async Task<Results<Ok, NotFound>> DeleteBlogById(
     ISender sender,
     string publicId
     )

@@ -6,19 +6,19 @@ using admin_service.Domain.Enums;
 
 namespace admin_service.Application.BlogModule.Commands.CreateBlog;
 
-public record IntiateBlogDraftRequestCommand: IRequest<BlogItemDto>
+public record IntiateBlogDraftRequestCommand : ICommand<BlogItemDto>
 {
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public string BackdropUrl {get; set;} = string.Empty;
+    public string BackdropUrl { get; set; } = string.Empty;
     public BlogStatus Status { get; set; } = BlogStatus.DRAFT;
 }
 
-public class InitiateBlogDraftReqeuest : IRequestHandler<IntiateBlogDraftRequestCommand, BlogItemDto>
+public class InitiateBlogDraftReqeuest : ICommandHandler<IntiateBlogDraftRequestCommand, BlogItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
-    public InitiateBlogDraftReqeuest(IApplicationDbContext dbContext,  IMapper mapper)
+    public InitiateBlogDraftReqeuest(IApplicationDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -33,7 +33,7 @@ public class InitiateBlogDraftReqeuest : IRequestHandler<IntiateBlogDraftRequest
             BackdropUrl = request.BackdropUrl,
             Status = BlogStatus.DRAFT,
         };
-        if(_dbContext.Blog.Any(x => x.Title == request.Title))
+        if (_dbContext.Blog.Any(x => x.Title == request.Title))
         {
             throw new AlreadyExistsException("Title already exists");
         }

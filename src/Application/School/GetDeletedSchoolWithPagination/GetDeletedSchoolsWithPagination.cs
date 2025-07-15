@@ -2,7 +2,7 @@ using System;
 using System;
 using admin_service.Application.Common.Interfaces;
 using admin_service.Application.Common.Mappings;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 using admin_service.Domain.Entities;
 using admin_service.Domain.Enums;
@@ -12,30 +12,30 @@ using admin_service.Domain.Enums;
 
 namespace admin_service.Application.School.Queries.GetDeletedSchoolWithPagination;
 
-public record GetDeletedSchoolsWithPagination: IRequest<PaginatedList<SchoolItemDto>> 
+public record GetDeletedSchoolsWithPagination : ICommand<PaginatedList<SchoolItemDto>>
 {
-    public string? SchoolName { get; set; } 
-    public string? LogoUrl { get; set; } 
+    public string? SchoolName { get; set; }
+    public string? LogoUrl { get; set; }
     public string? AddressCountry { get; set; }
     public string? AddressState { get; set; }
     public string? AddressLga { get; set; }
     public string? AddressStreetAddress { get; set; }
     public string? EmailAddress { get; set; }
-    public bool? Subscribed { get; set; } 
+    public bool? Subscribed { get; set; }
     public SchoolStatus? Status { get; set; }
     public string? PhoneNumber { get; set; }
     // public ICollection<string> DocumentUrl { get; set; } 
     // public ICollection<Modules> Modules { get; set; } 
     public SubscriptionType? SubscriptionType { get; set; }
-    public int? PageNumber { get; set; }= 1;
+    public int? PageNumber { get; set; } = 1;
     public int? PageSize { get; set; } = 10;
 }
 
 
-public class GetDeletedSchoolsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<GetDeletedSchoolsWithPagination,
+public class GetDeletedSchoolsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper) : ICommandHandler<GetDeletedSchoolsWithPagination,
     PaginatedList<SchoolItemDto>>
 {
-     private readonly IApplicationDbContext _context = context;
+    private readonly IApplicationDbContext _context = context;
     private readonly IMapper _mapper = mapper;
 
 
@@ -63,25 +63,25 @@ public class GetDeletedSchoolsWithPaginationQueryHandler(IApplicationDbContext c
             query = query.Where(x => x.LogoUrl.Contains(request.LogoUrl));
         }
 
-         if (!string.IsNullOrEmpty(request.AddressCountry))
-            {
-                query = query.Where(x => x.Address.Country == request.AddressCountry);
-            }
+        if (!string.IsNullOrEmpty(request.AddressCountry))
+        {
+            query = query.Where(x => x.Address.Country == request.AddressCountry);
+        }
 
-            if (!string.IsNullOrEmpty(request.AddressState))
-            {
-                query = query.Where(x => x.Address.State == request.AddressState);
-            }
+        if (!string.IsNullOrEmpty(request.AddressState))
+        {
+            query = query.Where(x => x.Address.State == request.AddressState);
+        }
 
-            if (!string.IsNullOrEmpty(request.AddressLga))
-            {
-                query = query.Where(x => x.Address.LGA == request.AddressLga);
-            }
+        if (!string.IsNullOrEmpty(request.AddressLga))
+        {
+            query = query.Where(x => x.Address.LGA == request.AddressLga);
+        }
 
-            if (!string.IsNullOrEmpty(request.AddressStreetAddress))
-            {
-                query = query.Where(x => x.Address.StreetAddress == request.AddressStreetAddress);
-            }
+        if (!string.IsNullOrEmpty(request.AddressStreetAddress))
+        {
+            query = query.Where(x => x.Address.StreetAddress == request.AddressStreetAddress);
+        }
 
 
         if (request.Subscribed.HasValue)

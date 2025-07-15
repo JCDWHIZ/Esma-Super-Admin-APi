@@ -1,4 +1,4 @@
-﻿using admin_service.Application.Common.Models;
+﻿using Application.Abstractions.Models;
 using admin_service.Application.TodoItems.Commands.CreateTodoItem;
 using admin_service.Application.TodoItems.Commands.DeleteTodoItem;
 using admin_service.Application.TodoItems.Commands.UpdateTodoItem;
@@ -50,7 +50,8 @@ public class TodoItems : EndpointGroupBase
     public async Task<Results<NoContent, BadRequest>> UpdateTodoItem(ISender sender, int id,
         UpdateTodoItemCommand command)
     {
-        if (id != command.Id) return TypedResults.BadRequest();
+        if (id != command.Id)
+            return TypedResults.BadRequest();
 
         await sender.Send(command);
 
@@ -60,7 +61,8 @@ public class TodoItems : EndpointGroupBase
     public async Task<Results<NoContent, BadRequest>> UpdateTodoItemDetail(ISender sender, int id,
         UpdateTodoItemDetailCommand command)
     {
-        if (id != command.Id) return TypedResults.BadRequest();
+        if (id != command.Id)
+            return TypedResults.BadRequest();
 
         await sender.Send(command);
 

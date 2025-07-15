@@ -4,12 +4,12 @@ using admin_service.Application.Common.Interfaces;
 
 namespace admin_service.Application.School.Queries.GetSchoolStats;
 
-public record GetSchoolStatsQuery : IRequest<SchoolStatsCountDto>;
+public record GetSchoolStatsQuery : ICommand<SchoolStatsCountDto>;
 
-public class GetSchoolStatsQueryHandler : IRequestHandler<GetSchoolStatsQuery, SchoolStatsCountDto>
+public class GetSchoolStatsQueryHandler : ICommandHandler<GetSchoolStatsQuery, SchoolStatsCountDto>
 {
-  private readonly IApplicationDbContext _context;
-  
+    private readonly IApplicationDbContext _context;
+
     public GetSchoolStatsQueryHandler(IApplicationDbContext context)
     {
         _context = context;
@@ -18,7 +18,7 @@ public class GetSchoolStatsQueryHandler : IRequestHandler<GetSchoolStatsQuery, S
     public async Task<SchoolStatsCountDto> Handle(GetSchoolStatsQuery request, CancellationToken cancellationToken)
     {
         var schoolStats = await _context.Schools
-            .GroupBy(_ => true) 
+            .GroupBy(_ => true)
             .Select(g => new SchoolStatsCountDto
             {
                 TotalSchools = g.Count(),

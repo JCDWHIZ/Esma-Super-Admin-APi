@@ -1,6 +1,6 @@
 using System;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using admin_service.Application.School.Commands.ApproveSchool;
 using admin_service.Application.School.Commands.DeleteSchool;
 using admin_service.Application.School.Commands.EditSchool;
@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.School.Commands;
 
 namespace admin_service.Web.Endpoints;
+
 public class Schools : EndpointGroupBase
 {
     public override void Map(WebApplication app)
@@ -50,7 +51,8 @@ public class Schools : EndpointGroupBase
         int id,
         ApproveSchoolCommand command)
     {
-        if (id != command.Id) return TypedResults.BadRequest();
+        if (id != command.Id)
+            return TypedResults.BadRequest();
         await sender.Send(command);
         return TypedResults.Ok();
     }
@@ -68,7 +70,8 @@ public class Schools : EndpointGroupBase
         string publicId,
         [FromBody] IntiateEditSchoolRequestCommand command)
     {
-        if (publicId != command.PublicId) return TypedResults.BadRequest();
+        if (publicId != command.PublicId)
+            return TypedResults.BadRequest();
         await sender.Send(command);
         return TypedResults.Ok();
     }

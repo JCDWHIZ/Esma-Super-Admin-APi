@@ -4,12 +4,13 @@ using admin_service.Application.Common.Interfaces;
 using admin_service.Domain.Enums;
 
 namespace admin_service.Application.BlogModule.Commands.CreateCommands.PublishBlog;
-    public class InitiateBlogPublish : IRequest
-    {
-        public string PublicId { get; set; } = string.Empty;
-    }
 
-public class InitiateBlogPublishHandler : IRequestHandler<InitiateBlogPublish>
+public class InitiateBlogPublish : ICommand
+{
+    public string PublicId { get; set; } = string.Empty;
+}
+
+public class InitiateBlogPublishHandler : ICommandHandler<InitiateBlogPublish>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -22,13 +23,14 @@ public class InitiateBlogPublishHandler : IRequestHandler<InitiateBlogPublish>
     {
         var blog = _dbContext.Blog.FirstOrDefault(x => x.PublicId == request.PublicId);
         Guard.Against.NotFound(request.PublicId, blog);
-        if (blog != null){    
-        blog.Status = BlogStatus.PUBLISHED;
-        blog.PublishDate = DateTime.UtcNow;
+        if (blog != null)
+        {
+            blog.Status = BlogStatus.PUBLISHED;
+            blog.PublishDate = DateTime.UtcNow;
         }
         await _dbContext.SaveChangesAsync(default);
 
         // return blog.PublicId;
     }
-    
+
 }

@@ -5,8 +5,8 @@ using admin_service.Domain.Entities;
 namespace admin_service.Application.BlogModule.Queries.GetBlogById;
 
 
-public record GetBlogByIdQuery(string PublicId) : IRequest<BlogItemDto>;
-public class GetBlogByIdQueryHandler : IRequestHandler<GetBlogByIdQuery, BlogItemDto>
+public record GetBlogByIdQuery(string PublicId) : ICommand<BlogItemDto>;
+public class GetBlogByIdQueryHandler : ICommandHandler<GetBlogByIdQuery, BlogItemDto>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

@@ -15,9 +15,9 @@ public class ApproveSchoolCommandValidator : AbstractValidator<ApproveSchoolComm
 }
 
 
-public record ApproveSchoolCommand(int Id) : IRequest;
+public record ApproveSchoolCommand(int Id) : ICommand;
 
-public class ApproveSchoolHandler(IApplicationDbContext context) : IRequestHandler<ApproveSchoolCommand>
+public class ApproveSchoolHandler(IApplicationDbContext context) : ICommandHandler<ApproveSchoolCommand>
 {
     private readonly IApplicationDbContext _context = context;
 
@@ -36,7 +36,7 @@ public class ApproveSchoolHandler(IApplicationDbContext context) : IRequestHandl
 }
 
 
-// Task<int> IRequestHandler<ApproveSchoolCommand, int>.Handle(ApproveSchoolCommand request, CancellationToken cancellationToken)
+// Task<int> ICommandHandler<ApproveSchoolCommand, int>.Handle(ApproveSchoolCommand request, CancellationToken cancellationToken)
 // {
 //      var entity = _context.Schools.Find(request.Id);
 //      Guard.Against.NotFound(request.Id, entity);

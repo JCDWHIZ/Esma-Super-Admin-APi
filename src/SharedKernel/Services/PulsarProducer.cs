@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Text.Json;
 using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Common.Models;
+using Application.Abstractions.Models;
 using DotPulsar;
 using DotPulsar.Abstractions;
 using DotPulsar.Extensions;

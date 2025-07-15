@@ -1,6 +1,9 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
@@ -28,6 +31,7 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddHealthChecks(configuration)
             .AddAuthenticationInternal(configuration)
+            .AddConfiguration(configuration)
             .AddAuthorizationInternal();
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -35,6 +39,100 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
+
+        services.AddSingleton<ITokenService, TokenService>();
+
+        services.AddTransient<IClaimsTransformation, KeycloakRoleClaimsTransformer>();
+
+        services.AddSingleton<IMessageProducer, PulsarProducer>();
+
+        // Register application services
+        services.AddScoped<IEmailService, EmailService>();
+
+        // services.AddIdentityCore<ApplicationUser>()
+        //     .AddRoles<IdentityRole>()
+        //     .AddEntityFrameworkStores<ApplicationDbContext>()
+        //     .AddApiEndpoints();
+
+
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<IExportService, ExportService>();
+        services.AddScoped<IExportStrategy>(sp =>
+    new DynamicExportStrategy<User>(
+        sp.GetRequiredService<IGenericRepository<User>>(),
+        AdminModule.USER
+    )
+);
+
+        services.AddScoped<IExportStrategy>(sp =>
+            new DynamicExportStrategy<Schools>(
+                sp.GetRequiredService<IGenericRepository<Schools>>(),
+                AdminModule.SCHOOL
+            )
+        );
+
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+        services.AddSingleton(TimeProvider.System);
+        services.AddTransient<IIdentityService, IdentityService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+
+        // builder.Services.AddHttpClient<IEmailService, EmailServices>();
+        services.AddRefitClient<IKeycloakApi>()
+        .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["Keycloak:BaseUrl"]!));
+        services.AddScoped<IKeycloakOrganizationService, KeycloakOrganizationService>();
+        services.AddScoped<KeycloakService>();
+        services.AddSingleton<IPulsarClient>(provider =>
+            {
+                var config = provider.GetRequiredService<IConfiguration>();
+                var serviceUrl = config["Pulsar:ServiceUrl"] ?? "pulsar://localhost:6650";
+                return PulsarClient.Builder()
+                .ServiceUrl(new Uri(serviceUrl))
+                .Build();
+            });
+
+        services.Configure<PulsarSettings>(
+        builder.Configuration.GetSection("Pulsar"));
+
+        // Register Pulsar client as a singleton
+        builder.Services.AddSingleton<IPulsarClient>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var pulsarSettings = configuration.GetSection("Pulsar").Get<PulsarSettings>();
+
+            if (pulsarSettings == null || string.IsNullOrEmpty(pulsarSettings.ServiceUrl))
+            {
+                throw new InvalidOperationException("Pulsar ServiceUrl is not configured.");
+            }
+
+            var pulsarBuilder = PulsarClient.Builder()
+                .ServiceUrl(new Uri(pulsarSettings.ServiceUrl));
+
+            // Configure TLS if enabled
+            // if (pulsarSettings.UseTls && !string.IsNullOrEmpty(pulsarSettings.TlsCertificatePath))
+            // {
+            //     pulsarBuilder.VerifyCertificateAuthority(pulsarOptions =>
+            //     {
+            //         pulsarOptions.TrustCertificateFilePath = pulsarSettings.TlsCertificatePath;
+            //     });
+            // }
+
+            return pulsarBuilder.Build();
+        });
+
+        services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(configuration.GetConnectionString("Database"))));
+        services.AddHangfireServer();
 
         return services;
     }
@@ -60,6 +158,8 @@ public static class DependencyInjection
             .AddHealthChecks()
             .AddNpgSql(configuration.GetConnectionString("Database")!);
 
+        services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
         return services;
     }
 
@@ -67,18 +167,59 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(o =>
+        // services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //     .AddJwtBearer(o =>
+        //     {
+        //         o.RequireHttpsMetadata = false;
+        //         o.TokenValidationParameters = new TokenValidationParameters
+        //         {
+        //             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
+        //             ValidIssuer = configuration["Jwt:Issuer"],
+        //             ValidAudience = configuration["Jwt:Audience"],
+        //             ClockSkew = TimeSpan.Zero
+        //         };
+        //     });
+
+        services.AddAuthentication(options =>
             {
-                o.RequireHttpsMetadata = false;
-                o.TokenValidationParameters = new TokenValidationParameters
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = configuration["Keycloak:Authority"];
+                options.Audience = configuration.GetSection("Keycloak:Audiences").GetChildren().FirstOrDefault()?.Value
+                      ?? configuration["Keycloak:ClientId"];
+
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    ClockSkew = TimeSpan.Zero
+                    ValidateIssuer = true,
+                    ValidIssuer = configuration["Keycloak:Authority"],
+                    // ValidateAudience = false,
+                    ValidAudiences = [configuration["Keycloak:ClientId"], "account"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(1)
                 };
+
+                options.Events = new JwtBearerEvents()
+                {
+                    OnTokenValidated = OnTokenValidatedHandler
+                };
+
             });
+
+        services.AddAuthorization(options =>
+        {
+            // options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+            // options.AddPolicy("ManagerOnly", policy => policy.RequireRole("Manager"));
+            // options.AddPolicy("CanCreateBlog", policy => policy.RequireRole("CreateBlog"));
+            // options.AddPolicy("CanDelteBlog", policy => policy.RequireRole("DeleteBlog"));
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+            options.AddPolicy("ManagerOnly", policy => policy.RequireRole("MANAGER"));
+            options.AddPolicy("CanCreateBlog", policy => policy.RequireRole("CREATE_BLOG"));
+            options.AddPolicy("CanDeleteBlog", policy => policy.RequireRole("DELETE_BLOG"));
+        });
 
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
@@ -137,5 +278,21 @@ public static class DependencyInjection
         {
             return Task.CompletedTask;
         }
+    }
+
+    private static Task OnTokenValidatedHandler(TokenValidatedContext context)
+    {
+
+        if (context.Principal == null || !context.Principal.Identities.Any(identity => identity.IsAuthenticated))
+        {
+            return Task.CompletedTask;
+        }
+        else
+        {
+            var claims = context.Principal.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+            Console.WriteLine("Claims: " + string.Join(", ", claims));
+        }
+
+        return Task.CompletedTask;
     }
 }

@@ -1,4 +1,4 @@
-﻿using admin_service.Application.Common.Models;
+﻿using Application.Abstractions.Models;
 
 namespace admin_service.Application.Common.Interfaces;
 

@@ -217,13 +217,13 @@
 //         {
 //             [JsonPropertyName("access_token")]
 //             public string? AccessToken { get; set; }
-            
+
 //             [JsonPropertyName("expires_in")]
 //             public int ExpiresIn { get; set; }
-            
+
 //             [JsonPropertyName("refresh_token")]
 //             public string? RefreshToken { get; set; }
-            
+
 //             [JsonPropertyName("token_type")]
 //             public string? TokenType { get; set; }
 //         }
@@ -342,7 +342,7 @@
 
 //         var jsonResponse = await response.Content.ReadAsStringAsync();
 //         using var doc = JsonDocument.Parse(jsonResponse);
-        
+
 //         var accessToken = doc.RootElement.GetProperty("access_token").GetString();
 
 //         return accessToken ?? throw new Exception("Access token not found in response.");
@@ -377,76 +377,76 @@
 // }
 
 
-    // public class KeycloakService : admin_service.Application.Common.Interfaces.IKeycloakService
-    // {
-    //     private readonly HttpClient _httpClient;
-    //     private readonly IConfiguration _configuration;
+// public class KeycloakService : admin_service.Application.Common.Interfaces.IKeycloakService
+// {
+//     private readonly HttpClient _httpClient;
+//     private readonly IConfiguration _configuration;
 
-    //     public KeycloakService(HttpClient httpClient, IConfiguration configuration)
-    //     {
-    //         _httpClient = httpClient;
-    //         _configuration = configuration;
-    //     }
+//     public KeycloakService(HttpClient httpClient, IConfiguration configuration)
+//     {
+//         _httpClient = httpClient;
+//         _configuration = configuration;
+//     }
 
-    //     // public async Task<bool> CreateUserAsync(InviteUserRequest request)
-    //     // {
-            
-    //     // }
+//     // public async Task<bool> CreateUserAsync(InviteUserRequest request)
+//     // {
 
-    // public async Task<bool> CreateUserAsync(admin_service.Application.Common.Interfaces.InviteUserRequest request)
-    // {
-    //     var adminToken = await GetAdminTokenAsync();
-    //         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+//     // }
 
-    //         var keycloakUser = new
-    //         {
-    //             username = request.Email,
-    //             email = request.Email,
-    //             enabled = true,
-    //             firstName = request.FirstName,
-    //             lastName = request.LastName
-    //         };
+// public async Task<bool> CreateUserAsync(admin_service.Application.Common.Interfaces.InviteUserRequest request)
+// {
+//     var adminToken = await GetAdminTokenAsync();
+//         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
 
-    //         var keycloakUrl = $"{_configuration["Keycloak:BaseUrl"]}/admin/realms/{_configuration["Keycloak:Realm"]}/users";
-    //         var response = await _httpClient.PostAsJsonAsync(keycloakUrl, keycloakUser);
-    //         return response.IsSuccessStatusCode;
-    // }
+//         var keycloakUser = new
+//         {
+//             username = request.Email,
+//             email = request.Email,
+//             enabled = true,
+//             firstName = request.FirstName,
+//             lastName = request.LastName
+//         };
 
-    // private async Task<string?> GetAdminTokenAsync()
-    //     {
-    //         var tokenEndpoint = $"{_configuration["Keycloak:BaseUrl"]}/realms/{_configuration["Keycloak:Realm"]}/protocol/openid-connect/token";
-    //         var clientId = _configuration["Keycloak:ClientId"]!;
-    //         var clientSecret = _configuration["Keycloak:ClientSecret"]!;
+//         var keycloakUrl = $"{_configuration["Keycloak:BaseUrl"]}/admin/realms/{_configuration["Keycloak:Realm"]}/users";
+//         var response = await _httpClient.PostAsJsonAsync(keycloakUrl, keycloakUser);
+//         return response.IsSuccessStatusCode;
+// }
 
-    //         var parameters = new Dictionary<string, string>
-    //         {
-    //             { "client_id", clientId },
-    //             { "client_secret", clientSecret },
-    //             { "grant_type", "client_credentials" }
-    //         };
+// private async Task<string?> GetAdminTokenAsync()
+//     {
+//         var tokenEndpoint = $"{_configuration["Keycloak:BaseUrl"]}/realms/{_configuration["Keycloak:Realm"]}/protocol/openid-connect/token";
+//         var clientId = _configuration["Keycloak:ClientId"]!;
+//         var clientSecret = _configuration["Keycloak:ClientSecret"]!;
 
-    //         var response = await _httpClient.PostAsync(tokenEndpoint, new FormUrlEncodedContent(parameters));
-    //         if(response.IsSuccessStatusCode)
-    //         {
-    //             var json = await response.Content.ReadAsStringAsync();
-    //             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(json);
-    //             return tokenResponse?.AccessToken;
-    //         }
-    //         throw new Exception("Unable to retrieve Keycloak admin token.");
-    //     }
-    // }
+//         var parameters = new Dictionary<string, string>
+//         {
+//             { "client_id", clientId },
+//             { "client_secret", clientSecret },
+//             { "grant_type", "client_credentials" }
+//         };
 
-    // //     public class InviteUserRequest
-    // // {
-    // //     public string? Email { get; set; }
-    // //     public string? FirstName { get; set; }
-    // //     public string? LastName { get; set; }
-    // // }
+//         var response = await _httpClient.PostAsync(tokenEndpoint, new FormUrlEncodedContent(parameters));
+//         if(response.IsSuccessStatusCode)
+//         {
+//             var json = await response.Content.ReadAsStringAsync();
+//             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(json);
+//             return tokenResponse?.AccessToken;
+//         }
+//         throw new Exception("Unable to retrieve Keycloak admin token.");
+//     }
+// }
 
-    // // public class TokenResponse
-    // // {
-    // //     public string? AccessToken { get; set; }
-    // // }
+// //     public class InviteUserRequest
+// // {
+// //     public string? Email { get; set; }
+// //     public string? FirstName { get; set; }
+// //     public string? LastName { get; set; }
+// // }
+
+// // public class TokenResponse
+// // {
+// //     public string? AccessToken { get; set; }
+// // }
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -479,55 +479,55 @@ public class KeycloakService
         return response.AccessToken;
     }
 
-public async Task<ApiResponse<HttpResponseMessage>> InviteUserAsync(InviteUserRequestDto request)
-{
-    var requestData = new Dictionary<string, string>
+    public async Task<ApiResponse<HttpResponseMessage>> InviteUserAsync(InviteUserRequestDto request)
+    {
+        var requestData = new Dictionary<string, string>
     {
         { "email", request.Email },
         { "firstName", request.FirstName },
         { "lastName", request.LastName }
     };
 
-    var token = await GetAdminAccessTokenAsync();
-    return await _keycloakApi.InviteUserAsync(_configuration["Keycloak:Realm"]!, _configuration["Keycloak:organizationId"]!, requestData, $"Bearer {token}");
-}
-
-
-     public async Task<string> CreateOrganizationAsync(string schoolName)
-{
-    var token = await GetAdminAccessTokenAsync();
-    var realm = _configuration["Keycloak:Realm"]!;
-    
-    var request = new CreateOrganizationRequest
-    {
-        Name = schoolName.Replace(" ", ""),
-        Alias = schoolName.Replace(" ", ""),
-        Description = "",
-        RedirectUrl = "",
-        Domains = new List<Domain> { new Domain { Name = $"{schoolName.Replace(" ", "")}.com" } }
-    };
-
-    var response = await _keycloakApi.CreateOrganization(realm, request, $"Bearer {token}");
-
-     if (!response.IsSuccessStatusCode)
-    {
-        throw new Exception($"Failed to create organization");
+        var token = await GetAdminAccessTokenAsync();
+        return await _keycloakApi.InviteUserAsync(_configuration["Keycloak:Realm"]!, _configuration["Keycloak:organizationId"]!, requestData, $"Bearer {token}");
     }
 
-    // Extract organization ID from the "Location" header if it exists
-    if (response.Headers.TryGetValues("Location", out var locationValues))
+
+    public async Task<string> CreateOrganizationAsync(string schoolName)
     {
-        var locationUrl = locationValues.FirstOrDefault();
-        if (locationUrl != null)
+        var token = await GetAdminAccessTokenAsync();
+        var realm = _configuration["Keycloak:Realm"]!;
+
+        var request = new CreateOrganizationRequest
         {
-            var orgId = locationUrl.Split('/').Last();
-            Console.WriteLine($"cxcghfghc {orgId}");
-            return orgId;
+            Name = schoolName.Replace(" ", ""),
+            Alias = schoolName.Replace(" ", ""),
+            Description = "",
+            RedirectUrl = "",
+            Links = new List<Links> { new Links { Name = $"{schoolName.Replace(" ", "")}.com" } }
+        };
+
+        var response = await _keycloakApi.CreateOrganization(realm, request, $"Bearer {token}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Failed to create organization");
         }
+
+        // Extract organization ID from the "Location" header if it exists
+        if (response.Headers.TryGetValues("Location", out var locationValues))
+        {
+            var locationUrl = locationValues.FirstOrDefault();
+            if (locationUrl != null)
+            {
+                var orgId = locationUrl.Split('/').Last();
+                Console.WriteLine($"cxcghfghc {orgId}");
+                return orgId;
+            }
+        }
+
+        throw new Exception("Organization created, but no ID found in response.");
+
     }
-
-    throw new Exception("Organization created, but no ID found in response.");
-
-}
 
 }

@@ -3,11 +3,11 @@ using admin_service.Application.Common.Interfaces;
 using admin_service.Domain.Common;
 
 namespace admin_service.Application.SoftDelete.Commands;
-    
-public record SoftDeleteEntityCommand<T>(T Entity) : IRequest<Unit> where T : class, ISoftDelete;
+
+public record SoftDeleteEntityCommand<T>(T Entity) : ICommand<Unit> where T : class, ISoftDelete;
 
 
-public class SoftDeleteEntityCommandHandler<T> : IRequestHandler<SoftDeleteEntityCommand<T>, Unit>
+public class SoftDeleteEntityCommandHandler<T> : ICommandHandler<SoftDeleteEntityCommand<T>, Unit>
     where T : class, ISoftDelete
 {
     private readonly IApplicationDbContext _context;
@@ -24,7 +24,7 @@ public class SoftDeleteEntityCommandHandler<T> : IRequestHandler<SoftDeleteEntit
         entity.DeletedAt = DateTime.UtcNow;
         _context.Set<T>().Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        
+
         return Unit.Value;
     }
 }

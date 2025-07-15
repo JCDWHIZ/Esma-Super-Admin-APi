@@ -7,7 +7,7 @@ using Hangfire;
 
 namespace admin_service.Application.BlogModule.Commands.CreateScheduledBlog;
 
-public record InitiateScheduledBlogRequestCommand : IRequest<BlogItemDto>
+public record InitiateScheduledBlogRequestCommand : ICommand<BlogItemDto>
 {
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
@@ -17,7 +17,7 @@ public record InitiateScheduledBlogRequestCommand : IRequest<BlogItemDto>
 }
 
 public class InitiateScheduledBlogRequest
-    : IRequestHandler<InitiateScheduledBlogRequestCommand, BlogItemDto>
+    : ICommandHandler<InitiateScheduledBlogRequestCommand, BlogItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -61,11 +61,12 @@ public class InitiateScheduledBlogRequest
     {
         var blog = _dbContext.Blog.FirstOrDefault(x => x.Id == blogId);
         Guard.Against.NotFound(blogId, blog);
-        if (blog != null){
-        blog.Status = BlogStatus.PUBLISHED;
-        blog.PublishDate = DateTime.UtcNow;
+        if (blog != null)
+        {
+            blog.Status = BlogStatus.PUBLISHED;
+            blog.PublishDate = DateTime.UtcNow;
         }
-        
+
         await _dbContext.SaveChangesAsync(default);
     }
 }
