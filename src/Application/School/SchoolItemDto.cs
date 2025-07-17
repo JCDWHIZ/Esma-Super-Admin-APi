@@ -1,11 +1,11 @@
 
 
-using admin_service.Domain.Entities;
-using admin_service.Domain.Enums;
+using Domain.Schools;
+using Domain.Subscriptions;
 
-namespace admin_service.Application.School.Queries;
+namespace Application.School;
 
-public class SchoolItemDto
+public record SchoolItemDto
 {
     public string PublicId { get; set; } = string.Empty;
     public int Id { get; set; }
@@ -16,7 +16,7 @@ public class SchoolItemDto
 
     public string EmailAddress { get; set; } = string.Empty;
     public bool Subscribed
-    { get; set; } = false;
+    { get; set; }
     public SchoolStatus Status { get; set; } = SchoolStatus.PENDING;
     public string PhoneNumber { get; set; } = string.Empty;
     public ICollection<string> DocumentUrl { get; set; } = new List<string>();
@@ -24,12 +24,4 @@ public class SchoolItemDto
     public required Subscriptions Subscriptions { get; set; }
     public required User User { get; set; }
     public bool IsDeleted { get; internal set; }
-
-    private class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<Schools, SchoolItemDto>();
-        }
-    }
 }

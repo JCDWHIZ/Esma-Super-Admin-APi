@@ -6,15 +6,16 @@ using System.Security.Claims;
 using System.Text.Json;
 
 
-namespace admin_service.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 public class KeycloakRoleClaimsTransformer : IClaimsTransformation
 {
     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
-        var claimsIdentity = principal.Identity as ClaimsIdentity;
-        if (claimsIdentity == null)
+        if (principal.Identity is not ClaimsIdentity claimsIdentity)
+        {
             return Task.FromResult(principal);
+        }
 
         Claim? realmAccessClaim = claimsIdentity.FindFirst("realm_access");
         if (realmAccessClaim != null)

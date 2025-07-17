@@ -1,7 +1,7 @@
 using System;
 using admin_service.Application.Common.Interfaces;
 
-namespace admin_service.Application.Common.BackgroundJobs;
+namespace Application.BackgroundJobs;
 
 public class NotificationJob
 {

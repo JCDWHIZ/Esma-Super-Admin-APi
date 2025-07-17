@@ -1,8 +1,8 @@
 using System;
-using admin_service.Application.Common.Interfaces;
 using Application.Abstractions.Models;
+using Application.Interfaces;
 
-namespace admin_service.Application.Common.BackgroundJobs;
+namespace Application.BackgroundJobs;
 
 public class EmailService : IEmailService
 {

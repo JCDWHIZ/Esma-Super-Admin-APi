@@ -453,7 +453,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System;
 using Refit;
+using Application.Abstractions.Models;
+using Application.Interfaces;
 
+
+namespace Application.Interfaces.Services;
 
 public class KeycloakService
 {
@@ -475,11 +479,11 @@ public class KeycloakService
             { "client_secret", _configuration["Keycloak:ClientSecret"]! }
         };
 
-        var response = await _keycloakApi.GetTokenAsync(_configuration["Keycloak:Realm"]!, parameters);
+        TokenResponseDto response = await _keycloakApi.GetTokenAsync(_configuration["Keycloak:Realm"]!, parameters);
         return response.AccessToken;
     }
 
-    public async Task<ApiResponse<HttpResponseMessage>> InviteUserAsync(InviteUserRequestDto request)
+    public async Task<Refit.ApiResponse<HttpResponseMessage>> InviteUserAsync(InviteUserRequestDto request)
     {
         var requestData = new Dictionary<string, string>
     {
@@ -488,15 +492,15 @@ public class KeycloakService
         { "lastName", request.LastName }
     };
 
-        var token = await GetAdminAccessTokenAsync();
+        string token = await GetAdminAccessTokenAsync();
         return await _keycloakApi.InviteUserAsync(_configuration["Keycloak:Realm"]!, _configuration["Keycloak:organizationId"]!, requestData, $"Bearer {token}");
     }
 
 
     public async Task<string> CreateOrganizationAsync(string schoolName)
     {
-        var token = await GetAdminAccessTokenAsync();
-        var realm = _configuration["Keycloak:Realm"]!;
+        string token = await GetAdminAccessTokenAsync();
+        string realm = _configuration["Keycloak:Realm"]!;
 
         var request = new CreateOrganizationRequest
         {
@@ -504,10 +508,10 @@ public class KeycloakService
             Alias = schoolName.Replace(" ", ""),
             Description = "",
             RedirectUrl = "",
-            Links = new List<Links> { new Links { Name = $"{schoolName.Replace(" ", "")}.com" } }
+            Links = [new() { Name = $"{schoolName.Replace(" ", "")}.com" }]
         };
 
-        var response = await _keycloakApi.CreateOrganization(realm, request, $"Bearer {token}");
+        Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.CreateOrganization(realm, request, $"Bearer {token}");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -515,12 +519,12 @@ public class KeycloakService
         }
 
         // Extract organization ID from the "Location" header if it exists
-        if (response.Headers.TryGetValues("Location", out var locationValues))
+        if (response.Headers.TryGetValues("Location", out IEnumerable<string>? locationValues))
         {
-            var locationUrl = locationValues.FirstOrDefault();
+            string? locationUrl = locationValues.FirstOrDefault();
             if (locationUrl != null)
             {
-                var orgId = locationUrl.Split('/').Last();
+                string orgId = locationUrl.Split('/')[^1];
                 Console.WriteLine($"cxcghfghc {orgId}");
                 return orgId;
             }

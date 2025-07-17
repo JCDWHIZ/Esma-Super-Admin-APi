@@ -1,8 +1,8 @@
 using System;
 
-namespace admin_service.Application.Common.Interfaces;
+namespace Application.Interfaces;
 
-   public interface IMessageProducer
-    {
-        Task<string> SendMessageAsync<T>(string messageType, T data, string? topic = null);
-    }
+public interface IMessageProducer
+{
+    Task<string> SendMessageAsync<T>(string messageType, T data, string? topic = null);
+}

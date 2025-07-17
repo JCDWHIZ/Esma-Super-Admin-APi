@@ -1,0 +1,93 @@
+
+
+
+using Domain.Schools;
+using Domain.Subscriptions;
+
+namespace Application.School.CreateSchool;
+
+public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContext) : ICommandHandler<CreateSchoolCommand, string>
+{
+    public async Task<Result<string>> Handle(CreateSchoolCommand command, CancellationToken cancellationToken)
+    {
+        Schools? existingSchool = await _dbContext.Schools
+            .FirstOrDefaultAsync(x => x.SchoolName == command.SchoolName, cancellationToken);
+
+        if (existingSchool != null)
+        {
+            throw new Exception("School already exists");
+        }
+
+        // Create school entity
+        var schoolEntity = new Schools
+        {
+            SchoolName = command.SchoolName,
+            LogoUrl = command.LogoUrl,
+            Address = new Address
+            {
+                State = command.Address.State,
+                Country = command.Address.Country,
+                LGA = command.Address.Lga,
+                StreetAddress = command.Address.StreetAddress
+            },
+            EmailAddress = command.EmailAddress,
+            PhoneNumber = command.PhoneNumber,
+            DocumentUrl = command.DocumentUrl,
+            Modules = command.Modules,
+            Subscriptions = new Subscriptions
+            {
+                SubscriptionType = command.Subscriptions.SubscriptionType,
+                StartDate = command.Subscriptions.StartDate,
+                EndDate = command.Subscriptions.EndDate,
+                Amount = command.Subscriptions.Amount
+            },
+
+            User = new User
+            {
+                Role = command.User.Role,
+                Username = command.User.Username,
+                FirstName = command.User.FirstName,
+                LastName = command.User.LastName,
+                Email = command.User.Email,
+                PhoneNumber = command.User.PhoneNumber
+            }
+        };
+        // _dbContext.Schools.Add(schoolEntity);
+        // await _dbContext.SaveChangesAsync(cancellationToken);
+        // var organizationId = await _keycloakService.CreateOrganizationAsync(schoolEntity.SchoolName);
+        // schoolEntity.OrganizationId = organizationId;
+        // await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _dbContext.Schools.Add(schoolEntity);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return Result.Success("School Created Succesfully");
+    }
+
+    // async Task<SchoolItemDto> ICommandHandler<IntiateSchoolRequestCommand, SchoolItemDto>.Handle(IntiateSchoolRequestCommand request, CancellationToken cancellationToken)
+    // {
+    //     var entity = new Schools {
+    //         SchoolName = request.SchoolName,
+    //         Address = request.Address,
+    //         DocumentUrl = request.DocumentUrl,
+    //         EmailAddress = request.EmailAddress,
+    //         LogoUrl = request.LogoUrl,
+    //         Modules = request.Modules,
+    //         PhoneNumber = request.PhoneNumber,
+    //         Subscriptions = new Subscriptions 
+    //         {
+    //             StartDate = request.Subscriptions.StartDate,
+    //             EndDate = request.Subscriptions.EndDate,
+    //             Amount = request.Subscriptions.Amount,
+    //             subscriptionType = request.Subscriptions.subscriptionType
+    //         }
+    //     };
+    //     if(_dbContext.Schools.Any(x => x.SchoolName == request.SchoolName))
+    //     {
+    //         throw new Exception("School already exists");
+    //     }
+    //     Guard.Against.NotFound(request.SchoolName, entity);
+    //     _dbContext.Schools.Add(entity);
+    //     await _dbContext.SaveChangesAsync(cancellationToken);
+    //     return _mapper.Map<SchoolItemDto>(entity);
+    // }
+}

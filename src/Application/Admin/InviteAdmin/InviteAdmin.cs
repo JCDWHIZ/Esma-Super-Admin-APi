@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using admin_service.Application.Common.Interfaces;
+using Application.BackgroundJobs;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;

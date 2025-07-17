@@ -3,6 +3,10 @@ using Refit;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Admin.InviteAdmin;
+using Application.Abstractions.Models;
+using System.Net.Http;
+
+namespace Application.Interfaces;
 
 public interface IKeycloakApi
 {
@@ -13,7 +17,7 @@ public interface IKeycloakApi
     );
 
     [Post("/admin/realms/{realm}/organizations/{organizationId}/members/invite-user")]
-    Task<ApiResponse<HttpResponseMessage>> InviteUserAsync(
+    Task<Refit.ApiResponse<HttpResponseMessage>> InviteUserAsync(
     [AliasAs("realm")] string realm,
     [AliasAs("organizationId")] string organizationId,
     [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, string> requestData,
@@ -22,7 +26,7 @@ public interface IKeycloakApi
 
 
     [Post("/admin/realms/{realm}/organizations")]
-    Task<ApiResponse<HttpResponseMessage>> CreateOrganization(
+    Task<Refit.ApiResponse<HttpResponseMessage>> CreateOrganization(
         [AliasAs("realm")] string realm,
         [Body] CreateOrganizationRequest request,
         [Header("Authorization")] string authorization);
@@ -55,15 +59,15 @@ public class CreateOrganizationRequest
     public required string Alias { get; set; }
     public string RedirectUrl { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public List<Links> Links { get; set; } = new();
+    public List<Links> Links { get; set; }
     public Dictionary<string, string> Attributes { get; set; } = new()
     {
         // { "type", "school" }
     };
 }
 
-internal class Links
+public class Links
 {
     public required string Name { get; set; }
-    public bool Verified { get; set; } = false;
+    public bool Verified { get; set; }
 }

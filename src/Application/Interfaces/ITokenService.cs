@@ -1,6 +1,6 @@
 using System;
 
-namespace admin_service.Application.Common.Interfaces;
+namespace Application.Interfaces;
 
 public interface ITokenService
 {

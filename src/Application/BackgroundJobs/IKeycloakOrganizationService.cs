@@ -1,14 +1,17 @@
 using System.Net.Mail;
 using System.Threading;
-using admin_service.Application.Common.Interfaces;
 using Application.Abstractions.Models;
+using Application.Interfaces;
+using Application.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
+using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
+
+namespace Application.BackgroundJobs;
 
 public interface IKeycloakOrganizationService
 {
     Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken);
     Task CreateAdmin(int userId);
-
 }
 
 public class KeycloakOrganizationService : IKeycloakOrganizationService
@@ -30,9 +33,11 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     public async Task CreateAdmin(int userId)
     {
 
-        var user = await _dbContext.Users.FindAsync(userId);
+        User? user = await _dbContext.Users.FindAsync(userId);
         if (user == null)
+        {
             return;
+        }
 
         try
         {
@@ -53,15 +58,17 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
 
     public async Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken)
     {
-        var school = await _dbContext.Schools
+        Domain.Schools.Schools? school = await _dbContext.Schools
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
         if (school == null)
+        {
             return;
+        }
 
         try
         {
-            var organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
+            string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
             school.OrganizationId = organizationId;
             await _dbContext.SaveChangesAsync(cancellationToken);
             var payload = new Dictionary<string, object>
@@ -78,7 +85,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
         };
 
-            var token = _tokenService.GenerateToken(payload);
+            string token = _tokenService.GenerateToken(payload);
             var message = new EmailMessage
             {
                 Email = school.EmailAddress,
