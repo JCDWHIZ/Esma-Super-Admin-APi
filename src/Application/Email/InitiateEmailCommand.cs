@@ -1,6 +1,6 @@
 // using System;
 // using System.ComponentModel.DataAnnotations;
-// using admin_service.Application.Common.Interfaces;
+// using Application.Interfaces;
 // using Application.Abstractions.Models;
 // using Microsoft.Extensions.Logging;
 
@@ -62,7 +62,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Application.Abstractions.Models;
 
 namespace admin_service.Application.Email

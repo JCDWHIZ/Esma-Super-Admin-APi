@@ -6,7 +6,7 @@
 // using System.Text.Json;
 // using System.Text.Json.Serialization;
 // using System.Threading.Tasks;
-// using admin_service.Application.Common.Interfaces;
+// using Application.Interfaces;
 // using Microsoft.Extensions.Configuration;
 // using Microsoft.Extensions.Logging;
 
@@ -237,7 +237,7 @@
 // using System.Text;
 // using System.Text.Json;
 // using System.Threading.Tasks;
-// using admin_service.Application.Common.Interfaces;
+// using Application.Interfaces;
 // using admin_service.Infrastructure.Repositories;
 // using Keycloak.Net;
 // using Keycloak.Net.Models.Root;
@@ -377,7 +377,7 @@
 // }
 
 
-// public class KeycloakService : admin_service.Application.Common.Interfaces.IKeycloakService
+// public class KeycloakService : Application.Interfaces.IKeycloakService
 // {
 //     private readonly HttpClient _httpClient;
 //     private readonly IConfiguration _configuration;
@@ -393,7 +393,7 @@
 
 //     // }
 
-// public async Task<bool> CreateUserAsync(admin_service.Application.Common.Interfaces.InviteUserRequest request)
+// public async Task<bool> CreateUserAsync(Application.Interfaces.InviteUserRequest request)
 // {
 //     var adminToken = await GetAdminTokenAsync();
 //         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);

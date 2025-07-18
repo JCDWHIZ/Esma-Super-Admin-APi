@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using admin_service.Application.Common.Exceptions;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using admin_service.Domain.Entities;
 using admin_service.Domain.Enums;
 using AutoMapper;

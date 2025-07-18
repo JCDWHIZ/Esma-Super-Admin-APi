@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using admin_service.Application.School.Queries;
 using admin_service.Domain.Entities;
 using admin_service.Domain.Enums;

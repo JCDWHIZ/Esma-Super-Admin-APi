@@ -30,6 +30,7 @@ public sealed class ApplicationDbContext(
     public DbSet<Blog> Blog => Set<Blog>();
     public DbSet<HelpRequestMessages> HelpRequestMessages => Set<HelpRequestMessages>();
     public DbSet<AuditLog> Auditlog => Set<AuditLog>();
+    public DbSet<SchoolAdmins> SchoolAdmins => Set<SchoolAdmins>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

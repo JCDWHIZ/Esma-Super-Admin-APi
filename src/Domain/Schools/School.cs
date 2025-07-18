@@ -22,7 +22,7 @@ public class Schools : BaseAuditableEntity
     public ICollection<Modules> Modules { get; set; } = new List<Modules>();
     [JsonIgnore]
     public required Subscriptions.Subscriptions Subscriptions { get; set; }
-    public required User User { get; set; }
+    public required SchoolAdmins User { get; set; }
 }
 
 public class Address

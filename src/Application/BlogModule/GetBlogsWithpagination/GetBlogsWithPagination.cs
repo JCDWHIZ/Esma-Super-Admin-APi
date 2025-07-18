@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Application.Abstractions.Models;
 using admin_service.Domain.Enums;
 using AutoMapper;

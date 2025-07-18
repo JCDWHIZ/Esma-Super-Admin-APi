@@ -1,6 +1,6 @@
 using System;
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using admin_service.Application.Common.Mappings;
 using Application.Abstractions.Models;
 using admin_service.Application.TodoItems.Queries.GetTodoItemsWithPagination;

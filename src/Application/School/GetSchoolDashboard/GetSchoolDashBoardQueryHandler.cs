@@ -1,4 +1,4 @@
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 

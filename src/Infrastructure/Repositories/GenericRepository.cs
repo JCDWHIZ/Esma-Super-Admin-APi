@@ -1,9 +1,9 @@
 using System;
 using System.Linq.Expressions;
-using admin_service.Application.Common.Interfaces;
-using admin_service.Infrastructure.Data;
+using Application.Interfaces;
+using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-namespace admin_service.Infrastructure.Repositories;
+namespace Infrastructure.Repositories;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
@@ -16,7 +16,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, 
+    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null,
         CancellationToken cancellationToken = default)
     {
         IQueryable<T> query = _dbSet;

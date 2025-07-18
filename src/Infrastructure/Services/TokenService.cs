@@ -6,9 +6,9 @@ using System.Text;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 
-namespace admin_service.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 
 public class JwtSettings

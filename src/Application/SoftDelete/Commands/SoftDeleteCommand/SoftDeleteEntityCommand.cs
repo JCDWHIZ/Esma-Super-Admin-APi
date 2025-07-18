@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using admin_service.Domain.Common;
 
 namespace admin_service.Application.SoftDelete.Commands;

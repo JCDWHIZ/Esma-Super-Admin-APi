@@ -17,7 +17,7 @@ public sealed record CreateSchoolCommand : ICommand<string>
     public List<Modules> Modules { get; init; } = new();
 
     public SubscriptionDto Subscriptions { get; init; } = new();
-    public UserDto User { get; init; } = new();
+    public UserDto SchoolAdmin { get; init; } = new();
 
 }
 

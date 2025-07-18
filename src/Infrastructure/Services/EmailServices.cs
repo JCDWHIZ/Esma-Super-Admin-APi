@@ -1,32 +1,59 @@
 using System;
 using System.Text;
 using System.Text.Json;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Application.Abstractions.Models;
+using Microsoft.Extensions.Options;
 
-namespace admin_service.Infrastructure.Services;
+namespace Infrastructure.Services;
 
-public class EmailServices(HttpClient httpClient) : IEmailService
+// public class EmailServices(HttpClient httpClient) : IEmailService
+// {
+//     private readonly HttpClient _httpClient = httpClient;
+
+//     public async Task SendEmailAsync(string recipient, string subject, string body)
+//     {
+//         var payload = new
+//         {
+//             to = recipient,
+//             subject = subject,
+//             body = body
+//         };
+
+//         string json = JsonSerializer.Serialize(payload);
+//         var content = new StringContent(json, Encoding.UTF8, "application/json");
+//         HttpResponseMessage response = await _httpClient.PostAsync("https://external-email-api.com/send", content);
+//         response.EnsureSuccessStatusCode();
+//     }
+
+//     public Task<string> SendEmailAsync(EmailMessage emailMessage)
+//     {
+//          var payload = new
+//         {
+//             to = recipient,
+//             subject = subject,
+//             body = body
+//         };
+
+//         string json = JsonSerializer.Serialize(payload);
+//         var content = new StringContent(json, Encoding.UTF8, "application/json");
+//         HttpResponseMessage response = await _httpClient.PostAsync("https://external-email-api.com/send", content);
+//         response.EnsureSuccessStatusCode();
+//     }
+// }
+public class EmailService : IEmailService
 {
-    private readonly HttpClient _httpClient = httpClient;
+    private readonly IMessageProducer _messageProducer;
+    private readonly KafkaSettings _kafkaSettings;
 
-    public async Task SendEmailAsync(string recipient, string subject, string body)
+    public EmailService(IMessageProducer messageProducer, IOptions<KafkaSettings> kafkaSettings)
     {
-        var payload = new
-        {
-            to = recipient,
-            subject = subject,
-            body = body
-        };
-
-        string json = JsonSerializer.Serialize(payload);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        HttpResponseMessage response = await _httpClient.PostAsync("https://external-email-api.com/send", content);
-        response.EnsureSuccessStatusCode();
+        _messageProducer = messageProducer;
+        _kafkaSettings = kafkaSettings.Value;
     }
 
-    public Task<string> SendEmailAsync(EmailMessage emailMessage)
+    public async Task<string> SendEmailAsync(EmailMessage emailMessage)
     {
-        throw new NotImplementedException();
+        return await _messageProducer.SendMessageAsync("SendEmail", emailMessage, _kafkaSettings.EmailTopic);
     }
 }

@@ -19,5 +19,6 @@ public interface IApplicationDbContext
     DbSet<HelpRequestMessages> HelpRequestMessages { get; }
     DbSet<Blog> Blog { get; }
     DbSet<AuditLog> Auditlog { get; }
+    DbSet<SchoolAdmins> SchoolAdmins { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

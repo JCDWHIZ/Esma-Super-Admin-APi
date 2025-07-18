@@ -3,7 +3,7 @@
 // using admin_service.Application.Authentication.Commands.Queries;
 // using admin_service.Application.Authentication.Commands.RefreshCommand;
 // using admin_service.Application.Common.Exceptions;
-// using admin_service.Application.Common.Interfaces;
+// using Application.Interfaces;
 // using Application.Abstractions.Models;
 // using admin_service.Infrastructure.Identity;
 // using Microsoft.AspNetCore.Http.HttpResults;

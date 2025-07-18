@@ -1,14 +1,13 @@
 using System;
-using admin_service.Application.Common.Interfaces;
-using admin_service.Application.Exports.Queries;
-using admin_service.Domain.Enums;
+using Application.Interfaces;
+using Application.Exports;
 
-namespace admin_service.Application.Exports.Command;
+namespace Application.Exports;
 
 public record ExportDataCommand(AdminModule Module, ExportType ExportType) : ICommand<ExportDataResultDto>;
 
 
-public class ExportDataCommandHandler : ICommandHandler<ExportDataCommand, ExportDataResultDto>
+public sealed class ExportDataCommandHandler : ICommandHandler<ExportDataCommand, ExportDataResultDto>
 {
     private readonly IExportService _exportService;
 
@@ -17,8 +16,8 @@ public class ExportDataCommandHandler : ICommandHandler<ExportDataCommand, Expor
         _exportService = exportService;
     }
 
-    public async Task<ExportDataResultDto> Handle(ExportDataCommand request, CancellationToken cancellationToken)
+    async Task<Result<ExportDataResultDto>> ICommandHandler<ExportDataCommand, ExportDataResultDto>.Handle(ExportDataCommand command, CancellationToken cancellationToken)
     {
-        return await _exportService.ExportDataAsync(request.Module, request.ExportType);
+        return await _exportService.ExportDataAsync(command.Module, command.ExportType);
     }
 }

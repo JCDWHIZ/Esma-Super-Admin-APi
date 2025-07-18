@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Application.BackgroundJobs;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +24,7 @@ public sealed class InviteUserCommandHandler(IApplicationDbContext _context) : I
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }
 
-        var newUser = new User
+        var newUser = new SchoolAdmins
         {
             Email = command.Email,
             Role = command.Role,
@@ -33,7 +33,7 @@ public sealed class InviteUserCommandHandler(IApplicationDbContext _context) : I
             LastName = command.LastName,
         };
 
-        _context.Users.Add(newUser);
+        _context.SchoolAdmins.Add(newUser);
         await _context.SaveChangesAsync(cancellationToken);
 
         BackgroundJob.Enqueue<IKeycloakOrganizationService>(

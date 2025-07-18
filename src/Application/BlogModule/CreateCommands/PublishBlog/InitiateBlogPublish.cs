@@ -1,6 +1,6 @@
 using System;
 using admin_service.Application.Common.Exceptions;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using admin_service.Domain.Enums;
 
 namespace admin_service.Application.BlogModule.Commands.CreateCommands.PublishBlog;

@@ -1,29 +1,30 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using CsvHelper;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-using admin_service.Application.Exports.Queries;
-using admin_service.Domain.Enums;
+using Application.Exports;
 using System.Globalization;
+using SharedKernel.Enums;
+using System.Reflection.Metadata;
 
-namespace admin_service.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 public class DynamicExportStrategy<T> : IExportStrategy where T : class
 {
     private readonly IGenericRepository<T> _repository;
-    private readonly AdminModule _moduleType; // Store module type during construction
 
     public DynamicExportStrategy(
         IGenericRepository<T> repository,
         AdminModule moduleType) // Add module type as a constructor parameter
     {
         _repository = repository;
-        _moduleType = moduleType; // Set the module type
+        ModuleType = moduleType; // Set the module type
     }
 
-    public AdminModule ModuleType => _moduleType;
+    public AdminModule ModuleType { get; }
 
+    AdminModule IExportStrategy.ModuleType => throw new NotImplementedException();
 
     public async Task<ExportDataResultDto> ExportDataAsync(ExportType exportType)
     {
@@ -133,7 +134,7 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
 
     private static AdminModule GetModuleTypeFromEntity()
     {
-        return Enum.TryParse(typeof(T).Name.ToUpper(), out AdminModule module)
+        return Enum.TryParse(typeof(T).Name.ToUpper(CultureInfo.CurrentCulture), out AdminModule module)
             ? module
             : throw new InvalidOperationException($"No module mapping for {typeof(T).Name}");
     }

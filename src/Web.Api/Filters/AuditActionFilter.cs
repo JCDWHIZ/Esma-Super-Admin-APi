@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Web.Api.Filters;

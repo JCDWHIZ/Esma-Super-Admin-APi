@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using admin_service.Domain.Enums;
 using Hangfire;
 

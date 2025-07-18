@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 using Application.Abstractions.Models;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 

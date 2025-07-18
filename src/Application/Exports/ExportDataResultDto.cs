@@ -1,6 +1,6 @@
 using System;
 
-namespace admin_service.Application.Exports.Queries;
+namespace Application.Exports;
 
 public class ExportDataResultDto
 {

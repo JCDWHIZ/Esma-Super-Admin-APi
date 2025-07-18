@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Models;
 
-namespace admin_service.Application.Common.Interfaces;
+namespace Application.Interfaces;
 
 public interface IIdentityService
 {

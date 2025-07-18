@@ -1,8 +1,10 @@
 
 
 
+using Application.BackgroundJobs;
 using Domain.Schools;
 using Domain.Subscriptions;
+using Hangfire;
 
 namespace Application.School.CreateSchool;
 
@@ -42,14 +44,14 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
                 Amount = command.Subscriptions.Amount
             },
 
-            User = new User
+            User = new SchoolAdmins
             {
-                Role = command.User.Role,
-                Username = command.User.Username,
-                FirstName = command.User.FirstName,
-                LastName = command.User.LastName,
-                Email = command.User.Email,
-                PhoneNumber = command.User.PhoneNumber
+                Role = command.SchoolAdmin.Role,
+                Username = command.SchoolAdmin.Username,
+                FirstName = command.SchoolAdmin.FirstName,
+                LastName = command.SchoolAdmin.LastName,
+                Email = command.SchoolAdmin.Email,
+                PhoneNumber = command.SchoolAdmin.PhoneNumber
             }
         };
         // _dbContext.Schools.Add(schoolEntity);
@@ -60,6 +62,9 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
 
         _dbContext.Schools.Add(schoolEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        BackgroundJob.Enqueue<IKeycloakOrganizationService>(
+        service => service.CreateOrganizationForSchoolAsync(schoolEntity.Id, cancellationToken));
         return Result.Success("School Created Succesfully");
     }
 

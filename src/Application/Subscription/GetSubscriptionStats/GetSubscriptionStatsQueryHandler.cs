@@ -1,5 +1,5 @@
 using System;
-using admin_service.Application.Common.Interfaces;
+using Application.Interfaces;
 
 namespace admin_service.Application.Subscription.Queries.GetSubscriptionWithPagination;
 

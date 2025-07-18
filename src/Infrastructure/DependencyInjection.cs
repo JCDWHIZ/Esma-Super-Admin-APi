@@ -2,13 +2,21 @@
 using System.Text.Json.Serialization;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
+using Application.BackgroundJobs;
+using Application.Interfaces;
+using Application.Interfaces.Services;
+using Domain.Schools;
+using Domain.Users;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Infrastructure.Time;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +26,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel;
+using SharedKernel.Enums;
 
 namespace Infrastructure;
 
@@ -32,6 +41,7 @@ public static class DependencyInjection
             .AddHealthChecks(configuration)
             .AddAuthenticationInternal(configuration)
             .AddConfiguration(configuration)
+            .AddKafkaServices(configuration)
             .AddAuthorizationInternal();
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -43,8 +53,6 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, TokenService>();
 
         services.AddTransient<IClaimsTransformation, KeycloakRoleClaimsTransformer>();
-
-        services.AddSingleton<IMessageProducer, PulsarProducer>();
 
         // Register application services
         services.AddScoped<IEmailService, EmailService>();
@@ -58,10 +66,10 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IExportService, ExportService>();
         services.AddScoped<IExportStrategy>(sp =>
-    new DynamicExportStrategy<User>(
-        sp.GetRequiredService<IGenericRepository<User>>(),
-        AdminModule.USER
-    )
+            new DynamicExportStrategy<User>(
+            sp.GetRequiredService<IGenericRepository<User>>(),
+            AdminModule.USER
+            )
 );
 
         services.AddScoped<IExportStrategy>(sp =>
@@ -74,7 +82,7 @@ public static class DependencyInjection
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
         services.AddSingleton(TimeProvider.System);
-        services.AddTransient<IIdentityService, IdentityService>();
+        // services.AddTransient<IIdentityService, IdentityService>();
 
         return services;
     }
@@ -89,43 +97,6 @@ public static class DependencyInjection
         .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["Keycloak:BaseUrl"]!));
         services.AddScoped<IKeycloakOrganizationService, KeycloakOrganizationService>();
         services.AddScoped<KeycloakService>();
-        services.AddSingleton<IPulsarClient>(provider =>
-            {
-                var config = provider.GetRequiredService<IConfiguration>();
-                var serviceUrl = config["Pulsar:ServiceUrl"] ?? "pulsar://localhost:6650";
-                return PulsarClient.Builder()
-                .ServiceUrl(new Uri(serviceUrl))
-                .Build();
-            });
-
-        services.Configure<PulsarSettings>(
-        builder.Configuration.GetSection("Pulsar"));
-
-        // Register Pulsar client as a singleton
-        builder.Services.AddSingleton<IPulsarClient>(provider =>
-        {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var pulsarSettings = configuration.GetSection("Pulsar").Get<PulsarSettings>();
-
-            if (pulsarSettings == null || string.IsNullOrEmpty(pulsarSettings.ServiceUrl))
-            {
-                throw new InvalidOperationException("Pulsar ServiceUrl is not configured.");
-            }
-
-            var pulsarBuilder = PulsarClient.Builder()
-                .ServiceUrl(new Uri(pulsarSettings.ServiceUrl));
-
-            // Configure TLS if enabled
-            // if (pulsarSettings.UseTls && !string.IsNullOrEmpty(pulsarSettings.TlsCertificatePath))
-            // {
-            //     pulsarBuilder.VerifyCertificateAuthority(pulsarOptions =>
-            //     {
-            //         pulsarOptions.TrustCertificateFilePath = pulsarSettings.TlsCertificatePath;
-            //     });
-            // }
-
-            return pulsarBuilder.Build();
-        });
 
         services.AddHangfire(config => config
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -159,6 +130,17 @@ public static class DependencyInjection
             .AddNpgSql(configuration.GetConnectionString("Database")!);
 
         services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+        return services;
+    }
+
+    public static IServiceCollection AddKafkaServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<KafkaSettings>(configuration.GetSection("Kafka"));
+        services.AddScoped<IMessageProducer, KafkaProducer>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddHostedService<OrganizationCreationService>();
+        services.AddHostedService<TenantResponseHandlerService>();
 
         return services;
     }

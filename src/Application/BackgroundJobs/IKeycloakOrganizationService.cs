@@ -19,16 +19,21 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     private readonly IApplicationDbContext _dbContext;
     private readonly KeycloakService _keycloakService;
     private readonly ITokenService _tokenService;
+    private readonly IKafkaSettings _kafkaSettings;
+    private readonly IMessageProducer _messageProducer;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
 
-    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, ITokenService tokenService, IEmailService emailService, IConfiguration configuration)
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, ITokenService tokenService, IEmailService emailService, IConfiguration configuration,
+        IKafkaSettings kafkaSettings, IMessageProducer messageProducer)
     {
         _dbContext = dbContext;
         _keycloakService = keycloakService;
         _tokenService = tokenService;
         _emailService = emailService;
         _configuration = configuration;
+        _kafkaSettings = kafkaSettings;
+        _messageProducer = messageProducer;
     }
     public async Task CreateAdmin(int userId)
     {
@@ -71,32 +76,52 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
             school.OrganizationId = organizationId;
             await _dbContext.SaveChangesAsync(cancellationToken);
-            var payload = new Dictionary<string, object>
-        {
-            { "schoolId", school.Id },
-            { "schoolPublicId", school.PublicId },
-            { "organizationId", organizationId },
-            { "schoolName", school.SchoolName },
-            { "email", school.EmailAddress },
-            { "firstName", school.User.FirstName },
-            { "lastName",  school.User.LastName },
-            { "role",      school.User.Role.ToString() },
-            { "username",  school.User.Username },
-            { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
-        };
+            //     var payload = new Dictionary<string, object>
+            // {
+            //     { "schoolId", school.Id },
+            //     { "schoolPublicId", school.PublicId },
+            //     { "organizationId", organizationId },
+            //     { "schoolName", school.SchoolName },
+            //     { "email", school.EmailAddress },
+            //     { "firstName", school.User.FirstName },
+            //     { "lastName",  school.User.LastName },
+            //     { "role",      school.User.Role.ToString() },
+            //     { "username",  school.User.Username },
+            //     { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
+            // };
 
-            string token = _tokenService.GenerateToken(payload);
-            var message = new EmailMessage
+            //     string token = _tokenService.GenerateToken(payload);
+            //     var message = new EmailMessage
+            //     {
+            //         Email = school.EmailAddress,
+            //         Title = "Your School Organization is Ready",
+            //         SchoolName = school.SchoolName,
+            //         Description = "We've successfully onboarded your school to our platform. We’re excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we’re looking forward to growing with you.",
+            //         EmailButton = true,
+            //         ButtonLink = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
+            //         ButtonText = "Complete Your Setup"
+            //     };
+            //     await _emailService.SendEmailAsync(message);
+
+            // send message to kafak for tenant service creation
+            var tenantMessage = new CreateTenantMessage
             {
-                Email = school.EmailAddress,
-                Title = "Your School Organization is Ready",
+                SchoolPublicId = school.PublicId,
+                SchoolId = school.Id,
                 SchoolName = school.SchoolName,
-                Description = "We've successfully onboarded your school to our platform. We’re excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we’re looking forward to growing with you.",
-                EmailButton = true,
-                ButtonLink = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
-                ButtonText = "Complete Your Setup"
+                OrganizationId = organizationId,
+                SchoolAdminEmail = school.User.Email,
+                SchoolAdminFirstName = school.User.FirstName,
+                SchoolAdminLastName = school.User.LastName,
             };
-            await _emailService.SendEmailAsync(message);
+
+            await _messageProducer.SendMessageAsync(
+                "CreateTenant",
+                tenantMessage,
+                _kafkaSettings.CreateTenantTopic);
+
+            _logger.LogInformation("Organization created and tenant creation task enqueued for school: {SchoolId}",
+                school.Id);
         }
         catch (Exception ex)
         {
