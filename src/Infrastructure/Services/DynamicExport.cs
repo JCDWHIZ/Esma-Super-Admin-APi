@@ -1,12 +1,17 @@
 using System;
+using System.Globalization;
+using System.Reflection;
 using Application.Interfaces;
 using CsvHelper;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
+using CsvHelper.Configuration;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+using iText.Kernel.Colors;
+using iText.Kernel.Geom;
 using Application.Exports;
-using System.Globalization;
 using SharedKernel.Enums;
-using System.Reflection.Metadata;
 
 namespace Infrastructure.Services;
 
@@ -16,15 +21,15 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
 
     public DynamicExportStrategy(
         IGenericRepository<T> repository,
-        AdminModule moduleType) // Add module type as a constructor parameter
+        AdminModule moduleType)
     {
         _repository = repository;
-        ModuleType = moduleType; // Set the module type
+        ModuleType = moduleType;
     }
 
     public AdminModule ModuleType { get; }
 
-    AdminModule IExportStrategy.ModuleType => throw new NotImplementedException();
+    AdminModule IExportStrategy.ModuleType => ModuleType;
 
     public async Task<ExportDataResultDto> ExportDataAsync(ExportType exportType)
     {
@@ -43,13 +48,13 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
         {
             throw new ArgumentException("No data available for export");
         }
+
         using var memoryStream = new MemoryStream();
-        using (var streamWriter = new StreamWriter(memoryStream))
-        using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
-        {
-            csvWriter.WriteRecords(data);
-            streamWriter.Flush();
-        }
+        using var streamWriter = new StreamWriter(memoryStream);
+        using var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture));
+
+        csvWriter.WriteRecords(data);
+        streamWriter.Flush();
 
         return new ExportDataResultDto
         {
@@ -62,64 +67,81 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
     private static ExportDataResultDto ExportToPdf(List<T> data)
     {
         using var memoryStream = new MemoryStream();
-        var document = new Document(PageSize.A4.Rotate());
-        PdfWriter.GetInstance(document, memoryStream);
-        document.Open();
-        var titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-        var title = new Paragraph($"{typeof(T).Name} Export", titleFont)
-        {
-            Alignment = Element.ALIGN_CENTER
-        };
-        document.Add(title);
-        document.Add(new Paragraph($"Export Date: {DateTime.Now:g}"));
-        document.Add(Chunk.NEWLINE);
-        System.Reflection.PropertyInfo[] properties = typeof(T).GetProperties();
-        var table = new PdfPTable(properties.Length)
-        {
-            WidthPercentage = 100,
-            SpacingBefore = 10f,
-            SpacingAfter = 10f
-        };
+        using var writer = new PdfWriter(memoryStream);
+        using var pdf = new PdfDocument(writer);
 
-        foreach (System.Reflection.PropertyInfo prop in properties)
+        // Set to landscape A4
+        pdf.SetDefaultPageSize(PageSize.A4.Rotate());
+
+        var document = new Document(pdf);
+
+        // Title
+        var title = new Paragraph($"{typeof(T).Name} Export")
+            .SetTextAlignment(TextAlignment.CENTER)
+            .SetFontSize(18)
+            .SetBold();
+        document.Add(title);
+
+        document.Add(new Paragraph($"Export Date: {DateTime.Now:g}"));
+        document.Add(new Paragraph("")); // Empty line
+
+        // Get properties
+        PropertyInfo[] properties = typeof(T).GetProperties();
+
+        // Create table with equal column widths
+        var table = new Table(properties.Length)
+            .SetWidth(UnitValue.CreatePercentValue(100))
+            .SetMarginTop(10)
+            .SetMarginBottom(10);
+
+        // Add headers
+        foreach (PropertyInfo prop in properties)
         {
-            var headerCell = new PdfPCell(new Phrase(prop.Name, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)))
-            {
-                BackgroundColor = BaseColor.LIGHT_GRAY
-            };
-            table.AddCell(headerCell);
+            var headerCell = new Cell()
+                .Add(new Paragraph(prop.Name)
+                    .SetBold()
+                    .SetFontSize(12))
+                .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
+                .SetTextAlignment(TextAlignment.CENTER);
+            table.AddHeaderCell(headerCell);
         }
 
+        // Add data rows
         foreach (T item in data)
         {
-            foreach (System.Reflection.PropertyInfo prop in properties)
+            foreach (PropertyInfo prop in properties)
             {
                 object? rawValue = prop.GetValue(item);
                 string cellValue = string.Empty;
 
                 if (rawValue != null)
                 {
-                    Type? enumType = prop.PropertyType.IsEnum
-                    ? prop.PropertyType
-                    : Nullable.GetUnderlyingType(prop.PropertyType)?.IsEnum == true
-                        ? Nullable.GetUnderlyingType(prop.PropertyType)
-                        : null;
-
-                    if (enumType != null)
+                    Type? enumType = null;
+                    if (prop.PropertyType.IsEnum)
                     {
-                        cellValue = Enum.GetName(enumType, rawValue) ?? string.Empty;
+                        enumType = prop.PropertyType;
                     }
                     else
                     {
-                        cellValue = rawValue.ToString() ?? string.Empty;
+                        Type? underlyingType = Nullable.GetUnderlyingType(prop.PropertyType);
+                        if (underlyingType != null && underlyingType.IsEnum)
+                        {
+                            enumType = underlyingType;
+                        }
                     }
+
+                    cellValue = enumType != null
+                        ? Enum.GetName(enumType, rawValue) ?? string.Empty
+                        : rawValue.ToString() ?? string.Empty;
                 }
 
-                table.AddCell(new Phrase(cellValue, new Font(Font.FontFamily.HELVETICA, 10)));
+                var cell = new Cell()
+                    .Add(new Paragraph(cellValue)
+                        .SetFontSize(10))
+                    .SetTextAlignment(TextAlignment.LEFT);
+                table.AddCell(cell);
             }
         }
-
-
 
         document.Add(table);
         document.Close();
@@ -130,12 +152,5 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
             FileName = $"{typeof(T).Name}_Export.pdf",
             ContentType = "application/pdf"
         };
-    }
-
-    private static AdminModule GetModuleTypeFromEntity()
-    {
-        return Enum.TryParse(typeof(T).Name.ToUpper(CultureInfo.CurrentCulture), out AdminModule module)
-            ? module
-            : throw new InvalidOperationException($"No module mapping for {typeof(T).Name}");
     }
 }

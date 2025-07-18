@@ -25,6 +25,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Refit;
 using SharedKernel;
 using SharedKernel.Enums;
 
@@ -139,7 +140,6 @@ public static class DependencyInjection
         services.Configure<KafkaSettings>(configuration.GetSection("Kafka"));
         services.AddScoped<IMessageProducer, KafkaProducer>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddHostedService<OrganizationCreationService>();
         services.AddHostedService<TenantResponseHandlerService>();
 
         return services;

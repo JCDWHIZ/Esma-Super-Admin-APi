@@ -4,6 +4,7 @@ using Application.Abstractions.Models;
 using Application.Interfaces;
 using Application.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 namespace Application.BackgroundJobs;
@@ -18,22 +19,17 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly KeycloakService _keycloakService;
-    private readonly ITokenService _tokenService;
-    private readonly IKafkaSettings _kafkaSettings;
     private readonly IMessageProducer _messageProducer;
-    private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<KeycloakOrganizationService> _logger;
 
-    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, ITokenService tokenService, IEmailService emailService, IConfiguration configuration,
-        IKafkaSettings kafkaSettings, IMessageProducer messageProducer)
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger)
     {
         _dbContext = dbContext;
         _keycloakService = keycloakService;
-        _tokenService = tokenService;
-        _emailService = emailService;
         _configuration = configuration;
-        _kafkaSettings = kafkaSettings;
         _messageProducer = messageProducer;
+        _logger = logger;
     }
     public async Task CreateAdmin(int userId)
     {
@@ -53,6 +49,9 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 LastName = user.LastName
             };
 
+            // keycloaks sends email
+            // might want to disable that for now 
+            // use emailService to send email instead, just use keycloak to create user
             await _keycloakService.InviteUserAsync(inviteRequest);
         }
         catch (Exception ex)
@@ -118,7 +117,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             await _messageProducer.SendMessageAsync(
                 "CreateTenant",
                 tenantMessage,
-                _kafkaSettings.CreateTenantTopic);
+                _configuration["KafkaSettings:CreateTenantTopic"]);
 
             _logger.LogInformation("Organization created and tenant creation task enqueued for school: {SchoolId}",
                 school.Id);

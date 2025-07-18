@@ -1,9 +1,10 @@
 using System;
 using Application.Interfaces;
-using admin_service.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Application.Abstractions.Data;
+using Domain.AuditLogs;
 
-namespace admin_service.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 public class AuditLogService : IAuditLogService
 {
@@ -19,7 +20,7 @@ public class AuditLogService : IAuditLogService
         var auditLog = new AuditLog
         {
             Action = actionDescription,
-            CreatedBy = "Unknown",
+            CreatedBy = Guid.Empty,
             Created = DateTimeOffset.UtcNow,
             Role = "Unknown"
         };

@@ -1,9 +1,9 @@
 using System;
+using Application.Exports;
 using Application.Interfaces;
-using admin_service.Application.Exports;
-using admin_service.Application.Exports.Queries;
-using admin_service.Domain.Enums;
-namespace admin_service.Infrastructure.Services;
+using SharedKernel.Enums;
+
+namespace Infrastructure.Services;
 
 public class ExportService : IExportService
 

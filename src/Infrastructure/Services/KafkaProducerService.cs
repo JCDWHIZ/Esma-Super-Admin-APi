@@ -15,6 +15,10 @@ public class KafkaProducer : IMessageProducer, IDisposable
     private readonly IProducer<string, string> _producer;
     private readonly ILogger<KafkaProducer> _logger;
     private readonly KafkaSettings _settings;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
     private bool _disposed;
 
     public KafkaProducer(IOptions<KafkaSettings> settings, ILogger<KafkaProducer> logger)
@@ -57,12 +61,7 @@ public class KafkaProducer : IMessageProducer, IDisposable
                 MessageId = Guid.NewGuid().ToString()
             };
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            string messageJson = JsonSerializer.Serialize(messageWrapper, options);
+            string messageJson = JsonSerializer.Serialize(messageWrapper, JsonOptions);
 
             _logger.LogDebug("Sending message to topic {Topic}: {Message}", actualTopic, messageJson);
 
@@ -83,7 +82,7 @@ public class KafkaProducer : IMessageProducer, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send message to topic {Topic}", actualTopic);
-            throw;
+            throw new Exception($"Failed to send message to topic {actualTopic}", ex);
         }
     }
 
@@ -105,8 +104,6 @@ public class KafkaProducer : IMessageProducer, IDisposable
         }
     }
 }
-
-// 2. Kafka Settings
 public class KafkaSettings
 {
     public required string BootstrapServers { get; set; }

@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Application.Abstractions.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
@@ -18,6 +20,10 @@ public class TenantResponseHandlerService : BackgroundService
     private readonly IConsumer<string, string> _consumer;
     private readonly ILogger<TenantResponseHandlerService> _logger;
     private readonly KafkaSettings _kafkaSettings;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public TenantResponseHandlerService(
         IServiceProvider serviceProvider,
@@ -46,7 +52,7 @@ public class TenantResponseHandlerService : BackgroundService
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var consumeResult = _consumer.Consume(stoppingToken);
+                ConsumeResult<string, string> consumeResult = _consumer.Consume(stoppingToken);
 
                 if (consumeResult?.Message?.Value != null)
                 {
@@ -64,35 +70,78 @@ public class TenantResponseHandlerService : BackgroundService
     {
         try
         {
-            var message = JsonSerializer.Deserialize<KafkaMessage<TenantCreatedResponse>>(messageJson);
+            KafkaMessage<TenantCreatedResponse>? message = JsonSerializer.Deserialize<KafkaMessage<TenantCreatedResponse>>(messageJson, JsonOptions);
             if (message?.Data == null)
             {
                 return;
             }
 
-            using var scope = _serviceProvider.CreateScope();
-            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            using IServiceScope scope = _serviceProvider.CreateScope();
+            IApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+            IEmailService emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
+            IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+            var schoolId = Guid.Parse(message.Data.SchoolId);
+            Domain.Schools.Schools? school = await dbContext.Schools
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.PublicId == schoolId);
+
+            if (school == null)
+            {
+                _logger.LogWarning("School not found for ID: {SchoolId}", message.Data.SchoolId);
+                return;
+            }
 
             if (message.Data.Success)
             {
-                // Send welcome email
+                var payload = new Dictionary<string, object>
+                {
+                    { "schoolId", school.Id },
+                    { "schoolPublicId", school.PublicId },
+                    { "organizationId", school.OrganizationId ?? string.Empty },
+                    { "schoolName", school.SchoolName },
+                    { "email", school.EmailAddress },
+                    { "firstName", school.User.FirstName },
+                    { "lastName", school.User.LastName },
+                    { "role", school.User.Role.ToString() },
+                    { "username", school.User.Username },
+                    { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
+                };
+
+                string token = tokenService.GenerateToken(payload);
+
                 var emailMessage = new EmailMessage
                 {
-                    To = message.Data.OriginalCommand.User.Email,
-                    Subject = "Welcome to the School Management System",
-                    Body = $"Dear {message.Data.OriginalCommand.User.FirstName},\n\nYour school '{message.Data.OriginalCommand.SchoolName}' has been successfully created.\n\nBest regards,\nThe Team",
-                    // Add other email properties as needed
+                    Email = school.EmailAddress,
+                    Title = "Your School Organization is Ready",
+                    SchoolName = school.SchoolName,
+                    Description = "We've successfully onboarded your school to our platform. We're excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we're looking forward to growing with you.",
+                    EmailButton = true,
+                    ButtonLink = $"{configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
+                    ButtonText = "Complete Your Setup"
                 };
 
                 await emailService.SendEmailAsync(emailMessage);
 
-                _logger.LogInformation("Welcome email sent for school: {SchoolId}", message.Data.SchoolId);
+                _logger.LogInformation("Welcome email sent for school: {SchoolName} ({SchoolId})",
+                    school.SchoolName, message.Data.SchoolId);
             }
             else
             {
-                // Handle failure - send error email or log
-                _logger.LogError("Tenant creation failed for school: {SchoolId}. Error: {Error}",
-                    message.Data.SchoolId, message.Data.ErrorMessage);
+                _logger.LogError("Tenant creation failed for school: {SchoolName} ({SchoolId}). Error: {Error}",
+                    school.SchoolName, message.Data.SchoolId, message.Data.ErrorMessage);
+
+                var errorEmailMessage = new EmailMessage
+                {
+                    Email = school.EmailAddress,
+                    Title = "School Setup Issue",
+                    SchoolName = school.SchoolName,
+                    Description = "We encountered an issue while setting up your school. Our technical team has been notified and will resolve this shortly. We'll contact you once everything is ready.",
+                    EmailButton = false
+                };
+
+                await emailService.SendEmailAsync(errorEmailMessage);
             }
         }
         catch (Exception ex)
