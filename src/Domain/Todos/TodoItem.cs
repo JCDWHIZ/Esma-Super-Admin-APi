@@ -3,9 +3,9 @@ using SharedKernel.Models;
 
 namespace Domain.Todos;
 
-public sealed class TodoItem : BaseEntity
+public sealed class TodoItem : BaseAuditableEntity
 {
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public string Description { get; set; }
     public DateTime? DueDate { get; set; }
     public List<string> Labels { get; set; } = [];

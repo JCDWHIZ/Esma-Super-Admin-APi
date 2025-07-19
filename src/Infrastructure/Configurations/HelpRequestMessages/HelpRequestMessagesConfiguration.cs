@@ -1,12 +1,11 @@
-using Domain.HelpRequests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Configurations.HelpRequest;
+namespace Infrastructure.Configurations.HelpRequestMessages;
 
-internal sealed class HelpRequestMessagesConfiguration : IEntityTypeConfiguration<HelpRequestMessages>
+internal sealed class HelpRequestMessagesConfiguration : IEntityTypeConfiguration<Domain.HelpRequests.HelpRequestMessages>
 {
-    public void Configure(EntityTypeBuilder<HelpRequestMessages> builder)
+    public void Configure(EntityTypeBuilder<Domain.HelpRequests.HelpRequestMessages> builder)
     {
         builder.HasKey(hrm => hrm.Id);
 

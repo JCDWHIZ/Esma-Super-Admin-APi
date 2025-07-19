@@ -4,7 +4,7 @@ using SharedKernel.Models;
 
 namespace Domain.Users;
 
-public sealed class User : BaseEntity
+public sealed class User : BaseAuditableEntity
 {
     public string Email { get; set; }
     public string FirstName { get; set; }
