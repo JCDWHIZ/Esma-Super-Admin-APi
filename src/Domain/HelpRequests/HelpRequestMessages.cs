@@ -3,7 +3,7 @@ using SharedKernel.Models;
 
 namespace Domain.HelpRequests;
 
-public class HelpRequestMessages : BaseAuditableEntity
+public sealed class HelpRequestMessages : BaseAuditableEntity
 {
     public string? Title { get; set; }
     public IList<string> Attachments { get; set; } = new List<string>();

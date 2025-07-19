@@ -6,7 +6,7 @@ using SharedKernel.Models;
 
 namespace Domain.Schools;
 
-public class Schools : BaseAuditableEntity
+public sealed class Schools : BaseAuditableEntity
 {
     public string SchoolName { get; set; } = string.Empty;
     public string LogoUrl { get; set; } = string.Empty;

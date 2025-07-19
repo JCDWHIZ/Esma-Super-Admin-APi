@@ -4,11 +4,22 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
 using Application.Abstractions.Models;
 
-namespace admin_service.Web.Middleware;
+namespace Web.Api.Middleware;
 
 public class ApiResponseMiddleware
 {
     private readonly RequestDelegate _next;
+
+    // Cache JsonSerializerOptions instances to avoid creating new ones for each request
+    private static readonly JsonSerializerOptions DeserializeOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    private static readonly JsonSerializerOptions SerializeOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public ApiResponseMiddleware(RequestDelegate next)
     {
@@ -21,6 +32,7 @@ public class ApiResponseMiddleware
         using var memStream = new MemoryStream();
         context.Response.Body = memStream;
         await _next(context);
+
         if (context.Request.Path.StartsWithSegments("/swagger") ||
             context.Request.Path.StartsWithSegments("/api-docs") ||
             context.Response.StatusCode == StatusCodes.Status204NoContent ||
@@ -31,6 +43,7 @@ public class ApiResponseMiddleware
             await memStream.CopyToAsync(originalBodyStream);
             return;
         }
+
         string customMessage = "Success";
         if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
         {
@@ -60,37 +73,40 @@ public class ApiResponseMiddleware
         {
             customMessage = "Error";
         }
+
         memStream.Seek(0, SeekOrigin.Begin);
-        string responseBodyText = await new StreamReader(memStream).ReadToEndAsync();
+
+        // Properly dispose StreamReader to fix CA2000 warning
+        string responseBodyText;
+        using (var streamReader = new StreamReader(memStream))
+        {
+            responseBodyText = await streamReader.ReadToEndAsync();
+        }
 
         object? dataObject;
         try
         {
-            dataObject = JsonSerializer.Deserialize<object>(responseBodyText, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            // Use cached JsonSerializerOptions instance
+            dataObject = JsonSerializer.Deserialize<object>(responseBodyText, DeserializeOptions);
             if (dataObject is string innerJson)
             {
-                object? temp = JsonSerializer.Deserialize<object>(innerJson, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                object? temp = JsonSerializer.Deserialize<object>(innerJson, DeserializeOptions);
                 if (temp != null)
                 {
                     dataObject = temp;
                 }
-                ;
             }
         }
         catch
         {
             dataObject = responseBodyText;
         }
+
         if (string.IsNullOrWhiteSpace(responseBodyText) && context.Response.StatusCode >= 400)
         {
             dataObject = null;
         }
+
         var apiResponse = new ApiResponse<object>
         {
             Status = context.Response.StatusCode,
@@ -98,11 +114,11 @@ public class ApiResponseMiddleware
             Message = customMessage,
             Timestamp = DateTime.UtcNow
         };
+
         context.Response.Body = originalBodyStream;
         context.Response.ContentType = "application/json";
-        await context.Response.WriteAsJsonAsync(apiResponse, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+
+        // Use cached JsonSerializerOptions instance
+        await context.Response.WriteAsJsonAsync(apiResponse, SerializeOptions);
     }
 }

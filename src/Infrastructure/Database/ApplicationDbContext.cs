@@ -24,13 +24,13 @@ public sealed class ApplicationDbContext(
 
     public DbSet<TodoItem> TodoItems { get; set; }
 
-    public DbSet<Schools> Schools => Set<Schools>();
-    public DbSet<Subscriptions> Subscriptions => Set<Subscriptions>();
-    public DbSet<HelpRequests> HelpRequests => Set<HelpRequests>();
+    public DbSet<Schools> Schools { get; set; }
+    public DbSet<Subscriptions> Subscriptions { get; set; }
+    public DbSet<HelpRequests> HelpRequests { get; set; }
     public DbSet<Blog> Blog => Set<Blog>();
-    public DbSet<HelpRequestMessages> HelpRequestMessages => Set<HelpRequestMessages>();
-    public DbSet<AuditLog> Auditlog => Set<AuditLog>();
-    public DbSet<SchoolAdmins> SchoolAdmins => Set<SchoolAdmins>();
+    public DbSet<HelpRequestMessages> HelpRequestMessages { get; set; }
+    public DbSet<AuditLog> Auditlog { get; set; }
+    public DbSet<SchoolAdmins> SchoolAdmins { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

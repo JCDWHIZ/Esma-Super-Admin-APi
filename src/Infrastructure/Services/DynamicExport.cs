@@ -76,10 +76,9 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
         var document = new Document(pdf);
 
         // Title
-        var title = new Paragraph($"{typeof(T).Name} Export")
+        Paragraph title = new Paragraph($"{typeof(T).Name} Export")
             .SetTextAlignment(TextAlignment.CENTER)
-            .SetFontSize(18)
-            .SetBold();
+            .SetFontSize(18).SetBackgroundColor(ColorConstants.LIGHT_GRAY);
         document.Add(title);
 
         document.Add(new Paragraph($"Export Date: {DateTime.Now:g}"));
@@ -88,25 +87,21 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
         // Get properties
         PropertyInfo[] properties = typeof(T).GetProperties();
 
-        // Create table with equal column widths
-        var table = new Table(properties.Length)
+        Table table = new Table(properties.Length)
             .SetWidth(UnitValue.CreatePercentValue(100))
             .SetMarginTop(10)
             .SetMarginBottom(10);
 
-        // Add headers
         foreach (PropertyInfo prop in properties)
         {
-            var headerCell = new Cell()
+            Cell headerCell = new Cell()
                 .Add(new Paragraph(prop.Name)
-                    .SetBold()
                     .SetFontSize(12))
                 .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
                 .SetTextAlignment(TextAlignment.CENTER);
             table.AddHeaderCell(headerCell);
         }
 
-        // Add data rows
         foreach (T item in data)
         {
             foreach (PropertyInfo prop in properties)
@@ -135,7 +130,7 @@ public class DynamicExportStrategy<T> : IExportStrategy where T : class
                         : rawValue.ToString() ?? string.Empty;
                 }
 
-                var cell = new Cell()
+                Cell cell = new Cell()
                     .Add(new Paragraph(cellValue)
                         .SetFontSize(10))
                     .SetTextAlignment(TextAlignment.LEFT);

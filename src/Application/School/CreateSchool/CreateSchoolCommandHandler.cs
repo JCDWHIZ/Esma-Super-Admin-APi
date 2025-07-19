@@ -62,9 +62,6 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
 
         _dbContext.Schools.Add(schoolEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
-
-        BackgroundJob.Enqueue<IKeycloakOrganizationService>(
-        service => service.CreateOrganizationForSchoolAsync(schoolEntity.Id, cancellationToken));
         return Result.Success("School Created Succesfully");
     }
 

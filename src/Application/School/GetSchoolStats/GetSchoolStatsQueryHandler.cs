@@ -1,23 +1,15 @@
 
 using Application.Interfaces;
 
+namespace Application.School.GetSchoolStats;
 
-namespace admin_service.Application.School.Queries.GetSchoolStats;
+public record GetSchoolStatsQuery : IQuery<SchoolStatsCountDto>;
 
-public record GetSchoolStatsQuery : ICommand<SchoolStatsCountDto>;
-
-public class GetSchoolStatsQueryHandler : ICommandHandler<GetSchoolStatsQuery, SchoolStatsCountDto>
+public sealed class GetSchoolStatsQueryHandler(IApplicationDbContext _context) : IQueryHandler<GetSchoolStatsQuery, SchoolStatsCountDto>
 {
-    private readonly IApplicationDbContext _context;
-
-    public GetSchoolStatsQueryHandler(IApplicationDbContext context)
+    async Task<Result<SchoolStatsCountDto>> IQueryHandler<GetSchoolStatsQuery, SchoolStatsCountDto>.Handle(GetSchoolStatsQuery query, CancellationToken cancellationToken)
     {
-        _context = context;
-    }
-
-    public async Task<SchoolStatsCountDto> Handle(GetSchoolStatsQuery request, CancellationToken cancellationToken)
-    {
-        var schoolStats = await _context.Schools
+        SchoolStatsCountDto? schoolStats = await _context.Schools
             .GroupBy(_ => true)
             .Select(g => new SchoolStatsCountDto
             {

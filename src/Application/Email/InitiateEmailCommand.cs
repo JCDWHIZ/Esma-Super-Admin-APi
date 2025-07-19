@@ -58,82 +58,82 @@
 //     }
 // }
 
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
-using Microsoft.Extensions.Logging;
-using Application.Interfaces;
-using Application.Abstractions.Models;
+// using System.Threading;
+// using System.Threading.Tasks;
+// using MediatR;
+// using Microsoft.Extensions.Logging;
+// using Application.Interfaces;
+// using Application.Abstractions.Models;
 
-namespace admin_service.Application.Email
-{
-    public record InitiateEmailCommand : ICommand<EmailRequestDto>
-    {
-        public required string Email { get; init; }
-        public required string SchoolName { get; init; }
-        public required string Title { get; init; }
-        public required string Description { get; init; }
-        public string? ButtonText { get; init; }
-        public string? ButtonLink { get; init; }
-        public bool EmailButton { get; init; }
-    }
+// namespace admin_service.Application.Email
+// {
+//     public record InitiateEmailCommand : ICommand<EmailRequestDto>
+//     {
+//         public required string Email { get; init; }
+//         public required string SchoolName { get; init; }
+//         public required string Title { get; init; }
+//         public required string Description { get; init; }
+//         public string? ButtonText { get; init; }
+//         public string? ButtonLink { get; init; }
+//         public bool EmailButton { get; init; }
+//     }
 
-    public class EmailRequestDto
-    {
-        public required string Email { get; init; }
-        public required string SchoolName { get; init; }
-        public required string Title { get; init; }
-        public required string Description { get; init; }
-        public string? ButtonText { get; init; }
-        public string? ButtonLink { get; init; }
-        public bool EmailButton { get; init; }
-    }
+//     public class EmailRequestDto
+//     {
+//         public required string Email { get; init; }
+//         public required string SchoolName { get; init; }
+//         public required string Title { get; init; }
+//         public required string Description { get; init; }
+//         public string? ButtonText { get; init; }
+//         public string? ButtonLink { get; init; }
+//         public bool EmailButton { get; init; }
+//     }
 
-    public class InitiateEmailRequestHandler
-        : ICommandHandler<InitiateEmailCommand, EmailRequestDto>
-    {
-        private readonly IEmailService _emailService;
-        private readonly ILogger<InitiateEmailRequestHandler> _logger;
+//     public class InitiateEmailRequestHandler
+//         : ICommandHandler<InitiateEmailCommand, EmailRequestDto>
+//     {
+//         private readonly IEmailService _emailService;
+//         private readonly ILogger<InitiateEmailRequestHandler> _logger;
 
-        public InitiateEmailRequestHandler(
-            IEmailService emailService,
-            ILogger<InitiateEmailRequestHandler> logger)
-        {
-            _emailService = emailService;
-            _logger = logger;
-        }
+//         public InitiateEmailRequestHandler(
+//             IEmailService emailService,
+//             ILogger<InitiateEmailRequestHandler> logger)
+//         {
+//             _emailService = emailService;
+//             _logger = logger;
+//         }
 
-        public async Task<EmailRequestDto> Handle(
-            InitiateEmailCommand request,
-            CancellationToken cancellationToken)
-        {
-            // 1. Map to your domain/email model
-            var emailMessage = new EmailMessage
-            {
-                Email = request.Email,
-                Title = request.Title,
-                SchoolName = request.SchoolName,
-                Description = request.Description,
-                ButtonText = request.ButtonText,
-                ButtonLink = request.ButtonLink,
-                EmailButton = request.EmailButton
-            };
+//         public async Task<EmailRequestDto> Handle(
+//             InitiateEmailCommand request,
+//             CancellationToken cancellationToken)
+//         {
+//             // 1. Map to your domain/email model
+//             var emailMessage = new EmailMessage
+//             {
+//                 Email = request.Email,
+//                 Title = request.Title,
+//                 SchoolName = request.SchoolName,
+//                 Description = request.Description,
+//                 ButtonText = request.ButtonText,
+//                 ButtonLink = request.ButtonLink,
+//                 EmailButton = request.EmailButton
+//             };
 
-            // 2. Fire-and-forget? or get back an ID?
-            var messageId = await _emailService.SendEmailAsync(emailMessage);
-            _logger.LogInformation("Email queued with message ID: {MessageId}", messageId);
+//             // 2. Fire-and-forget? or get back an ID?
+//             var messageId = await _emailService.SendEmailAsync(emailMessage);
+//             _logger.LogInformation("Email queued with message ID: {MessageId}", messageId);
 
-            // 3. Return the DTO (mirror the request or include new data)
-            return new EmailRequestDto
-            {
-                Email = request.Email,
-                Title = request.Title,
-                SchoolName = request.SchoolName,
-                Description = request.Description,
-                ButtonText = request.ButtonText,
-                ButtonLink = request.ButtonLink,
-                EmailButton = request.EmailButton
-            };
-        }
-    }
-}
+//             // 3. Return the DTO (mirror the request or include new data)
+//             return new EmailRequestDto
+//             {
+//                 Email = request.Email,
+//                 Title = request.Title,
+//                 SchoolName = request.SchoolName,
+//                 Description = request.Description,
+//                 ButtonText = request.ButtonText,
+//                 ButtonLink = request.ButtonLink,
+//                 EmailButton = request.EmailButton
+//             };
+//         }
+//     }
+// }

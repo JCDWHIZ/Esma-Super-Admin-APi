@@ -4,43 +4,31 @@ using System.Globalization;
 
 namespace admin_service.Application.School.Queries.GetSchoolStats;
 
-public record GetSchoolDashboardQuery : ICommand<List<YearlyOverviewDto>>;
-public class GetSchoolDashboardQueryHandler : ICommandHandler<GetSchoolDashboardQuery, List<YearlyOverviewDto>>
+public sealed record GetSchoolDashboardQuery : IQuery<List<YearlyOverviewDto>>;
+public sealed class GetSchoolDashboardQueryHandler(IApplicationDbContext _context) : IQueryHandler<GetSchoolDashboardQuery, List<YearlyOverviewDto>>
 {
-    private readonly IApplicationDbContext _context;
-
-    public GetSchoolDashboardQueryHandler(IApplicationDbContext context)
+    async Task<Result<List<YearlyOverviewDto>>> IQueryHandler<GetSchoolDashboardQuery, List<YearlyOverviewDto>>.Handle(GetSchoolDashboardQuery query, CancellationToken cancellationToken)
     {
-        _context = context;
-    }
-
-    public async Task<List<YearlyOverviewDto>> Handle(GetSchoolDashboardQuery request, CancellationToken cancellationToken)
-    {
-        var yearlyOverview = await _context.Schools
-    .GroupBy(s => new { s.Created.Year, s.Created.Month })
-    .Select(g => new
-    {
-        Year = g.Key.Year,
-        Month = g.Key.Month,
-        Count = g.Count()
-    })
-    .ToListAsync(cancellationToken);
+        var yearlyOverview = await _context.Schools.GroupBy(s => new { s.Created.Year, s.Created.Month }).Select(g => new
+        {
+            g.Key.Year,
+            g.Key.Month,
+            Count = g.Count()
+        })
+        .ToListAsync(cancellationToken);
 
 
-        var groupedYearlyOverview = yearlyOverview
-            .GroupBy(x => x.Year)
-            .Select(g => new YearlyOverviewDto
-            {
-                Year = g.Key,
-                MonthlyOverview = [.. Enumerable.Range(1, 12)
-            .Select(month =>
-            {
-                var monthData = g.FirstOrDefault(x => x.Month == month);
-                var count = monthData?.Count ?? 0;
-                return $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)}: {count}";
-            })]
-            })
-            .ToList();
+        var groupedYearlyOverview = yearlyOverview.GroupBy(x => x.Year).Select(g => new YearlyOverviewDto
+        {
+            Year = g.Key,
+            MonthlyOverview = [.. Enumerable.Range(1, 12)
+        .Select(month =>
+        {
+            var monthData = g.FirstOrDefault(x => x.Month == month);
+            int count = monthData?.Count ?? 0;
+            return $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)}: {count}";
+        })]
+        }).ToList();
 
         return groupedYearlyOverview;
     }

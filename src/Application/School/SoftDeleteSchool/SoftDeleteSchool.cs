@@ -1,22 +1,22 @@
-using System;
-using Application.Interfaces;
+// using System;
+// using Application.Interfaces;
 
-namespace admin_service.Application.School.Commands.SoftDeleteSchool;
+// namespace admin_service.Application.School.Commands.SoftDeleteSchool;
 
 
-public record SoftDeleteSchoolCommand(string PublicId) : ICommand; // Ensure SchoolItemDto has an Id property
-public class SoftDeleteSchoolCommandHandler(IApplicationDbContext context) : ICommandHandler<SoftDeleteSchoolCommand>
-{
-    private readonly IApplicationDbContext _context = context;
+// public record SoftDeleteSchoolCommand(string PublicId) : ICommand; // Ensure SchoolItemDto has an Id property
+// public class SoftDeleteSchoolCommandHandler(IApplicationDbContext context) : ICommandHandler<SoftDeleteSchoolCommand>
+// {
+//     private readonly IApplicationDbContext _context = context;
 
-    public async Task Handle(SoftDeleteSchoolCommand request, CancellationToken cancellationToken)
-    {
-        var entity = await _context.Schools.FirstOrDefaultAsync(x => x.PublicId == request.PublicId);
+//     public async Task Handle(SoftDeleteSchoolCommand request, CancellationToken cancellationToken)
+//     {
+//         var entity = await _context.Schools.FirstOrDefaultAsync(x => x.PublicId == request.PublicId);
 
-        Guard.Against.NotFound(request.PublicId, entity); // Ensure SchoolItemDto has an Id property
-        entity.IsDeleted = true;
-        entity.DeletedAt = DateTime.UtcNow;
+//         Guard.Against.NotFound(request.PublicId, entity); // Ensure SchoolItemDto has an Id property
+//         entity.IsDeleted = true;
+//         entity.DeletedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync(cancellationToken);
-    }
-}
+//         await _context.SaveChangesAsync(cancellationToken);
+//     }
+// }

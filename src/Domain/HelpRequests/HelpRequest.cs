@@ -4,7 +4,7 @@ using SharedKernel.Models;
 
 namespace Domain.HelpRequests;
 
-public class HelpRequests : BaseAuditableEntity
+public sealed class HelpRequests : BaseAuditableEntity
 {
     public string? TicketId { get; set; }
     public HelpStatus Status { get; set; } = HelpStatus.OPEN_REQUEST;

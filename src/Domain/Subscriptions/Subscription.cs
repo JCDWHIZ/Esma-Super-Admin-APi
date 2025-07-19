@@ -5,7 +5,7 @@ using SharedKernel.Models;
 
 namespace Domain.Subscriptions;
 
-public class Subscriptions : BaseAuditableEntity
+public sealed class Subscriptions : BaseAuditableEntity
 {
     public SubscriptionType SubscriptionType { get; set; }
     public DateTime? StartDate { get; set; }

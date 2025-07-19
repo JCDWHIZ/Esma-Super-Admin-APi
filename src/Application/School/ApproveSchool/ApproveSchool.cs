@@ -1,37 +1,30 @@
 using System;
 using Application.Interfaces;
-using admin_service.Domain.Enums;
 using Hangfire;
+using Application.BackgroundJobs;
+using Domain.Schools;
 
-namespace admin_service.Application.School.Commands.ApproveSchool;
+namespace Application.School.ApproveSchool;
 
+public sealed record ApproveSchoolCommand(Guid PublicId) : ICommand<string>;
 
-public class ApproveSchoolCommandValidator : AbstractValidator<ApproveSchoolCommand>
+public class ApproveSchoolHandler(IApplicationDbContext context) : ICommandHandler<ApproveSchoolCommand, string>
 {
-    public ApproveSchoolCommandValidator()
+    public async Task<Result<string>> Handle(ApproveSchoolCommand request, CancellationToken cancellationToken)
     {
-        RuleFor(x => x.Id).NotEmpty();
-    }
-}
+        Schools? school = await context.Schools.FindAsync(new object[] { request.PublicId }, cancellationToken);
+        if (school == null)
+        {
+            return Result.Failure<string>(SchoolErrors.NotFound(request.PublicId));
+        }
 
+        school.Status = SchoolStatus.APPROVED;
+        await context.SaveChangesAsync(cancellationToken);
 
-public record ApproveSchoolCommand(int Id) : ICommand;
-
-public class ApproveSchoolHandler(IApplicationDbContext context) : ICommandHandler<ApproveSchoolCommand>
-{
-    private readonly IApplicationDbContext _context = context;
-
-    public async Task Handle(ApproveSchoolCommand request, CancellationToken cancellationToken)
-    {
-        var entity = await _context.Schools.FindAsync(new object[] { request.Id }, cancellationToken);
-        Guard.Against.NotFound(request.Id, entity); // Ensure SchoolItemDto has an Id property
-
-
-        entity.Status = SchoolStatus.APPROVED;
-        // notification here
         BackgroundJob.Enqueue<IKeycloakOrganizationService>(
-       service => service.CreateOrganizationForSchoolAsync(entity.Id, cancellationToken));
-        await _context.SaveChangesAsync(cancellationToken);
+        service => service.CreateOrganizationForSchoolAsync(school.Id, cancellationToken));
+
+        return Result.Success("School approved successfully.");
     }
 }
 

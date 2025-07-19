@@ -6,10 +6,21 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using Web.Api;
 using Web.Api.Extensions;
+using Web.Api.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
+
+string[]? allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+if (allowedOrigins is null || allowedOrigins.Length == 0)
+{
+    throw new InvalidOperationException("Allowed origins for CORS must be configured in appsettings.json.");
+}
+builder.Services.AddCors(options => options.AddPolicy("AppCorsPolicy", policy => policy.WithOrigins(allowedOrigins!)
+              .AllowAnyHeader()
+              .AllowAnyMethod()));
 
 builder.Services.AddSwaggerGenWithAuth();
 
@@ -29,6 +40,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerWithUi();
 
     app.ApplyMigrations();
+    app.UseHttpsRedirection();
+    app.UseHsts();
 }
 
 app.MapHealthChecks("health", new HealthCheckOptions
@@ -40,13 +53,16 @@ app.UseRequestContextLogging();
 
 app.UseSerilogRequestLogging();
 
+app.UseCors("AppCorsPolicy");
+
+app.UseMiddleware<ApiResponseMiddleware>();
+
 app.UseExceptionHandler();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-// REMARK: If you want to use Controllers, you'll need this.
 app.MapControllers();
 
 await app.RunAsync();
@@ -54,5 +70,5 @@ await app.RunAsync();
 // REMARK: Required for functional and integration tests to work.
 namespace Web.Api
 {
-    public partial class Program;
+    public class Program;
 }
