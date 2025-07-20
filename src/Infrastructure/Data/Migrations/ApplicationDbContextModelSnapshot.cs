@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -538,12 +538,6 @@ namespace Infrastructure.Database.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("last_name");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("password_hash");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)

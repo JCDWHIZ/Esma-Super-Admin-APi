@@ -23,6 +23,6 @@ public record SchoolItemDto
     public ICollection<string>? DocumentUrl { get; set; } = new List<string>();
     public ICollection<Modules> Modules { get; set; } = new List<Modules>();
     public required SubscriptionDto? Subscriptions { get; set; }
-    public required SchoolAdmins? User { get; set; }
+    public required UserDto? User { get; set; }
     public bool IsDeleted { get; internal set; }
 }

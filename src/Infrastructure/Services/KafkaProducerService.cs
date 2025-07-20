@@ -21,6 +21,7 @@ public class KafkaProducer : IMessageProducer, IDisposable
     };
     private bool _disposed;
 
+
     public KafkaProducer(IOptions<KafkaSettings> settings, ILogger<KafkaProducer> logger)
     {
         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));

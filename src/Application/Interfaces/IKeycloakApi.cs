@@ -59,7 +59,7 @@ public class CreateOrganizationRequest
     public required string Alias { get; set; }
     public string RedirectUrl { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public List<Links> Links { get; set; }
+    public List<Links> Domains { get; set; }
     public Dictionary<string, string> Attributes { get; set; } = new()
     {
         // { "type", "school" }

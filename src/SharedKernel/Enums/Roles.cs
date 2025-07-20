@@ -6,6 +6,6 @@ public enum Roles
 {
     ADMIN,
     MANAGER,
-    CONTENT_CREATOR
-
+    CONTENT_CREATOR,
+    SCHOOL_SUPER_ADMIN
 }

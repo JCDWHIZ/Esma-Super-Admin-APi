@@ -508,7 +508,7 @@ public class KeycloakService
             Alias = schoolName.Replace(" ", ""),
             Description = "",
             RedirectUrl = "",
-            Links = [new() { Name = $"{schoolName.Replace(" ", "")}.com" }]
+            Domains = [new() { Name = $"{schoolName.Replace(" ", "")}.com" }]
         };
 
         Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.CreateOrganization(realm, request, $"Bearer {token}");
@@ -525,7 +525,7 @@ public class KeycloakService
             if (locationUrl != null)
             {
                 string orgId = locationUrl.Split('/')[^1];
-                Console.WriteLine($"cxcghfghc {orgId}");
+                Console.WriteLine($"OrgId {orgId}");
                 return orgId;
             }
         }

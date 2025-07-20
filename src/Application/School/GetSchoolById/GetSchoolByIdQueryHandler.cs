@@ -38,14 +38,15 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
             },
             Modules = entity.Modules,
             DocumentUrl = entity.DocumentUrl,
-            User = entity.User == null ? null : new SchoolAdmins
+            User = entity.User == null ? null :
+            new UserDto
             {
                 Role = entity.User.Role,
                 Username = entity.User.Username,
                 FirstName = entity.User.FirstName,
                 LastName = entity.User.LastName,
                 Email = entity.User.Email,
-                PhoneNumber = entity.User.PhoneNumber
+                PhoneNumber = entity.User.PhoneNumber ?? string.Empty
             },
         };
         return schoolDto;

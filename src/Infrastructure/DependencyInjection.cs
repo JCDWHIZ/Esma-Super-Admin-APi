@@ -140,6 +140,7 @@ public static class DependencyInjection
         services.Configure<KafkaSettings>(configuration.GetSection("Kafka"));
         services.AddScoped<IMessageProducer, KafkaProducer>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddSingleton<IKafkaAdminService, KafkaAdminService>();
         services.AddHostedService<TenantResponseHandlerService>();
 
         return services;

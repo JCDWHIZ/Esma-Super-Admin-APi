@@ -12,7 +12,7 @@ public class ApproveSchoolHandler(IApplicationDbContext context) : ICommandHandl
 {
     public async Task<Result<string>> Handle(ApproveSchoolCommand request, CancellationToken cancellationToken)
     {
-        Schools? school = await context.Schools.FindAsync(new object[] { request.PublicId }, cancellationToken);
+        Schools? school = await context.Schools.FirstOrDefaultAsync(x => x.PublicId == request.PublicId, cancellationToken);
         if (school == null)
         {
             return Result.Failure<string>(SchoolErrors.NotFound(request.PublicId));

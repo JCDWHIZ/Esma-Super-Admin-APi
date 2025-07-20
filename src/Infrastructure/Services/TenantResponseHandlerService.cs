@@ -24,15 +24,17 @@ public class TenantResponseHandlerService : BackgroundService
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+    private readonly IKafkaAdminService _kafkaAdminService;
 
     public TenantResponseHandlerService(
         IServiceProvider serviceProvider,
         IOptions<KafkaSettings> kafkaSettings,
-        ILogger<TenantResponseHandlerService> logger)
+        ILogger<TenantResponseHandlerService> logger, IKafkaAdminService kafkaAdminService)
     {
         _serviceProvider = serviceProvider;
         _kafkaSettings = kafkaSettings.Value;
         _logger = logger;
+        _kafkaAdminService = kafkaAdminService;
 
         var config = new ConsumerConfig
         {
@@ -44,25 +46,92 @@ public class TenantResponseHandlerService : BackgroundService
         _consumer = new ConsumerBuilder<string, string>(config).Build();
     }
 
+    // protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    // {
+    //         await _kafkaAdminService.EnsureTopicsExistAsync(
+    //             _kafkaSettings.DefaultTopic,
+    //             _kafkaSettings.CreateOrganizationTopic,
+    //             _kafkaSettings.CreateTenantTopic,
+    //             _kafkaSettings.EmailTopic,
+    //             _kafkaSettings.TenantResponseTopic
+    //         );
+
+    //     _consumer.Subscribe(_kafkaSettings.TenantResponseTopic);
+
+    //     _logger.LogInformation("Started consuming from topic: {Topic}", _kafkaSettings.TenantResponseTopic);
+    //     try
+    //     {
+    //         while (!stoppingToken.IsCancellationRequested)
+    //         {
+    //             ConsumeResult<string, string> consumeResult = _consumer.Consume(stoppingToken);
+
+    //             if (consumeResult?.Message?.Value != null)
+    //             {
+    //                 await ProcessTenantResponse(consumeResult.Message.Value);
+    //             }
+    //         }
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "Error in tenant response handler service");
+    //     }
+    // }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _consumer.Subscribe(_kafkaSettings.TenantResponseTopic);
-
+        await Task.Delay(5000, stoppingToken);
         try
         {
+            await _kafkaAdminService.EnsureTopicsExistAsync(
+                _kafkaSettings.DefaultTopic,
+                _kafkaSettings.CreateOrganizationTopic,
+                _kafkaSettings.CreateTenantTopic,
+                _kafkaSettings.EmailTopic,
+                _kafkaSettings.TenantResponseTopic
+            );
+
+            _consumer.Subscribe(_kafkaSettings.TenantResponseTopic);
+            _logger.LogInformation("Started consuming from topic: {Topic}", _kafkaSettings.TenantResponseTopic);
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                ConsumeResult<string, string> consumeResult = _consumer.Consume(stoppingToken);
-
-                if (consumeResult?.Message?.Value != null)
+                try
                 {
-                    await ProcessTenantResponse(consumeResult.Message.Value);
+                    // Use a timeout to prevent indefinite blocking
+                    ConsumeResult<string, string>? consumeResult = _consumer.Consume(TimeSpan.FromSeconds(1));
+
+                    if (consumeResult?.Message?.Value != null)
+                    {
+                        _logger.LogInformation("Received message from topic {Topic}", consumeResult.Topic);
+                        await ProcessTenantResponse(consumeResult.Message.Value);
+                    }
+                    // If no message received within timeout, continue loop (allows cancellation check)
+                }
+                catch (ConsumeException ex)
+                {
+                    _logger.LogError(ex, "Error consuming message from Kafka");
+                }
+                catch (OperationCanceledException)
+                {
+                    // Expected when cancellation is requested
+                    break;
                 }
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in tenant response handler service");
+        }
+        finally
+        {
+            try
+            {
+                _consumer.Close();
+                _logger.LogInformation("Kafka consumer closed");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error closing Kafka consumer");
+            }
         }
     }
 

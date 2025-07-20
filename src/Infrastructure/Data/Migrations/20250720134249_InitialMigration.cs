@@ -5,7 +5,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration
@@ -96,7 +96,6 @@ namespace Infrastructure.Database.Migrations
                     email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    password_hash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     role = table.Column<string>(type: "text", nullable: false),
                     username = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),

@@ -117,7 +117,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             await _messageProducer.SendMessageAsync(
                 "CreateTenant",
                 tenantMessage,
-                _configuration["KafkaSettings:CreateTenantTopic"]);
+                _configuration["Kafka:CreateTenantTopic"]);
 
             _logger.LogInformation("Organization created and tenant creation task enqueued for school: {SchoolId}",
                 school.Id);

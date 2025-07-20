@@ -22,9 +22,6 @@ internal sealed class SchoolAdminsConfiguration : IEntityTypeConfiguration<Schoo
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(sa => sa.PasswordHash)
-            .HasMaxLength(255);
-
         builder.Property(sa => sa.Role)
             .HasConversion<string>();
 

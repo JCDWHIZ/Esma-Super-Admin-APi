@@ -91,14 +91,14 @@ public sealed class GetDeletedSchoolsWithPaginationQueryHandler(IApplicationDbCo
                     EndDate = s.Subscriptions.EndDate ?? DateTime.MinValue,
                     Amount = s.Subscriptions.Amount
                 },
-                User = s.User == null ? null : new SchoolAdmins
+                User = s.User == null ? null : new UserDto
                 {
                     Role = s.User.Role,
                     Username = s.User.Username,
                     FirstName = s.User.FirstName,
                     LastName = s.User.LastName,
                     Email = s.User.Email,
-                    PhoneNumber = s.User.PhoneNumber
+                    PhoneNumber = s.User.PhoneNumber ?? string.Empty
                 },
             }),
             query.PageNumber ?? 1,
