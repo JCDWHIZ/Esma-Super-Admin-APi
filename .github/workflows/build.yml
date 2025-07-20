@@ -76,14 +76,14 @@ docker-build-push:
     - docker buildx create --use
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
-    - |
-      docker buildx build \
-        --platform linux/arm64 \
-        --push \
-        -t $DOCKER_IMAGE:latest \
-        -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
-        -f ./src/Web.Api/Dockerfile \
-        ./src/Web.Api
+  - |
+    docker buildx build \
+      --platform linux/arm64 \
+      --push \
+      -t $DOCKER_IMAGE:latest \
+      -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
+      -f ./src/Web.Api/Dockerfile \
+      .
   needs: ["build-test-dotnet"]  # Require tests to pass first
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
