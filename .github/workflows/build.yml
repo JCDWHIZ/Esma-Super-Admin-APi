@@ -38,7 +38,7 @@ stages:
 
 variables:
   DOCKER_REGISTRY: "docker.io"
-  IMAGE_NAME: "admin-service"
+  IMAGE_NAME: "admin-service-v2"
   DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
   SOLUTION_FILE: "CleanArchitecture.sln"   # Correct solution name
 
