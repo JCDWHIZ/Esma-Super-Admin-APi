@@ -38,8 +38,9 @@ stages:
 
 variables:
   DOCKER_REGISTRY: "docker.io"
-  IMAGE_NAME: "admin-service-v2"
+  IMAGE_NAME: "admin-service"
   DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
+  SOLUTION_FILE: "CleanArchitecture.sln"   # Correct solution name
 
 # Build and test .NET application
 build-test-dotnet:
@@ -48,9 +49,13 @@ build-test-dotnet:
   tags:
     - esma
   script:
-    - dotnet restore CleanArchitecture.sln
-    - dotnet build CleanArchitecture.sln --no-restore -c Release
-    - dotnet test CleanArchitecture.sln --no-build -c Release -m:4 --logger "trx;LogFileName=test-results.trx"
+    - dotnet restore $SOLUTION_FILE
+    - dotnet build $SOLUTION_FILE --no-restore -c Release
+    - dotnet test $SOLUTION_FILE --no-build -c Release -m:4 --logger "trx;LogFileName=test-results.trx"
+  artifacts:
+    paths:
+      - "**/TestResults/*.trx"   # Capture test results
+    when: always
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
@@ -79,9 +84,9 @@ docker-build-push:
         -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
         -f ./src/Web.Api/Dockerfile \
         ./src/Web.Api
+  needs: ["build-test-dotnet"]  # Require tests to pass first
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
 
 # Auto-deploy to server
 deploy-to-server:
