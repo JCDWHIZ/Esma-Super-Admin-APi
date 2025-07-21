@@ -102,7 +102,7 @@ public class TenantResponseHandlerService : BackgroundService
                     if (consumeResult?.Message?.Value != null)
                     {
                         _logger.LogInformation("Received message from topic {Topic}", consumeResult.Topic);
-                        await ProcessTenantResponse(consumeResult.Message.Value);
+                        await ProcessTenantResponse(consumeResult.Message.Value, stoppingToken);
                     }
                     // If no message received within timeout, continue loop (allows cancellation check)
                 }
@@ -135,7 +135,7 @@ public class TenantResponseHandlerService : BackgroundService
         }
     }
 
-    private async Task ProcessTenantResponse(string messageJson)
+    private async Task ProcessTenantResponse(string messageJson, CancellationToken cancellationToken)
     {
         try
         {
@@ -154,7 +154,7 @@ public class TenantResponseHandlerService : BackgroundService
             var schoolId = Guid.Parse(message.Data.SchoolId);
             Domain.Schools.Schools? school = await dbContext.Schools
                 .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.PublicId == schoolId);
+                .FirstOrDefaultAsync(s => s.PublicId == schoolId, cancellationToken);
 
             if (school == null)
             {
@@ -164,6 +164,9 @@ public class TenantResponseHandlerService : BackgroundService
 
             if (message.Data.Success)
             {
+                school.TenantId = message.Data.TenantId;
+
+                await dbContext.SaveChangesAsync(cancellationToken);
                 var payload = new Dictionary<string, object>
                 {
                     { "schoolId", school.Id },

@@ -5,7 +5,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Data.Migrations
+namespace Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration
@@ -184,6 +184,7 @@ namespace Infrastructure.Data.Migrations
                     phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     document_url = table.Column<string>(type: "text", nullable: false),
                     modules = table.Column<string>(type: "text", nullable: false),
+                    tenant_id = table.Column<string>(type: "text", nullable: false),
                     public_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),

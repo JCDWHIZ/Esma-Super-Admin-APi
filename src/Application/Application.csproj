@@ -19,8 +19,4 @@
 	<InternalsVisibleTo Include="Application.UnitTests" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Subscription\Queries\" />
-  </ItemGroup>
-
 </Project>

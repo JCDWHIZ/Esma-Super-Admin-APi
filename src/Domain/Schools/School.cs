@@ -22,6 +22,7 @@ public sealed class Schools : BaseAuditableEntity
     public ICollection<Modules> Modules { get; set; } = new List<Modules>();
     [JsonIgnore]
     public required Subscriptions.Subscriptions Subscriptions { get; set; }
+    public string TenantId { get; set; } = string.Empty;
     public required SchoolAdmins User { get; set; }
 }
 

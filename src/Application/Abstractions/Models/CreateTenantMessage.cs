@@ -1,14 +1,24 @@
 using System;
+using Application.School.CreateSchool;
 
 namespace Application.Abstractions.Models;
 
 public class CreateTenantMessage
 {
-    public required int SchoolId { get; set; }
-    public required string OrganizationId { get; set; }
-    public required Guid SchoolPublicId { get; set; }
-    public required string SchoolName { get; set; }
-    public required string SchoolAdminEmail { get; set; }
-    public required string SchoolAdminFirstName { get; set; }
-    public required string SchoolAdminLastName { get; set; }
+    public int SchoolId { get; set; }
+    public string OrganizationId { get; set; }
+    public Guid SchoolPublicId { get; set; }
+    public string SchoolName { get; set; }
+    public string SchoolAdminEmail { get; set; }
+    public string SchoolAdminFirstName { get; set; }
+    public string SchoolAdminLastName { get; set; }
+    public string SchoolAdminUsername { get; set; }
+    public string? SchoolAdminPhoneNumber { get; set; }
+    public string SchoolLogoUrl { get; set; }
+    public string SchoolEmail { get; set; }
+    public string? SchoolPhoneNumber { get; set; }
+    public AddressDto? SchoolAddress { get; set; }
+    public Roles SchoolAdminRole { get; set; }
+    public ICollection<Modules> Modules { get; set; }
+    public SubscriptionDto Subscriptions { get; set; }
 }

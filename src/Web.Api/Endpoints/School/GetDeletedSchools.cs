@@ -1,15 +1,15 @@
 using System;
 using Application;
 using Application.School;
-using Application.School.GetSchoolsWithPagination;
+using Application.School.GetDeletedSchoolWithPagination;
 
 namespace Web.Api.Endpoints.School;
 
-internal sealed class GetSchools : IEndpoint
+internal sealed class GetDeletedSchools : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("schools", async (
+        app.MapGet("schools/deleted", async (
             string? schoolName,
             string? logoUrl,
             string? addressCountry,
@@ -23,10 +23,10 @@ internal sealed class GetSchools : IEndpoint
             SubscriptionType? subscriptionType,
             int? pageNumber,
             int? pageSize,
-            IQueryHandler<GetSchoolsWithPaginationQuery, PaginatedList<SchoolItemDto>> handler,
+            IQueryHandler<GetDeletedSchoolsWithPaginationQuery, PaginatedList<SchoolItemDto>> handler,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetSchoolsWithPaginationQuery
+            var query = new GetDeletedSchoolsWithPaginationQuery
             {
                 SchoolName = schoolName,
                 LogoUrl = logoUrl,

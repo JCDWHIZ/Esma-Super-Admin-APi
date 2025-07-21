@@ -6,4 +6,6 @@ public static class Tags
     public const string Schools = "Schools";
     public const string Admin = "Admin";
     public const string Todos = "todos";
+    public const string Subscription = "Subscription";
+    public const string AuditLogs = "AuditLogs";
 }

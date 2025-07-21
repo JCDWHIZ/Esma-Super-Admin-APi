@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Data.Migrations
+namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -350,6 +350,11 @@ namespace Infrastructure.Data.Migrations
                     b.Property<bool>("Subscribed")
                         .HasColumnType("boolean")
                         .HasColumnName("subscribed");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tenant_id");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")

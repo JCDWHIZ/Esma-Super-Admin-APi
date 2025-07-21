@@ -2,9 +2,9 @@ using Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
-namespace admin_service.Application.School.Queries.GetSchoolStats;
+namespace Application.School.GetSchoolDashboard;
 
-public sealed record GetSchoolDashboardQuery : IQuery<List<YearlyOverviewDto>>;
+
 public sealed class GetSchoolDashboardQueryHandler(IApplicationDbContext _context) : IQueryHandler<GetSchoolDashboardQuery, List<YearlyOverviewDto>>
 {
     async Task<Result<List<YearlyOverviewDto>>> IQueryHandler<GetSchoolDashboardQuery, List<YearlyOverviewDto>>.Handle(GetSchoolDashboardQuery query, CancellationToken cancellationToken)

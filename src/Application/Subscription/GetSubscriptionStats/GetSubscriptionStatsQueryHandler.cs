@@ -1,38 +1,35 @@
-// using System;
-// using Application.Interfaces;
+using System;
+using Application.Interfaces;
 
-// namespace admin_service.Application.Subscription.Queries.GetSubscriptionWithPagination;
+namespace Application.Subscription.GetSubscriptionStats;
 
-// public record GetSubscriptionStatsQuery : ICommand<SubscriptionStatsDto>;
-// public class GetSubscriptionStatsQueryHandler(IApplicationDbContext context, IMapper mapper) : ICommandHandler<GetSubscriptionStatsQuery, SubscriptionStatsDto>
-// {
-//     private readonly IApplicationDbContext _context = context;
-//     private readonly IMapper _mapper = mapper;
+public sealed record GetSubscriptionStatsQuery : ICommand<SubscriptionStatsDto>;
+public sealed class GetSubscriptionStatsQueryHandler(IApplicationDbContext _context) : ICommandHandler<GetSubscriptionStatsQuery, SubscriptionStatsDto>
+{
+    async Task<Result<SubscriptionStatsDto>> ICommandHandler<GetSubscriptionStatsQuery, SubscriptionStatsDto>.Handle(GetSubscriptionStatsQuery command, CancellationToken cancellationToken)
+    {
+        DateTime currentDate = DateTime.UtcNow;
+        DateTime expiryThreshold = currentDate.AddDays(15);
 
-//     public async Task<SubscriptionStatsDto> Handle(GetSubscriptionStatsQuery request, CancellationToken cancellationToken)
-//     {
-//         var currentDate = DateTime.UtcNow;
-//         var expiryThreshold = currentDate.AddDays(15);
+        SubscriptionStatsDto? subscriptionStats = await _context.Subscriptions
+            .GroupBy(_ => true)
+            .Select(g => new SubscriptionStatsDto
+            {
+                TotalSubscriptions = g.Count(),
+                ActiveSubscriptions = g.Count(x => x.EndDate >= currentDate),
+                ExpiringIn15Days = g.Count(x => x.EndDate > currentDate && x.EndDate <= expiryThreshold),
+                ExpiredSubscriptions = g.Count(x => x.EndDate < currentDate)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
-//         var subscriptionStats = await _context.Subscriptions
-//             .GroupBy(_ => true)
-//             .Select(g => new SubscriptionStatsDto
-//             {
-//                 TotalSubscriptions = g.Count(),
-//                 ActiveSubscriptions = g.Count(x => x.EndDate >= currentDate),
-//                 ExpiringIn15Days = g.Count(x => x.EndDate > currentDate && x.EndDate <= expiryThreshold),
-//                 ExpiredSubscriptions = g.Count(x => x.EndDate < currentDate)
-//             })
-//             .FirstOrDefaultAsync(cancellationToken);
+        return subscriptionStats ?? new SubscriptionStatsDto();
+    }
+}
 
-//         return subscriptionStats ?? new SubscriptionStatsDto();
-//     }
-// }
-
-// public class SubscriptionStatsDto
-// {
-//     public int TotalSubscriptions { get; set; }
-//     public int ActiveSubscriptions { get; set; }
-//     public int ExpiringIn15Days { get; set; }
-//     public int ExpiredSubscriptions { get; set; }
-// }
+public class SubscriptionStatsDto
+{
+    public int TotalSubscriptions { get; set; }
+    public int ActiveSubscriptions { get; set; }
+    public int ExpiringIn15Days { get; set; }
+    public int ExpiredSubscriptions { get; set; }
+}

@@ -3,6 +3,7 @@ using System.Threading;
 using Application.Abstractions.Models;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Application.School.CreateSchool;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
@@ -64,6 +65,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     {
         Domain.Schools.Schools? school = await _dbContext.Schools
             .Include(s => s.User)
+            .Include(s => s.Subscriptions)
+            .Include(s => s.Address)
             .FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
         if (school == null)
         {
@@ -112,6 +115,27 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 SchoolAdminEmail = school.User.Email,
                 SchoolAdminFirstName = school.User.FirstName,
                 SchoolAdminLastName = school.User.LastName,
+                SchoolLogoUrl = school.LogoUrl,
+                SchoolEmail = school.EmailAddress,
+                SchoolPhoneNumber = school.User.PhoneNumber,
+                SchoolAddress = school.Address == null ? null : new AddressDto
+                {
+                    State = school.Address.State ?? string.Empty,
+                    Country = school.Address.Country ?? string.Empty,
+                    Lga = school.Address.LGA ?? string.Empty,
+                    StreetAddress = school.Address.StreetAddress ?? string.Empty
+                },
+                SchoolAdminUsername = school.User.Username,
+                SchoolAdminRole = school.User.Role,
+                Modules = school.Modules,
+                Subscriptions = new SubscriptionDto
+                {
+                    SubscriptionType = school.Subscriptions.SubscriptionType,
+                    StartDate = school.Subscriptions.StartDate,
+                    EndDate = school.Subscriptions.EndDate,
+                    Amount = school.Subscriptions.Amount
+                }
+
             };
 
             await _messageProducer.SendMessageAsync(
