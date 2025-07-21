@@ -49,8 +49,6 @@ app.MapHealthChecks("health", new HealthCheckOptions
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
-app.UsePathBase("/admin");
-
 app.UseRequestContextLogging();
 
 app.UseSerilogRequestLogging();

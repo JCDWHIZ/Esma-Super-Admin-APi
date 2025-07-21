@@ -8,6 +8,9 @@ public static class HelpRequestErrors
     public static Error NotFound(Guid publicId) => Error.NotFound(
         "HelpRequest.NotFound",
         $"The help request with the PublicId = '{publicId}' was not found.");
+    public static Error NotFound(int Id) => Error.NotFound(
+        "HelpRequest.NotFound",
+        $"The help request with the Id = '{Id}' was not found.");
 
     public static Error NotFoundByTicket(string ticketId) => Error.NotFound(
         "HelpRequest.NotFoundByTicket",
