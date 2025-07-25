@@ -11,10 +11,10 @@ public sealed class GetAdmins : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/admin", async (
-            int pageNumber,
-            int pageSize,
-            string username,
-            Roles role,
+            int? pageNumber,
+            int? pageSize,
+            string? username,
+            Roles? role,
             IQueryHandler<GetAdminsQuery, PaginatedList<UserDto>> handler,
             CancellationToken cancellationToken
         ) =>

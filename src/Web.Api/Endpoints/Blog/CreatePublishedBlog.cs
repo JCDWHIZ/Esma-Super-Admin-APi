@@ -12,19 +12,15 @@ internal sealed class CreatePublishedBlog : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("blogs/published", async (
-            string title,
-            string content,
-            string backdropUrl,
-            BlogStatus status,
+            Request request,
             ICommandHandler<CreatePublishedBlogCommand, BlogItemDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new CreatePublishedBlogCommand
             {
-                Title = title,
-                Content = content,
-                BackdropUrl = backdropUrl,
-                Status = status
+                Title = request.Title,
+                Content = request.Content,
+                BackdropUrl = request.BackdropUrl
             };
 
             Result<BlogItemDto> result = await handler.Handle(command, cancellationToken);
@@ -34,4 +30,5 @@ internal sealed class CreatePublishedBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .RequireAuthorization();
     }
+    public sealed record Request(string Title, string Content, string BackdropUrl);
 }

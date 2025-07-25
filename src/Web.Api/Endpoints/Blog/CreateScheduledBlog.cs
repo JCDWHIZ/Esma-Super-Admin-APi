@@ -12,21 +12,16 @@ internal sealed class CreateScheduledBlog : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("blogs/scheduled", async (
-            string title,
-            string content,
-            string backdropUrl,
-            BlogStatus status,
-            DateTime? publishDate,
+            Request request,
             ICommandHandler<CreateScheduledBlogCommand, BlogItemDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new CreateScheduledBlogCommand
             {
-                Title = title,
-                Content = content,
-                BackdropUrl = backdropUrl,
-                Status = status,
-                PublishDate = publishDate
+                Title = request.Title,
+                Content = request.Content,
+                BackdropUrl = request.BackdropUrl,
+                PublishDate = request.PublishDate
             };
 
             Result<BlogItemDto> result = await handler.Handle(command, cancellationToken);
@@ -36,4 +31,5 @@ internal sealed class CreateScheduledBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .RequireAuthorization();
     }
+    public sealed record Request(string Title, string Content, string BackdropUrl, DateTime PublishDate);
 }

@@ -20,8 +20,8 @@ internal sealed class GetBlogs : IEndpoint
             string? backdropUrl,
             BlogStatus? status,
             DateTime? publishDate,
-            int pageNumber,
-            int pageSize,
+            int? pageNumber,
+            int? pageSize,
             IQueryHandler<GetBlogWithPaginationQuery, PaginatedList<BlogItemDto>> handler,
             CancellationToken cancellationToken) =>
         {

@@ -9,19 +9,15 @@ internal sealed class CreateBlogDraft : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("blogs/drafts", async (
-            string title,
-            string content,
-            string backdropUrl,
-            BlogStatus status,
+            Request request,
             ICommandHandler<CreateBlogDraftCommand, BlogItemDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new CreateBlogDraftCommand
             {
-                Title = title,
-                Content = content,
-                BackdropUrl = backdropUrl,
-                Status = status
+                Title = request.Title,
+                Content = request.Content,
+                BackdropUrl = request.BackdropUrl
             };
 
             Result<BlogItemDto> result = await handler.Handle(command, cancellationToken);
@@ -32,4 +28,5 @@ internal sealed class CreateBlogDraft : IEndpoint
         .RequireAuthorization();
     }
 
+    public sealed record Request(string Title, string Content, string BackdropUrl);
 }
