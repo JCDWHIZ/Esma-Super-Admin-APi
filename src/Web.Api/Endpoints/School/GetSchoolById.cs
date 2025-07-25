@@ -19,6 +19,7 @@ public class GetSchoolById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Schools);
+        .WithTags(Tags.Schools)
+        .RequireAuthorization();
     }
 }

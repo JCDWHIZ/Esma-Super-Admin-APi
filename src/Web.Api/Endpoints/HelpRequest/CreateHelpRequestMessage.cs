@@ -28,8 +28,8 @@ internal sealed class CreateHelpRequestMessage : IEndpoint
             Result<HelpRequestMessageDto> result = await handler.Handle(command, cancellationToken);
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.HelpRequests);
-        // .RequireAuthorization();
+        .WithTags(Tags.HelpRequests)
+        .RequireAuthorization();
     }
 }
 

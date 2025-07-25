@@ -47,7 +47,7 @@ internal sealed class GetSchools : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Schools);
-        // .RequireAuthorization();
+        .WithTags(Tags.Schools)
+        .RequireAuthorization();
     }
 }

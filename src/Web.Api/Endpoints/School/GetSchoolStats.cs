@@ -17,7 +17,7 @@ internal sealed class GetSchoolStats : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Schools);
-        // .RequireAuthorization(); // Remove if stats should be public
+        .WithTags(Tags.Schools)
+        .RequireAuthorization(); // Remove if stats should be public
     }
 }

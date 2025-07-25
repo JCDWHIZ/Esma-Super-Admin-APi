@@ -35,7 +35,7 @@ internal sealed class CreateHelpRequest : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.HelpRequests);
-        // .RequireAuthorization();
+        .WithTags(Tags.HelpRequests)
+        .RequireAuthorization();
     }
 }

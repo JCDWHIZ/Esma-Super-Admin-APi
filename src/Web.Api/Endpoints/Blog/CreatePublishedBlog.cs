@@ -31,7 +31,7 @@ internal sealed class CreatePublishedBlog : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Blogs);
-        // .RequireAuthorization();
+        .WithTags(Tags.Blogs)
+        .RequireAuthorization();
     }
 }

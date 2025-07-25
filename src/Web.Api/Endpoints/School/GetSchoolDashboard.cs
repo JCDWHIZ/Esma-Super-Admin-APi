@@ -17,7 +17,7 @@ internal sealed class GetSchoolDashboard : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Schools);
-        // .RequireAuthorization(); // Remove if public dashboard access is allowed
+        .WithTags(Tags.Schools)
+        .RequireAuthorization(); // Remove if public dashboard access is allowed
     }
 }

@@ -25,7 +25,8 @@ internal sealed class InviteAdmin : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithName("InviteAdmin")
-        .WithTags(Tags.Admin);
+        .WithTags(Tags.Admin)
+        .RequireAuthorization();
     }
 
     public sealed class Request

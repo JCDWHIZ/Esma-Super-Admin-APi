@@ -32,6 +32,7 @@ public sealed class GetAdmins : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithName("GetAdmins")
-        .WithTags(Tags.Admin);
+        .WithTags(Tags.Admin)
+        .RequireAuthorization();
     }
 }

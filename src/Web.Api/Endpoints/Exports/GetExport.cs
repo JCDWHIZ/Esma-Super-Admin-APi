@@ -19,7 +19,7 @@ public sealed class GetExport : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Exports);
-        // .RequireAuthorization();
+        .WithTags(Tags.Exports)
+        .RequireAuthorization();
     }
 }

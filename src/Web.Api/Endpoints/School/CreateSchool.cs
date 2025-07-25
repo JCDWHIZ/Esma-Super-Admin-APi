@@ -57,7 +57,8 @@ internal sealed class CreateSchool : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithName("CreateSchool")
-        .WithTags(Tags.Schools);
+        .WithTags(Tags.Schools)
+        .RequireAuthorization();
     }
 
     public sealed class Request()

@@ -16,6 +16,7 @@ internal sealed class ApproveSchool : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithName("ApproveSchool")
-        .WithTags(Tags.Schools);
+        .WithTags(Tags.Schools)
+        .RequireAuthorization();
     }
 }

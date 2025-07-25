@@ -23,7 +23,7 @@ internal sealed class GetBlogById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Blogs);
-        // .RequireAuthorization();
+        .WithTags(Tags.Blogs)
+        .RequireAuthorization();
     }
 }
