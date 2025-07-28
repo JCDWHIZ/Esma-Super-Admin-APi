@@ -48,6 +48,7 @@ internal sealed class GetDeletedSchools : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Schools)
+        .Produces<PaginatedList<SchoolItemDto>>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

@@ -33,6 +33,7 @@ public sealed class GetAdmins : IEndpoint
         })
         .WithName("GetAdmins")
         .WithTags(Tags.Admin)
+        .Produces<PaginatedList<UserDto>>()
         .RequireAuthorization();
     }
 }

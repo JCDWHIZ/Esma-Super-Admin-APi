@@ -48,6 +48,7 @@ internal sealed class GetSchools : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Schools)
+        .Produces<PaginatedList<SchoolItemDto>>()
         .RequireAuthorization();
     }
 }

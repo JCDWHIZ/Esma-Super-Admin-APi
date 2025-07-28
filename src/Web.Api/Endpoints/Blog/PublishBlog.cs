@@ -22,6 +22,7 @@ internal sealed class PublishBlog : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
+        .Produces<string>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

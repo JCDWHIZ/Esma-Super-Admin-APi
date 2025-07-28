@@ -35,6 +35,7 @@ internal sealed class GetPaginated : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.HelpRequests)
+        .Produces<PaginatedList<HelpRequestDto>>()
         .RequireAuthorization();
     }
 }

@@ -26,6 +26,7 @@ internal sealed class InviteAdmin : IEndpoint
         })
         .WithName("InviteAdmin")
         .WithTags(Tags.Admin)
+        .Produces<UserDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 

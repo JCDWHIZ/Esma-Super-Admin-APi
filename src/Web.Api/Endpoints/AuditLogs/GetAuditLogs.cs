@@ -32,6 +32,7 @@ internal sealed class GetAuditLogs : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.AuditLogs)
+        .Produces<PaginatedList<AuditLogDto>>()
         .RequireAuthorization();
     }
 }

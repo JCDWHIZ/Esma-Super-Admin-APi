@@ -18,6 +18,7 @@ internal sealed class GetSubscriptionStats : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Subscription)
+        .Produces<SubscriptionStatsDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

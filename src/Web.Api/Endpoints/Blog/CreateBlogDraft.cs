@@ -25,6 +25,7 @@ internal sealed class CreateBlogDraft : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
+        .Produces<BlogItemDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 

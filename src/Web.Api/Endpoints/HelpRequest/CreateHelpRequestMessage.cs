@@ -29,6 +29,7 @@ internal sealed class CreateHelpRequestMessage : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.HelpRequests)
+        .Produces<HelpRequestMessageDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

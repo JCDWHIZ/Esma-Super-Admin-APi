@@ -19,6 +19,7 @@ internal sealed class RestoreDeletedSchool : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Schools)
+        .Produces<string>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

@@ -29,6 +29,7 @@ internal sealed class CreateScheduledBlog : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
+        .Produces<BlogItemDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
     public sealed record Request(string Title, string Content, string BackdropUrl, DateTime PublishDate);

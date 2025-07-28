@@ -36,6 +36,7 @@ public sealed class GetSubscriptions : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Subscription)
+        .Produces<PaginatedList<SubscriptionDto>>()
         .RequireAuthorization();
     }
 }

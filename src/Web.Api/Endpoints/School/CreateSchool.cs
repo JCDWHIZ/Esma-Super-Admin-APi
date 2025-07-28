@@ -58,6 +58,7 @@ internal sealed class CreateSchool : IEndpoint
         })
         .WithName("CreateSchool")
         .WithTags(Tags.Schools)
+        .Produces<string>(StatusCodes.Status201Created)
         .RequireAuthorization();
     }
 

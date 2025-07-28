@@ -41,6 +41,7 @@ internal sealed class GetBlogs : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
+        .Produces<PaginatedList<BlogItemDto>>()
         .RequireAuthorization();
     }
 }

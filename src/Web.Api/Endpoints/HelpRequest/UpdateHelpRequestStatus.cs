@@ -28,6 +28,7 @@ internal sealed class UpdateStatus : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.HelpRequests)
+        .Produces<HelpRequestDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

@@ -20,6 +20,7 @@ public class GetSchoolById : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Schools)
+        .Produces<SchoolItemDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }
