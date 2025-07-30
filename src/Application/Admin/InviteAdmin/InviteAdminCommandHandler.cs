@@ -22,7 +22,6 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
         {
             return Result.Failure<UserDto>(UserErrors.AlreadyExists());
         }
-
         var newUser = new SchoolAdmins
         {
             Email = command.Email,
