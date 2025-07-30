@@ -7,6 +7,7 @@ using Application.Interfaces;
 using Application.BackgroundJobs;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
+using Domain.Users;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 
@@ -17,13 +18,10 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
 {
     async Task<Result<UserDto>> ICommandHandler<InviteAdminCommand, UserDto>.Handle(InviteAdminCommand command, CancellationToken cancellationToken)
     {
-        User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
-
-        if (existingUser is null)
+        if (await _context.Users.AnyAsync(u => u.Email == command.Email, cancellationToken))
         {
-            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
+            return Result.Failure<UserDto>(UserErrors.AlreadyExists());
         }
-
         var newUser = new SchoolAdmins
         {
             Email = command.Email,
