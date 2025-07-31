@@ -6,6 +6,6 @@ public enum BlogStatus
 {
     DRAFT,
     PUBLISHED,
-    SCHEDULED
-
+    SCHEDULED,
+    PENDING_APPROVAL,
 }
