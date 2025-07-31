@@ -12,7 +12,6 @@ public sealed class CreateBlogForApprovalCommandHandler(IApplicationDbContext _d
             Title = command.Title,
             Content = command.Content,
             BackdropUrl = command.BackdropUrl,
-            Status = BlogStatus.DRAFT,
         };
         _dbContext.Blog.Add(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
