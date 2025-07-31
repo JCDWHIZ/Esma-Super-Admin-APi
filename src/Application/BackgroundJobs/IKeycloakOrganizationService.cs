@@ -47,13 +47,18 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             {
                 Email = user.Email,
                 FirstName = user.FirstName,
-                LastName = user.LastName
+                LastName = user.LastName,
+                Attributes = new Dictionary<string, List<string>>
+                {
+                    { "internal_user_id", new() { user.PublicId.ToString() } }
+                }
             };
 
             // keycloaks sends email
             // might want to disable that for now 
             // use emailService to send email instead, just use keycloak to create user
             await _keycloakService.InviteUserAsync(inviteRequest);
+            // would not invite user instead create user and add user to organization
         }
         catch (Exception ex)
         {

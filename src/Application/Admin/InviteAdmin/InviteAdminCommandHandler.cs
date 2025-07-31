@@ -22,7 +22,7 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
         {
             return Result.Failure<UserDto>(UserErrors.AlreadyExists());
         }
-        var newUser = new SchoolAdmins
+        var newUser = new User
         {
             Email = command.Email,
             Role = command.Role,
@@ -31,7 +31,7 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
             LastName = command.LastName,
         };
 
-        _context.SchoolAdmins.Add(newUser);
+        _context.Users.Add(newUser);
         await _context.SaveChangesAsync(cancellationToken);
 
         BackgroundJob.Enqueue<IKeycloakOrganizationService>(
