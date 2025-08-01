@@ -20,7 +20,7 @@ internal sealed class GetBlogs : IEndpoint
             string? backdropUrl,
             BlogStatus? status,
             DateTime? publishDate,
-            Guid AdminPublicId,
+            Guid? AdminPublicId,
             int? pageNumber,
             int? pageSize,
             IQueryHandler<GetBlogWithPaginationQuery, PaginatedList<BlogItemDto>> handler,
