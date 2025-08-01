@@ -29,6 +29,7 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
             Username = command.Email,
             FirstName = command.FirstName,
             LastName = command.LastName,
+            ProfilePic = command.ProfilePic
         };
 
         _context.Users.Add(newUser);
@@ -44,6 +45,7 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
             Role = newUser.Role,
             FirstName = newUser.FirstName,
             LastName = newUser.LastName,
+            ProfilePic = newUser.ProfilePic
         };
     }
 }

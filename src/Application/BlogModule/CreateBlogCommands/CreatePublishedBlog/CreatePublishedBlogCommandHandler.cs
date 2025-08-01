@@ -18,11 +18,13 @@ public sealed class InitiatePublishedBlogRequest(IApplicationDbContext _dbContex
         await _dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success(new BlogItemDto
         {
-            Id = entity.Id,
+            PublicId = entity.PublicId,
             Title = entity.Title,
             Content = entity.Content,
             BackdropUrl = entity.BackdropUrl,
-            Status = entity.Status
+            Status = entity.Status,
+            PublishDate = entity.PublishDate,
+            CreatedAt = entity.Created
         });
     }
 }

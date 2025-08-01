@@ -35,12 +35,13 @@ public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _co
         PaginatedList<BlogItemDto> blogList = await PaginatedList<BlogItemDto>.CreateAsync(
             blogQuery.Select(b => new BlogItemDto
             {
-                Id = b.Id,
+                PublicId = b.PublicId,
                 Title = b.Title,
                 Content = b.Content,
                 BackdropUrl = b.BackdropUrl,
                 Status = b.Status,
-                PublishDate = b.PublishDate
+                PublishDate = b.PublishDate,
+                CreatedAt = b.Created
             }),
             query.PageNumber ?? 1,
             query.PageSize ?? 10

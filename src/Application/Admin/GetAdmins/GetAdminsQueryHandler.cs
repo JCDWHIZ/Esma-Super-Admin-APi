@@ -28,7 +28,8 @@ public class GetAdminsQueryHandler(IApplicationDbContext _context) : IQueryHandl
                 Role = r.Role,
                 Username = r.Username,
                 FirstName = r.FirstName,
-                LastName = r.LastName
+                LastName = r.LastName,
+                ProfilePic = r.ProfilePic
             }),
             query.PageNumber ?? 1,
             query.PageSize ?? 10

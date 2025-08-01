@@ -17,7 +17,8 @@ internal sealed class InviteAdmin : IEndpoint
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Role = request.Role
+                Role = request.Role,
+                ProfilePic = request.ProfilePic
             };
 
             Result<UserDto> result = await handler.Handle(command, cancellationToken);
@@ -34,6 +35,7 @@ internal sealed class InviteAdmin : IEndpoint
     {
         public string Email { get; set; }
         public string FirstName { get; set; }
+        public string ProfilePic { get; set; }
         public string LastName { get; set; }
         public Roles Role { get; set; }
     }
