@@ -32,6 +32,11 @@ public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _co
             blogQuery = blogQuery.Where(b => b.PublishDate == query.PublishDate.Value);
         }
 
+        if (query.UserPublicId.HasValue)
+        {
+            blogQuery = blogQuery.Where(b => b.CreatedBy == query.UserPublicId.Value);
+        }
+
         PaginatedList<BlogItemDto> blogList = await PaginatedList<BlogItemDto>.CreateAsync(
             blogQuery.Select(b => new BlogItemDto
             {
@@ -41,7 +46,8 @@ public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _co
                 BackdropUrl = b.BackdropUrl,
                 Status = b.Status,
                 PublishDate = b.PublishDate,
-                CreatedAt = b.Created
+                CreatedAt = b.Created,
+                CreatedBy = b.CreatedBy
             }),
             query.PageNumber ?? 1,
             query.PageSize ?? 10

@@ -8,6 +8,7 @@ using Domain.Subscriptions;
 using Domain.Todos;
 using Domain.Users;
 using Infrastructure.DomainEvents;
+using Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SharedKernel;
@@ -17,7 +18,8 @@ namespace Infrastructure.Database;
 
 public sealed class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
-    IDomainEventsDispatcher domainEventsDispatcher)
+    IDomainEventsDispatcher domainEventsDispatcher,
+      AuditingInterceptor auditingInterceptor)
     : DbContext(options), IApplicationDbContext
 {
     public DbSet<User> Users { get; set; }
@@ -79,6 +81,7 @@ public sealed class ApplicationDbContext(
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
+        optionsBuilder.AddInterceptors(auditingInterceptor);
 
         optionsBuilder.ConfigureWarnings(warnings =>
             // Convert PendingModelChangesWarning into a log (or ignore entirely)

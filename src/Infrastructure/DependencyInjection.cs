@@ -13,6 +13,7 @@ using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
+using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Time;
@@ -206,6 +207,7 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<AuditingInterceptor>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         // services.AddSingleton<ITokenProvider, TokenProvider>();
 
@@ -250,7 +252,7 @@ public static class DependencyInjection
             // Create a mock/null domain events dispatcher for design time
             var mockDomainEventsDispatcher = new MockDomainEventsDispatcher();
 
-            return new ApplicationDbContext(optionsBuilder.Options, mockDomainEventsDispatcher);
+            return new ApplicationDbContext(optionsBuilder.Options, mockDomainEventsDispatcher, new NoOpAuditingInterceptor());
         }
     }
 
@@ -260,6 +262,18 @@ public static class DependencyInjection
         public Task DispatchAsync(IEnumerable<DomainEvent> domainEvents, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
+        }
+    }
+
+    public class FakeUserContext : IUserContext
+    {
+        public Guid? UserPublicId => Guid.Empty;
+    }
+
+    public class NoOpAuditingInterceptor : AuditingInterceptor
+    {
+        public NoOpAuditingInterceptor() : base(new FakeUserContext())
+        {
         }
     }
 

@@ -12,10 +12,9 @@ internal sealed class UserContext : IUserContext
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Guid UserId =>
+    public Guid? UserPublicId =>
         _httpContextAccessor
             .HttpContext?
             .User
-            .GetUserId() ??
-        throw new ApplicationException("User context is unavailable");
+            .GetUserPublicId();
 }

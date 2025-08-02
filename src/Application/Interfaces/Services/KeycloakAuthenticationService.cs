@@ -534,4 +534,36 @@ public class KeycloakService
 
     }
 
+    public async Task<string> CreateUserAsync(InviteUserRequestDto request)
+    {
+        string token = await GetAdminAccessTokenAsync();
+        Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.CreateUserAsync(_configuration["Keycloak:Realm"]!, request, $"Bearer {token}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Failed to create Keycloak user");
+        }
+
+        if (response.Headers.TryGetValues("Location", out IEnumerable<string>? values))
+        {
+            string? location = values.FirstOrDefault();
+            return location?.Split('/')[^1] ?? throw new Exception("User ID missing in Keycloak response");
+        }
+
+        throw new Exception("User creation succeeded but no ID returned");
+    }
+
+    public async Task AddUserToOrganizationAsync(string userId)
+    {
+        string token = await GetAdminAccessTokenAsync();
+
+        await _keycloakApi.AddUserToOrganizationAsync(
+            _configuration["Keycloak:Realm"]!,
+            _configuration["Keycloak:organizationId"]!,
+            userId,
+            $"Bearer {token}"
+        );
+    }
+
+
 }

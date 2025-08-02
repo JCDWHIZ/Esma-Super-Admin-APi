@@ -31,6 +31,28 @@ public interface IKeycloakApi
         [Body] CreateOrganizationRequest request,
         [Header("Authorization")] string authorization);
 
+
+    [Post("/admin/realms/{realm}/users")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> CreateUserAsync(
+        [AliasAs("realm")] string realm,
+        [Body] InviteUserRequestDto request,
+        [Header("Authorization")] string authorization);
+
+    // [Put("/admin/realms/{realm}/organizations/{organizationId}/members/{userId}")]
+    // Task<Refit.ApiResponse<HttpResponseMessage>> AddUserToOrganizationAsync(
+    //     [AliasAs("realm")] string realm,
+    //     [AliasAs("organizationId")] string organizationId,
+    //     [AliasAs("userId")] string userId,
+    //     [Header("Authorization")] string authorization);
+
+    [Post("/admin/realms/{realm}/organizations/{organizationId}/members")]
+    [Headers("Content-Type: application/json")]
+    Task AddUserToOrganizationAsync(
+      [AliasAs("realm")] string realm,
+      [AliasAs("organizationId")] string organizationId,
+      [Body] string userId,
+      [Header("Authorization")] string authorization);
+
 }
 
 public class TokenResponseDto
@@ -48,10 +70,17 @@ public class ApiResponse
 
 public class InviteUserRequestDto
 {
+    public required string Username { get; set; }
     public required string Email { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    public Dictionary<string, List<string>> Attributes { get; set; }
+
+    public bool Enabled { get; set; } = true;
+
+    public Dictionary<string, List<string>> Attributes { get; set; } = new();
+
+    [JsonPropertyName("emailVerified")]
+    public bool EmailVerified { get; set; } = true;
 }
 
 public class CreateOrganizationRequest

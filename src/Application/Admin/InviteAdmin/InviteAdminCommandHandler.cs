@@ -36,16 +36,19 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
         await _context.SaveChangesAsync(cancellationToken);
 
         BackgroundJob.Enqueue<IKeycloakOrganizationService>(
-        service => service.CreateAdmin(newUser.Id));
+        service => service.CreateAdmin(newUser.Id, cancellationToken));
 
         return new UserDto
         {
-            Id = newUser.Id,
+            PublicId = newUser.PublicId,
             Email = newUser.Email,
             Role = newUser.Role,
+            Username = newUser.Username,
             FirstName = newUser.FirstName,
             LastName = newUser.LastName,
-            ProfilePic = newUser.ProfilePic
+            ProfilePic = newUser.ProfilePic,
+            CreatedAt = newUser.Created,
+            CreatedBy = newUser.CreatedBy
         };
     }
 }

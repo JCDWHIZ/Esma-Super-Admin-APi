@@ -33,7 +33,7 @@ internal sealed class GetBlogs : IEndpoint
                 BackdropUrl = backdropUrl,
                 Status = status,
                 PublishDate = publishDate,
-                AdminPublicId = AdminPublicId,
+                UserPublicId = AdminPublicId,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };

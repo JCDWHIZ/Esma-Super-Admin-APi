@@ -9,4 +9,5 @@ public sealed record BlogItemDto
     public BlogStatus Status { get; set; } = BlogStatus.DRAFT;
     public DateTime? PublishDate { get; set; }
     public DateTimeOffset? CreatedAt { get; set; }
+    public Guid? CreatedBy { get; set; }
 }

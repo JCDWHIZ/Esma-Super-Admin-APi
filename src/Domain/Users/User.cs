@@ -9,6 +9,7 @@ public sealed class User : BaseAuditableEntity
     public string Email { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public Guid KeycloakUserId { get; set; }
     public string? PasswordHash { get; set; }
     public string ProfilePic { get; set; }
     public Roles Role { get; set; }

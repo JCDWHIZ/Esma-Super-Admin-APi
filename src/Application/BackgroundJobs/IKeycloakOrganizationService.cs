@@ -13,7 +13,7 @@ namespace Application.BackgroundJobs;
 public interface IKeycloakOrganizationService
 {
     Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken);
-    Task CreateAdmin(int userId);
+    Task CreateAdmin(int userId, CancellationToken cancellationToken);
 }
 
 public class KeycloakOrganizationService : IKeycloakOrganizationService
@@ -32,10 +32,10 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         _messageProducer = messageProducer;
         _logger = logger;
     }
-    public async Task CreateAdmin(int userId)
+    public async Task CreateAdmin(int userId, CancellationToken cancellationToken)
     {
 
-        User? user = await _dbContext.Users.FindAsync(userId);
+        User? user = await _dbContext.Users.FindAsync([userId], cancellationToken: cancellationToken);
         if (user == null)
         {
             return;
@@ -45,20 +45,37 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         {
             var inviteRequest = new InviteUserRequestDto
             {
+                Username = user.Email,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Attributes = new Dictionary<string, List<string>>
-                {
-                    { "internal_user_id", new() { user.PublicId.ToString() } }
-                }
+                EmailVerified = true,
+                Enabled = true,
+                Attributes = new()
+            {
+                { "internal_user_id", new() { user.PublicId.ToString() } }
+            }
             };
 
             // keycloaks sends email
             // might want to disable that for now 
             // use emailService to send email instead, just use keycloak to create user
-            await _keycloakService.InviteUserAsync(inviteRequest);
-            // would not invite user instead create user and add user to organization
+            // await _keycloakService.InviteUserAsync(inviteRequest);
+            // 1. Create the user in Keycloak
+            string keycloakUserId = await _keycloakService.CreateUserAsync(inviteRequest);
+            // 2. Add the user to organization
+            await _keycloakService.AddUserToOrganizationAsync(keycloakUserId);
+            if (!Guid.TryParse(keycloakUserId, out Guid keycloakId))
+            {
+                throw new InvalidOperationException("Returned Keycloak ID is not a valid GUID.");
+            }
+
+            // 4. Store it in the user entity
+            user.KeycloakUserId = keycloakId;
+
+            // 5. Save changes
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            // notify user via email service
         }
         catch (Exception ex)
         {

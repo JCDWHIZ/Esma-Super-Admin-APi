@@ -8,6 +8,8 @@ public class UserDto
     public string PhoneNumber { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string ProfilePic { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
+    public Guid? CreatedBy { get; set; }
     public Guid PublicId { get; set; }
     public int Id { get; set; }
     public string Email { get; set; } = string.Empty;

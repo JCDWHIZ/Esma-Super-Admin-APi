@@ -23,13 +23,15 @@ public class GetAdminsQueryHandler(IApplicationDbContext _context) : IQueryHandl
         PaginatedList<UserDto> pagedAdmins = await PaginatedList<UserDto>.CreateAsync(
             userQuery.Select(r => new UserDto
             {
-                Id = r.Id,
+                PublicId = r.PublicId,
                 Email = r.Email,
                 Role = r.Role,
                 Username = r.Username,
                 FirstName = r.FirstName,
                 LastName = r.LastName,
-                ProfilePic = r.ProfilePic
+                ProfilePic = r.ProfilePic,
+                CreatedAt = r.Created,
+                CreatedBy = r.CreatedBy
             }),
             query.PageNumber ?? 1,
             query.PageSize ?? 10
