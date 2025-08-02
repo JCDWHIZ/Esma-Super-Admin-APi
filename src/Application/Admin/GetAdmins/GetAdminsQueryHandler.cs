@@ -29,6 +29,7 @@ public class GetAdminsQueryHandler(IApplicationDbContext _context) : IQueryHandl
                 Username = r.Username,
                 FirstName = r.FirstName,
                 LastName = r.LastName,
+                PhoneNumber = r.PhoneNumber,
                 ProfilePic = r.ProfilePic,
                 CreatedAt = r.Created,
                 CreatedBy = r.CreatedBy

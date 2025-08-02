@@ -640,7 +640,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("phone_number");
 
                     b.Property<string>("ProfilePic")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("profile_pic");
 

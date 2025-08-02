@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250802163303_addedExtraFields")]
+    [Migration("20250802193552_addedExtraFields")]
     partial class addedExtraFields
     {
         /// <inheritdoc />
@@ -643,7 +643,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("phone_number");
 
                     b.Property<string>("ProfilePic")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("profile_pic");
 

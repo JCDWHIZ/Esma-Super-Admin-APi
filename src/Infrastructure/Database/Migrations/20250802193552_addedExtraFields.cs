@@ -24,8 +24,7 @@ namespace Infrastructure.Database.Migrations
                 schema: "public",
                 table: "users",
                 type: "text",
-                nullable: false,
-                defaultValue: "");
+                nullable: true);
         }
 
         /// <inheritdoc />

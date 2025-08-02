@@ -11,7 +11,7 @@ public sealed class User : BaseAuditableEntity
     public string LastName { get; set; }
     public Guid KeycloakUserId { get; set; }
     public string? PasswordHash { get; set; }
-    public string ProfilePic { get; set; }
+    public string? ProfilePic { get; set; }
     public Roles Role { get; set; }
     public string Username { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; } = string.Empty;
