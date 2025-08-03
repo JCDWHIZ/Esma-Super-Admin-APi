@@ -4,6 +4,7 @@ using Hangfire;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Web.Api;
 using Web.Api.Extensions;
@@ -34,21 +35,26 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 WebApplication app = builder.Build();
 
+app.UseSwaggerWithUi();
 app.MapEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwaggerWithUi();
-
     app.ApplyMigrations();
-    app.UseHttpsRedirection();
-    app.UseHsts();
 }
+app.UseHttpsRedirection();
+app.UseHsts();
 
 app.MapHealthChecks("health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+app.UseHttpsRedirection();
 
 app.UseRequestContextLogging();
 
