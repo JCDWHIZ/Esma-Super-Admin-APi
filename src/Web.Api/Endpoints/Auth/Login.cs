@@ -27,6 +27,7 @@ internal sealed class LoginEndpoint : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Auth);
+        .WithTags(Tags.Auth)
+        .Produces<LoginCommandResponseDto>(StatusCodes.Status200OK);
     }
 }

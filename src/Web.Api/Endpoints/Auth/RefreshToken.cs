@@ -24,6 +24,7 @@ internal sealed class RefreshTokenEndpoint : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Auth);
+        .WithTags(Tags.Auth)
+        .Produces<RefreshTokenResponseDto>(StatusCodes.Status200OK);
     }
 }
