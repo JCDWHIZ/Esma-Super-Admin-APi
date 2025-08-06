@@ -26,4 +26,18 @@ public static class UserErrors
             "Users.AlreadyExists",
         "The user with the specified email already exists");
     }
+    public static Error ErrorOccured()
+    {
+        return Error.Problem(
+            "Users.ErrorOccured",
+        "An error occured during the process");
+    }
+    public static Error PasswordIncorrect()
+    {
+        return Error.Problem(
+            "Users.ErrorOccured",
+        "The password specified is incorrect");
+    }
+
+
 }

@@ -76,6 +76,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             // 5. Save changes
             await _dbContext.SaveChangesAsync(cancellationToken);
             // notify user via email service
+
+            await _keycloakService.SetupNewUserAsync(keycloakUserId, sendWelcomeEmail: true);
         }
         catch (Exception ex)
         {

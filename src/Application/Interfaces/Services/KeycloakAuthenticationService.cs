@@ -455,6 +455,9 @@ using System;
 using Refit;
 using Application.Abstractions.Models;
 using Application.Interfaces;
+using Application.Auth.Login;
+using Application.Auth.ForgotPassword;
+using System.Security.Claims;
 
 
 namespace Application.Interfaces.Services;
@@ -565,5 +568,318 @@ public class KeycloakService
         );
     }
 
+    public async Task<LoginCommandResponseDto> LoginAsync(string email, string password)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "grant_type", "password" },
+            { "client_id", _configuration["Keycloak:ClientId"]! },
+            { "client_secret", _configuration["Keycloak:ClientSecret"]! },
+            { "username", email },
+            { "password", password },
+            { "scope", "openid profile email" }
+        };
 
+        try
+        {
+            LoginResponseDto response = await _keycloakApi.LoginAsync(_configuration["Keycloak:Realm"]!, parameters);
+
+            // Get user information separately since we're not parsing JWT
+            KeycloakUserDto? userInfo = await GetUserByEmailAsync(email);
+
+            return new LoginCommandResponseDto
+            {
+                AccessToken = response.AccessToken,
+                RefreshToken = response.RefreshToken,
+                IdToken = response.IdToken,
+                ExpiresIn = response.ExpiresIn,
+                RefreshExpiresIn = response.RefreshExpiresIn,
+                TokenType = response.TokenType,
+                SessionState = response.SessionState,
+                Scope = response.Scope,
+                UserId = userInfo?.Id ?? string.Empty,
+                Username = userInfo?.Username ?? string.Empty,
+                Email = userInfo?.Email ?? email,
+                ExpiresAt = DateTime.UtcNow.AddSeconds(response.ExpiresIn),
+                RefreshExpiresAt = DateTime.UtcNow.AddSeconds(response.RefreshExpiresIn)
+            };
+        }
+        catch (Refit.ApiException ex)
+        {
+            // Handle authentication errors
+            if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException("Invalid email or password");
+            }
+            throw new Exception($"Login failed: {ex.Message}");
+        }
+    }
+
+    public async Task<RefreshTokenResponseDto> RefreshTokenAsync(string refreshToken)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "grant_type", "refresh_token" },
+            { "client_id", _configuration["Keycloak:ClientId"]! },
+            { "client_secret", _configuration["Keycloak:ClientSecret"]! },
+            { "refresh_token", refreshToken }
+        };
+
+        try
+        {
+            return await _keycloakApi.RefreshTokenAsync(_configuration["Keycloak:Realm"]!, parameters);
+        }
+        catch (Refit.ApiException ex)
+        {
+            throw new Exception($"Token refresh failed: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> LogoutAsync(string refreshToken)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "client_id", _configuration["Keycloak:ClientId"]! },
+            { "client_secret", _configuration["Keycloak:ClientSecret"]! },
+            { "refresh_token", refreshToken }
+        };
+
+        try
+        {
+            Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.LogoutAsync(_configuration["Keycloak:Realm"]!, parameters);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Refit.ApiException ex)
+        {
+            throw new Exception($"Logout failed: {ex.Message}");
+        }
+    }
+
+    public async Task<ForgotPasswordResponseDto> SendPasswordResetEmailAsync(string email)
+    {
+        try
+        {
+            string token = await GetAdminAccessTokenAsync();
+
+            // First, find the user by email
+            List<KeycloakUserDto> users = await _keycloakApi.GetUsersByEmailAsync(
+                _configuration["Keycloak:Realm"]!,
+                email,
+                $"Bearer {token}"
+            ).ConfigureAwait(false);
+
+            if (!users.Any())
+            {
+                return new ForgotPasswordResponseDto
+                {
+                    Success = false,
+                    Message = "User not found with the provided email address."
+                };
+            }
+
+            KeycloakUserDto user = users[0];
+            var actions = new List<string> { "UPDATE_PASSWORD" };
+
+            Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.SendResetPasswordEmailAsync(
+                _configuration["Keycloak:Realm"]!,
+                user.Id,
+                actions,
+                $"Bearer {token}",
+                _configuration["Keycloak:ClientId"]!
+            // _configuration["Keycloak:RedirectUri"] ?? ""
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ForgotPasswordResponseDto
+                {
+                    Success = true,
+                    Message = "Password reset email sent successfully."
+                };
+            }
+            else
+            {
+                return new ForgotPasswordResponseDto
+                {
+                    Success = false,
+                    Message = "Failed to send password reset email."
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new ForgotPasswordResponseDto
+            {
+                Success = false,
+                Message = $"Error sending password reset email: {ex.Message}"
+            };
+        }
+    }
+
+    public async Task<bool> ValidateTokenAsync(string accessToken)
+    {
+        var parameters = new Dictionary<string, string>
+        {
+            { "token", accessToken },
+            { "client_id", _configuration["Keycloak:ClientId"]! },
+            { "client_secret", _configuration["Keycloak:ClientSecret"]! }
+        };
+
+        try
+        {
+            TokenIntrospectionResponseDto response = await _keycloakApi.IntrospectTokenAsync(_configuration["Keycloak:Realm"]!, parameters);
+            return response.Active;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    public async Task<KeycloakUserDto?> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            string token = await GetAdminAccessTokenAsync();
+            List<KeycloakUserDto> users = await _keycloakApi.GetUsersByEmailAsync(
+                _configuration["Keycloak:Realm"]!,
+                email,
+                $"Bearer {token}"
+            );
+
+            return users.FirstOrDefault();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> SetupNewUserAsync(string keycloakUserId, bool sendWelcomeEmail = true)
+    {
+        try
+        {
+            string token = await GetAdminAccessTokenAsync();
+
+            // Set required actions for the user (they must set password on first login)
+            var updateRequest = new UpdateUserRequest
+            {
+                Id = keycloakUserId,
+                Enabled = true,
+                EmailVerified = true, // They need to verify email first
+                RequiredActions = new List<string>
+                {
+                    "UPDATE_PASSWORD"
+                }
+            };
+
+            Refit.ApiResponse<HttpResponseMessage> updateResponse = await _keycloakApi.UpdateUserAsync(
+                _configuration["Keycloak:Realm"]!,
+                keycloakUserId,
+                updateRequest,
+                $"Bearer {token}"
+            );
+
+            if (!updateResponse.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to set required actions for user");
+            }
+
+            if (sendWelcomeEmail)
+            {
+                // Send the required actions email (this will include password setup)
+                bool actionsResponse = await SendUserSetupEmailAsync(keycloakUserId);
+                return actionsResponse;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error setting up new user: " + keycloakUserId, ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> SendUserSetupEmailAsync(string keycloakUserId)
+    {
+        try
+        {
+            string token = await GetAdminAccessTokenAsync();
+
+            var actions = new List<string>
+            {
+                "UPDATE_PASSWORD",
+                "VERIFY_EMAIL"
+            };
+
+            Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.SendRequiredActionsEmailAsync(
+                _configuration["Keycloak:Realm"]!,
+                keycloakUserId,
+                actions,
+                $"Bearer {token}",
+                _configuration["Keycloak:ClientId"]!,
+                86400 // 24 hours lifespan
+            );
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending setup email: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<ChangePasswordResponseDto> ChangeUserPasswordAsync(string currentPassword, string newPassword, string userAccessToken)
+    {
+        try
+        {
+            var request = new ChangePasswordRequest
+            {
+                CurrentPassword = currentPassword,
+                NewPassword = newPassword,
+                Confirmation = newPassword
+            };
+
+            Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.ChangePasswordAsync(
+                _configuration["Keycloak:Realm"]!,
+                request,
+                $"Bearer {userAccessToken}"
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ChangePasswordResponseDto
+                {
+                    Success = true,
+                    Message = "Password changed successfully."
+                };
+            }
+            else
+            {
+                return new ChangePasswordResponseDto
+                {
+                    Success = false,
+                    Message = "Failed to change password. Please check your current password."
+                };
+            }
+        }
+        catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            return new ChangePasswordResponseDto
+            {
+                Success = false,
+                Message = "Invalid current password or new password doesn't meet requirements."
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ChangePasswordResponseDto
+            {
+                Success = false,
+                Message = $"Error changing password: {ex.Message}"
+            };
+        }
+    }
 }
