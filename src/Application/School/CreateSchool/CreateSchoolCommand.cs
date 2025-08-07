@@ -50,5 +50,10 @@ public record SubscriptionDto
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public decimal Amount { get; init; }
+    public string SchoolLogo { get; init; }
+    public string SchoolName { get; init; }
+    public string SchoolAdminName { get; init; }
+    public ICollection<Modules> SchoolModules { get; init; }
+    public SubscriptionStatus Status { get; set; }
 }
 

@@ -14,4 +14,25 @@ public sealed class Subscriptions : BaseAuditableEntity
     public int SchoolId { get; set; }
     [JsonIgnore]
     public Schools.Schools? Schools { get; set; }
+    public static SubscriptionStatus GetStatus(DateTime? startDate, DateTime? endDate)
+    {
+        DateTime now = DateTime.UtcNow;
+
+        if (!startDate.HasValue || !endDate.HasValue)
+        {
+            return SubscriptionStatus.Expired;
+        }
+
+        if (endDate.Value < now)
+        {
+            return SubscriptionStatus.Expired;
+        }
+
+        if (endDate.Value <= now.AddDays(7))
+        {
+            return SubscriptionStatus.ExpiresSoon;
+        }
+
+        return SubscriptionStatus.Active;
+    }
 }
