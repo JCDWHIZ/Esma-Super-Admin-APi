@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Net.Mail;
 using System.Threading;
+using Application.Abstractions.Authentication;
 using Application.Abstractions.Models;
 using Application.Interfaces;
 using Application.Interfaces.Services;
@@ -19,18 +21,20 @@ public interface IKeycloakOrganizationService
 public class KeycloakOrganizationService : IKeycloakOrganizationService
 {
     private readonly IApplicationDbContext _dbContext;
+    private readonly ITokenProvider _tokenProvider;
     private readonly KeycloakService _keycloakService;
     private readonly IMessageProducer _messageProducer;
     private readonly IConfiguration _configuration;
     private readonly ILogger<KeycloakOrganizationService> _logger;
 
-    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger)
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider)
     {
         _dbContext = dbContext;
         _keycloakService = keycloakService;
         _configuration = configuration;
         _messageProducer = messageProducer;
         _logger = logger;
+        _tokenProvider = tokenProvider;
     }
     public async Task CreateAdmin(int userId, CancellationToken cancellationToken)
     {
@@ -52,9 +56,13 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 EmailVerified = true,
                 Enabled = true,
                 Attributes = new()
-            {
-                { "internal_user_id", new() { user.PublicId.ToString() } }
-            }
+                {
+                    { "internal_user_id", new() { user.PublicId.ToString() } }
+                },
+                RequiredActions = new List<string>
+                {
+                    "UPDATE_PASSWORD"
+                }
             };
 
             // keycloaks sends email
@@ -76,8 +84,13 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             // 5. Save changes
             await _dbContext.SaveChangesAsync(cancellationToken);
             // notify user via email service
+            string onboardingToken = _tokenProvider.CreateOnboardingToken(user);
+            // string fullName = $"{user.FirstName} {user.LastName}";
+            // string loginUrl = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={onboardingToken}";
 
-            await _keycloakService.SetupNewUserAsync(keycloakUserId, sendWelcomeEmail: true);
+            Console.WriteLine("onboarding token:" + onboardingToken);
+
+            await _keycloakService.SendUserSetupEmailAsync(keycloakUserId); //send email using keycloak or via email service  
         }
         catch (Exception ex)
         {

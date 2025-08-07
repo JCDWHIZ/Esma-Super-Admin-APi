@@ -121,6 +121,9 @@ public interface IKeycloakApi
         // [Query("redirect_uri")] string redirectUri,
         [Query("lifespan")] int? lifespan = null
     );
+
+    [Put("/admin/realms/{realm}/users/{userId}/reset-password")]
+    Task ResetPasswordAsync(string realm, string userId, [Body] PasswordResetRequest request, [Header("Authorization")] string authorization);
 }
 
 public class TokenResponseDto
@@ -149,6 +152,8 @@ public class InviteUserRequestDto
 
     [JsonPropertyName("emailVerified")]
     public bool EmailVerified { get; set; } = true;
+    [JsonPropertyName("requiredActions")]
+    public List<string> RequiredActions { get; set; } = new();
 }
 
 public class CreateOrganizationRequest
@@ -306,7 +311,7 @@ public class ChangePasswordRequest
     public required string Confirmation { get; set; }
 }
 
-public class ChangePasswordResponseDto
+public class SetPasswordResponseDto
 {
     public bool Success { get; set; }
     public string Message { get; set; } = string.Empty;
@@ -340,4 +345,13 @@ public class UpdateUserRequest
 
     [JsonPropertyName("attributes")]
     public Dictionary<string, List<string>> Attributes { get; set; } = new();
+}
+public class PasswordResetRequest
+{
+    [JsonPropertyName("temporary")]
+    public bool Temporary { get; set; }
+    [JsonPropertyName("type")]
+    public string Type { get; set; }
+    [JsonPropertyName("value")]
+    public string Value { get; set; }
 }

@@ -755,52 +755,6 @@ public class KeycloakService
         }
     }
 
-    public async Task<bool> SetupNewUserAsync(string keycloakUserId, bool sendWelcomeEmail = true)
-    {
-        try
-        {
-            string token = await GetAdminAccessTokenAsync();
-
-            // Set required actions for the user (they must set password on first login)
-            var updateRequest = new UpdateUserRequest
-            {
-                Id = keycloakUserId,
-                Enabled = true,
-                EmailVerified = true, // They need to verify email first
-                RequiredActions = new List<string>
-                {
-                    "UPDATE_PASSWORD"
-                }
-            };
-
-            Refit.ApiResponse<HttpResponseMessage> updateResponse = await _keycloakApi.UpdateUserAsync(
-                _configuration["Keycloak:Realm"]!,
-                keycloakUserId,
-                updateRequest,
-                $"Bearer {token}"
-            );
-
-            if (!updateResponse.IsSuccessStatusCode)
-            {
-                throw new Exception("Failed to set required actions for user");
-            }
-
-            if (sendWelcomeEmail)
-            {
-                // Send the required actions email (this will include password setup)
-                bool actionsResponse = await SendUserSetupEmailAsync(keycloakUserId);
-                return actionsResponse;
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error setting up new user: " + keycloakUserId, ex);
-            return false;
-        }
-    }
-
     public async Task<bool> SendUserSetupEmailAsync(string keycloakUserId)
     {
         try
@@ -810,7 +764,6 @@ public class KeycloakService
             var actions = new List<string>
             {
                 "UPDATE_PASSWORD",
-                "VERIFY_EMAIL"
             };
 
             Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.SendRequiredActionsEmailAsync(
@@ -831,7 +784,7 @@ public class KeycloakService
         }
     }
 
-    public async Task<ChangePasswordResponseDto> ChangeUserPasswordAsync(string currentPassword, string newPassword, string userAccessToken)
+    public async Task<SetPasswordResponseDto> ChangeUserPasswordAsync(string currentPassword, string newPassword, string userAccessToken)
     {
         try
         {
@@ -850,7 +803,7 @@ public class KeycloakService
 
             if (response.IsSuccessStatusCode)
             {
-                return new ChangePasswordResponseDto
+                return new SetPasswordResponseDto
                 {
                     Success = true,
                     Message = "Password changed successfully."
@@ -858,7 +811,7 @@ public class KeycloakService
             }
             else
             {
-                return new ChangePasswordResponseDto
+                return new SetPasswordResponseDto
                 {
                     Success = false,
                     Message = "Failed to change password. Please check your current password."
@@ -867,7 +820,7 @@ public class KeycloakService
         }
         catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
-            return new ChangePasswordResponseDto
+            return new SetPasswordResponseDto
             {
                 Success = false,
                 Message = "Invalid current password or new password doesn't meet requirements."
@@ -875,11 +828,34 @@ public class KeycloakService
         }
         catch (Exception ex)
         {
-            return new ChangePasswordResponseDto
+            return new SetPasswordResponseDto
             {
                 Success = false,
                 Message = $"Error changing password: {ex.Message}"
             };
+        }
+    }
+
+    public async Task ResetPasswordAsync(Guid KeycloakUserId, string password)
+    {
+        string token = await GetAdminAccessTokenAsync();
+        var request = new PasswordResetRequest
+        {
+            Temporary = false,
+            Type = "password",
+            Value = password
+        };
+
+        string authorizationHeader = $"Bearer {token}";
+        try
+        {
+            await _keycloakApi.ResetPasswordAsync(_configuration["Keycloak:Realm"]!, KeycloakUserId.ToString(), request, authorizationHeader);
+            Console.WriteLine("Password reset successfully for: ." + KeycloakUserId);
+        }
+        catch (ApiException ex)
+        {
+            Console.WriteLine($"Failed to reset password: {ex.Message}");
+            throw;
         }
     }
 }

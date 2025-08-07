@@ -1,35 +1,33 @@
-// using System;
-// using Application.Auth.ChangePassword;
-// using Application.Interfaces;
+using System;
+using Application.Auth.SetPassword;
+using Application.Interfaces;
 
-// namespace Web.Api.Endpoints.Auth;
+namespace Web.Api.Endpoints.Auth;
 
-// internal sealed class ChangePasswordEndpoint : IEndpoint
-// {
-//     public sealed class Request
-//     {
-//         public string CurrentPassword { get; init; }
-//         public string NewPassword { get; init; }
-//         public string AccessToken { get; init; }
-//     }
+internal sealed class SetPasswordEndpoint : IEndpoint
+{
+    public sealed class Request
+    {
+        public string NewPassword { get; init; }
+        public string AccessToken { get; init; }
+    }
 
-//     public void MapEndpoint(IEndpointRouteBuilder app)
-//     {
-//         app.MapPost("auth/change-password", async (
-//             Request request,
-//             ICommandHandler<ChangePasswordCommand, ChangePasswordResponseDto> handler,
-//             CancellationToken cancellationToken) =>
-//         {
-//             var command = new ChangePasswordCommand(
-//                 request.CurrentPassword,
-//                 request.NewPassword,
-//                 request.AccessToken
-//             );
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("auth/change-password", async (
+            Request request,
+            ICommandHandler<SetPasswordCommand, string> handler,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new SetPasswordCommand(
+                request.NewPassword,
+                request.AccessToken
+            );
 
-//             Result<ChangePasswordResponseDto> result = await handler.Handle(command, cancellationToken);
+            Result<string> result = await handler.Handle(command, cancellationToken);
 
-//             return result.Match(Results.Ok, CustomResults.Problem);
-//         })
-//         .WithTags(Tags.Auth);
-//     }
-// }
+            return result.Match(Results.Ok, CustomResults.Problem);
+        })
+        .WithTags(Tags.Auth);
+    }
+}

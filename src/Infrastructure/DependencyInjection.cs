@@ -209,7 +209,7 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<AuditingInterceptor>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        // services.AddSingleton<ITokenProvider, TokenProvider>();
+        services.AddScoped<ITokenProvider, TokenProvider>();
 
         return services;
     }
