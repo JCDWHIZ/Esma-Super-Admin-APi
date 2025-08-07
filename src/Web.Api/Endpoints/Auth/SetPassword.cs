@@ -14,7 +14,7 @@ internal sealed class SetPasswordEndpoint : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/change-password", async (
+        app.MapPost("auth/set-password", async (
             Request request,
             ICommandHandler<SetPasswordCommand, string> handler,
             CancellationToken cancellationToken) =>

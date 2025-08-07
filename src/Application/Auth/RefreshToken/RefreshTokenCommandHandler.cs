@@ -31,7 +31,7 @@ public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCom
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error refreshing token");
-            return (Result<RefreshTokenResponseDto>)Result.Failure(UserErrors.ErrorOccured());
+            return Result.Failure<RefreshTokenResponseDto>(UserErrors.ErrorOccured());
         }
     }
 }

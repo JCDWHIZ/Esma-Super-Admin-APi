@@ -21,7 +21,7 @@ public sealed class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswor
         {
             _logger.LogInformation("Processing password reset request for email: {Email}", command.Email);
 
-            ForgotPasswordResponseDto result = await _keycloakService.SendPasswordResetEmailAsync(command.Email);
+            ForgotPasswordResponseDto result = await _keycloakService.SendPasswordResetEmailAsync(command.Email, cancellationToken);
 
             if (result.Success)
             {
@@ -37,7 +37,7 @@ public sealed class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswor
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing password reset for email: {Email}", command.Email);
-            return (Result<ForgotPasswordResponseDto>)Result.Failure(UserErrors.ErrorOccured());
+            return Result.Failure<ForgotPasswordResponseDto>(UserErrors.ErrorOccured());
         }
     }
 }

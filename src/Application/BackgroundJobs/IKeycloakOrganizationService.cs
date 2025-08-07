@@ -22,18 +22,20 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly ITokenProvider _tokenProvider;
+    private readonly IEmailService _emailService;
     private readonly KeycloakService _keycloakService;
     private readonly IMessageProducer _messageProducer;
     private readonly IConfiguration _configuration;
     private readonly ILogger<KeycloakOrganizationService> _logger;
 
-    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider)
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider, IEmailService emailService)
     {
         _dbContext = dbContext;
         _keycloakService = keycloakService;
         _configuration = configuration;
         _messageProducer = messageProducer;
         _logger = logger;
+        _emailService = emailService;
         _tokenProvider = tokenProvider;
     }
     public async Task CreateAdmin(int userId, CancellationToken cancellationToken)
@@ -78,19 +80,22 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 throw new InvalidOperationException("Returned Keycloak ID is not a valid GUID.");
             }
 
-            // 4. Store it in the user entity
             user.KeycloakUserId = keycloakId;
-
-            // 5. Save changes
             await _dbContext.SaveChangesAsync(cancellationToken);
-            // notify user via email service
-            string onboardingToken = _tokenProvider.CreateOnboardingToken(user);
-            // string fullName = $"{user.FirstName} {user.LastName}";
-            // string loginUrl = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={onboardingToken}";
 
-            Console.WriteLine("onboarding token:" + onboardingToken);
+            string resetToken = _tokenProvider.CreateOnboardingToken(user);
+            var emailMessage = new EmailMessage
+            {
+                Email = user.Email,
+                Title = "Set Up Your Account",
+                Name = $"{user.FirstName} {user.LastName}",
+                Description = "You've been invited to join our platform. To get started, please click the button below to set your password and activate your account. This link is secure and will expire after a period of time for your protection.",
+                EmailButton = true,
+                ButtonLink = $"{_configuration["Frontend:BaseUrl"]}/auth/password/set-password?token={resetToken}",
+                ButtonText = "Set Your Password"
+            };
 
-            await _keycloakService.SendUserSetupEmailAsync(keycloakUserId); //send email using keycloak or via email service  
+            await _emailService.SendEmailAsync(emailMessage);
         }
         catch (Exception ex)
         {

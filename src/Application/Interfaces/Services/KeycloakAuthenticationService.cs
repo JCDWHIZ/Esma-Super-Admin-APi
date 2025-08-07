@@ -458,6 +458,7 @@ using Application.Interfaces;
 using Application.Auth.Login;
 using Application.Auth.ForgotPassword;
 using System.Security.Claims;
+using Application.Abstractions.Authentication;
 
 
 namespace Application.Interfaces.Services;
@@ -466,11 +467,17 @@ public class KeycloakService
 {
     private readonly IKeycloakApi _keycloakApi;
     private readonly IConfiguration _configuration;
+    private readonly IApplicationDbContext _dbContext;
+    private readonly IEmailService _emailService;
+    private readonly ITokenProvider _tokenService;
 
-    public KeycloakService(IKeycloakApi keycloakApi, IConfiguration configuration)
+    public KeycloakService(IKeycloakApi keycloakApi, IConfiguration configuration, IApplicationDbContext dbContext, IEmailService emailService, ITokenProvider tokenService)
     {
         _keycloakApi = keycloakApi;
         _configuration = configuration;
+        _emailService = emailService;
+        _tokenService = tokenService;
+        _dbContext = dbContext;
     }
 
     public async Task<string> GetAdminAccessTokenAsync()
@@ -655,7 +662,7 @@ public class KeycloakService
         }
     }
 
-    public async Task<ForgotPasswordResponseDto> SendPasswordResetEmailAsync(string email)
+    public async Task<ForgotPasswordResponseDto> SendPasswordResetEmailAsync(string email, CancellationToken cancellationToken)
     {
         try
         {
@@ -677,34 +684,65 @@ public class KeycloakService
                 };
             }
 
-            KeycloakUserDto user = users[0];
-            var actions = new List<string> { "UPDATE_PASSWORD" };
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
-            Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.SendResetPasswordEmailAsync(
-                _configuration["Keycloak:Realm"]!,
-                user.Id,
-                actions,
-                $"Bearer {token}",
-                _configuration["Keycloak:ClientId"]!
-            // _configuration["Keycloak:RedirectUri"] ?? ""
-            );
-
-            if (response.IsSuccessStatusCode)
-            {
-                return new ForgotPasswordResponseDto
-                {
-                    Success = true,
-                    Message = "Password reset email sent successfully."
-                };
-            }
-            else
+            if (user == null)
             {
                 return new ForgotPasswordResponseDto
                 {
                     Success = false,
-                    Message = "Failed to send password reset email."
+                    Message = "User not found with the provided email address."
                 };
+
             }
+            string resetToken = _tokenService.CreateOnboardingToken(user);
+            var emailMessage = new EmailMessage
+            {
+                Email = user.Email,
+                Title = "Reset Your Password",
+                Name = user.FirstName + " " + user.LastName,
+                Description = "It looks like you requested to reset your password. No worries — we're here to help! Click the button below to securely set a new password. If you didn’t request this, you can safely ignore this email.",
+                EmailButton = true,
+                ButtonLink = $"{_configuration["Frontend:BaseUrl"]}/auth/password/reset-password?token={resetToken}",
+                ButtonText = "Reset Password"
+            };
+
+            await _emailService.SendEmailAsync(emailMessage);
+
+            return new ForgotPasswordResponseDto
+            {
+                Success = true,
+                Message = "Password reset email sent successfully."
+            };
+
+            // KeycloakUserDto user = users[0];
+            // var actions = new List<string> { "UPDATE_PASSWORD" };
+
+            // Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.SendResetPasswordEmailAsync(
+            //     _configuration["Keycloak:Realm"]!,
+            //     user.Id,
+            //     actions,
+            //     $"Bearer {token}",
+            //     _configuration["Keycloak:ClientId"]!
+            // // _configuration["Keycloak:RedirectUri"] ?? ""
+            // );
+
+            // if (response.IsSuccessStatusCode)
+            // {
+            //     return new ForgotPasswordResponseDto
+            //     {
+            //         Success = true,
+            //         Message = "Password reset email sent successfully."
+            //     };
+            // }
+            // else
+            // {
+            //     return new ForgotPasswordResponseDto
+            //     {
+            //         Success = false,
+            //         Message = "Failed to send password reset email."
+            //     };
+            // }
         }
         catch (Exception ex)
         {

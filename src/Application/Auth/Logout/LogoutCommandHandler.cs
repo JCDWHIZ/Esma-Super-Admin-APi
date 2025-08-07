@@ -26,18 +26,18 @@ public sealed class LogoutCommandHandler : ICommandHandler<LogoutCommand, bool>
             if (success)
             {
                 _logger.LogInformation("Logout successful");
-                return Result<bool>.Success(true);
+                return Result.Success(true);
             }
             else
             {
                 _logger.LogWarning("Logout failed");
-                return (Result<bool>)Result.Failure(UserErrors.ErrorOccured());
+                return Result.Failure<bool>(UserErrors.ErrorOccured());
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during logout");
-            return (Result<bool>)Result.Failure(UserErrors.ErrorOccured());
+            return Result.Failure<bool>(UserErrors.ErrorOccured());
         }
     }
 }

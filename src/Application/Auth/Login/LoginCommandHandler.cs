@@ -29,12 +29,12 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCom
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogWarning(ex, "Login failed for user {Email}", command.Email);
-            return (Result<LoginCommandResponseDto>)Result.Failure(UserErrors.ErrorOccured());
+            return Result.Failure<LoginCommandResponseDto>(UserErrors.Unauthorized());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Login error for user {Email}", command.Email);
-            return (Result<LoginCommandResponseDto>)Result.Failure(UserErrors.ErrorOccured());
+            return Result.Failure<LoginCommandResponseDto>(UserErrors.ErrorOccured());
         }
     }
 }
