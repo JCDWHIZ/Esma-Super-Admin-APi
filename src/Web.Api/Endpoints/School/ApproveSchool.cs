@@ -7,7 +7,7 @@ internal sealed class ApproveSchool : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/schools/approve/{PublicId:guid}", async (Guid PublicId, ICommandHandler<ApproveSchoolCommand, string> handler, CancellationToken cancellationToken) =>
+        app.MapPut("/schools/approve/{PublicId:guid}", async (Guid PublicId, ICommandHandler<ApproveSchoolCommand, string> handler, CancellationToken cancellationToken) =>
         {
             var command = new ApproveSchoolCommand(PublicId);
 
