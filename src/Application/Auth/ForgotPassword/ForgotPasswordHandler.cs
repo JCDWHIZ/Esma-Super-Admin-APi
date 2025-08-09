@@ -8,17 +8,26 @@ public sealed class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswor
 {
     private readonly KeycloakService _keycloakService;
     private readonly ILogger<ForgotPasswordCommandHandler> _logger;
+    private readonly IApplicationDbContext _context;
 
-    public ForgotPasswordCommandHandler(KeycloakService keycloakService, ILogger<ForgotPasswordCommandHandler> logger)
+    public ForgotPasswordCommandHandler(KeycloakService keycloakService, ILogger<ForgotPasswordCommandHandler> logger, IApplicationDbContext context)
     {
         _keycloakService = keycloakService;
         _logger = logger;
+        _context = context;
     }
 
     public async Task<Result<ForgotPasswordResponseDto>> Handle(ForgotPasswordCommand command, CancellationToken cancellationToken)
     {
         try
         {
+            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
+
+            if(existingUser == null)
+            {
+                return Result.Failure<ForgotPasswordResponseDto>(UserErrors.NotFoundByEmail);
+            }
+
             _logger.LogInformation("Processing password reset request for email: {Email}", command.Email);
 
             ForgotPasswordResponseDto result = await _keycloakService.SendPasswordResetEmailAsync(command.Email, cancellationToken);
