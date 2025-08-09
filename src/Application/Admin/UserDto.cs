@@ -10,8 +10,8 @@ public class UserDto
     public string? ProfilePic { get; set; }
     public DateTimeOffset? CreatedAt { get; set; }
     public Guid? CreatedBy { get; set; }
-    public Guid PublicId { get; set; }
-    public int Id { get; set; }
+    public Guid? PublicId { get; set; }
+    public int? Id { get; set; }
     public string Email { get; set; } = string.Empty;
     // public int Signups { get; set; }
 }

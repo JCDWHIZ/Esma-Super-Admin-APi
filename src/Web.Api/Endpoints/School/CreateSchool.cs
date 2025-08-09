@@ -79,6 +79,6 @@ internal sealed class CreateSchool : IEndpoint
         public List<Modules> Modules { get; init; } = new();
 
         public SubscriptionDto Subscriptions { get; init; } = new();
-        public Application.Admin.UserDto SchoolAdmin { get; init; } = new();
+        public UserDto SchoolAdmin { get; init; } = new();
     };
 }
