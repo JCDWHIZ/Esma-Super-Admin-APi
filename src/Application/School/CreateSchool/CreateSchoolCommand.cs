@@ -39,8 +39,8 @@ public record UserDto
     public string? ProfilePic { get; set; }
     public DateTimeOffset? CreatedAt { get; set; }
     public Guid? CreatedBy { get; set; }
-    public Guid PublicId { get; set; }
-    public int Id { get; set; }
+    public Guid? PublicId { get; set; }
+    public int? Id { get; set; }
     public string Email { get; set; } = string.Empty;
 }
 
@@ -50,10 +50,10 @@ public record SubscriptionDto
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public decimal Amount { get; init; }
-    public string SchoolLogo { get; init; }
-    public string SchoolName { get; init; }
-    public string SchoolAdminName { get; init; }
-    public ICollection<Modules> SchoolModules { get; init; }
-    public SubscriptionStatus Status { get; set; }
+    public string? SchoolLogo { get; init; }
+    public string? SchoolName { get; init; }
+    public string? SchoolAdminName { get; init; }
+    public ICollection<Modules>? SchoolModules { get; init; }
+    public SubscriptionStatus? Status { get; set; }
 }
 
