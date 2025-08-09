@@ -29,7 +29,7 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
             Username = command.Email,
             FirstName = command.FirstName,
             LastName = command.LastName,
-            ProfilePic = command.ProfilePic,
+            ProfilePic = command.ProfilePic ?? "string",
             PhoneNumber = command.PhoneNumber
         };
 
