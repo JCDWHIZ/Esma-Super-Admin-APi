@@ -41,7 +41,7 @@ internal sealed class CreateSchool : IEndpoint
                     Amount = request.Subscriptions.Amount
                 },
 
-                SchoolAdmin = new UserDto
+                SchoolAdmin = new SchoolAdminRequest
                 {
                     Role = request.SchoolAdmin.Role,
                     Username = request.SchoolAdmin.Username,
@@ -79,6 +79,6 @@ internal sealed class CreateSchool : IEndpoint
         public List<Modules> Modules { get; init; } = new();
 
         public SubscriptionDto Subscriptions { get; init; } = new();
-        public UserDto SchoolAdmin { get; init; } = new();
+        public SchoolAdminRequest SchoolAdmin { get; init; } = new();
     };
 }

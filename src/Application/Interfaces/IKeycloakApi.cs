@@ -124,6 +124,114 @@ public interface IKeycloakApi
 
     [Put("/admin/realms/{realm}/users/{userId}/reset-password")]
     Task ResetPasswordAsync(string realm, string userId, [Body] PasswordResetRequest request, [Header("Authorization")] string authorization);
+
+    // Realm Roles Management
+    [Get("/admin/realms/{realm}/roles")]
+    Task<Refit.ApiResponse<List<KeycloakRoleDto>>> GetRealmRolesAsync(
+        [AliasAs("realm")] string realm,
+        [Header("Authorization")] string authorization
+    );
+
+    [Get("/admin/realms/{realm}/roles/{roleName}")]
+    Task<Refit.ApiResponse<KeycloakRoleDto>> GetRealmRoleByNameAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("roleName")] string roleName,
+        [Header("Authorization")] string authorization
+    );
+
+    [Post("/admin/realms/{realm}/roles")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> CreateRealmRoleAsync(
+        [AliasAs("realm")] string realm,
+        [Body] CreateKeycloakRoleDto role,
+        [Header("Authorization")] string authorization
+    );
+
+    [Put("/admin/realms/{realm}/roles/{roleName}")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> UpdateRealmRoleAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("roleName")] string roleName,
+        [Body] UpdateKeycloakRoleDto role,
+        [Header("Authorization")] string authorization
+    );
+
+    [Delete("/admin/realms/{realm}/roles/{roleName}")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> DeleteRealmRoleAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("roleName")] string roleName,
+        [Header("Authorization")] string authorization
+    );
+
+    // Composite Roles Management
+    [Get("/admin/realms/{realm}/roles/{roleName}/composites")]
+    Task<Refit.ApiResponse<List<KeycloakRoleDto>>> GetCompositeRolesAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("roleName")] string roleName,
+        [Header("Authorization")] string authorization
+    );
+
+    [Post("/admin/realms/{realm}/roles/{roleName}/composites")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> AddCompositeRolesAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("roleName")] string roleName,
+        [Body] List<KeycloakRoleDto> compositeRoles,
+        [Header("Authorization")] string authorization
+    );
+
+    [Delete("/admin/realms/{realm}/roles/{roleName}/composites")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> RemoveCompositeRolesAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("roleName")] string roleName,
+        [Body] List<KeycloakRoleDto> compositeRoles,
+        [Header("Authorization")] string authorization
+    );
+
+    // Client Roles Management
+    [Get("/admin/realms/{realm}/clients/{clientId}/roles")]
+    Task<Refit.ApiResponse<List<KeycloakRoleDto>>> GetClientRolesAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("clientId")] string clientId,
+        [Header("Authorization")] string authorization
+    );
+
+    [Post("/admin/realms/{realm}/clients/{clientId}/roles")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> CreateClientRoleAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("clientId")] string clientId,
+        [Body] CreateKeycloakRoleDto role,
+        [Header("Authorization")] string authorization
+    );
+
+    [Get("/admin/realms/{realm}/clients/{clientId}/roles/{roleName}")]
+    Task<Refit.ApiResponse<KeycloakRoleDto>> GetClientRoleByNameAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("clientId")] string clientId,
+        [AliasAs("roleName")] string roleName,
+        [Header("Authorization")] string authorization
+    );
+
+    // User Role Assignments
+    [Get("/admin/realms/{realm}/users/{userId}/role-mappings/realm")]
+    Task<Refit.ApiResponse<List<KeycloakRoleDto>>> GetUserRealmRolesAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("userId")] string userId,
+        [Header("Authorization")] string authorization
+    );
+
+    [Post("/admin/realms/{realm}/users/{userId}/role-mappings/realm")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> AssignRealmRolesToUserAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("userId")] string userId,
+        [Body] List<KeycloakRoleDto> roles,
+        [Header("Authorization")] string authorization
+    );
+
+    [Delete("/admin/realms/{realm}/users/{userId}/role-mappings/realm")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> RemoveRealmRolesFromUserAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("userId")] string userId,
+        [Body] List<KeycloakRoleDto> roles,
+        [Header("Authorization")] string authorization
+    );
 }
 
 public class TokenResponseDto
@@ -354,4 +462,31 @@ public class PasswordResetRequest
     public string Type { get; set; }
     [JsonPropertyName("value")]
     public string Value { get; set; }
+}
+
+public class KeycloakRoleDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool Composite { get; set; }
+    public bool ClientRole { get; set; }
+    public string ContainerId { get; set; } = string.Empty;
+    public Dictionary<string, List<string>>? Attributes { get; set; }
+}
+
+public class CreateKeycloakRoleDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool Composite { get; set; }
+    public Dictionary<string, List<string>>? Attributes { get; set; }
+}
+
+public class UpdateKeycloakRoleDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool Composite { get; set; }
+    public Dictionary<string, List<string>>? Attributes { get; set; }
 }

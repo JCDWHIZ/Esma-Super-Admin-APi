@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Domain.AuditLogs;
 using Domain.Blogs;
 using Domain.HelpRequests;
+using Domain.Roles;
 using Domain.Schools;
 using Domain.Subscriptions;
 using Domain.Todos;
@@ -33,6 +34,8 @@ public sealed class ApplicationDbContext(
     public DbSet<HelpRequestMessages> HelpRequestMessages { get; set; }
     public DbSet<AuditLog> Auditlog { get; set; }
     public DbSet<SchoolAdmins> SchoolAdmins { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

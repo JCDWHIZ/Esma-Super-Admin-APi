@@ -17,7 +17,7 @@ public sealed record CreateSchoolCommand : ICommand<string>
     public List<Modules> Modules { get; init; } = new();
 
     public SubscriptionDto Subscriptions { get; init; } = new();
-    public UserDto SchoolAdmin { get; init; } = new();
+    public SchoolAdminRequest SchoolAdmin { get; init; } = new();
 
 }
 
@@ -31,7 +31,7 @@ public record AddressDto
 
 public record UserDto
 {
-    public Roles Role { get; set; }
+    public SharedKernel.Enums.Roles Role { get; set; }
     public string Username { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
@@ -43,6 +43,18 @@ public record UserDto
     public int? Id { get; set; }
     public string Email { get; set; } = string.Empty;
 }
+
+
+public record SchoolAdminRequest
+{
+    public SharedKernel.Enums.Roles Role { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
+    public string LastName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+}
+
 
 public record SubscriptionDto
 {

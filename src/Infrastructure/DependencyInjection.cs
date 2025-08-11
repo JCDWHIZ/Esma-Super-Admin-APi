@@ -11,6 +11,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
+using Infrastructure.Data;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Interceptors;
@@ -48,6 +49,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<DataSeeder>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
@@ -82,6 +84,7 @@ public static class DependencyInjection
         );
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddHostedService<RunDataSeederTask>();
 
         services.AddSingleton(TimeProvider.System);
         // services.AddTransient<IIdentityService, IdentityService>();
@@ -99,6 +102,7 @@ public static class DependencyInjection
         .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["Keycloak:BaseUrl"]!));
         services.AddScoped<IKeycloakOrganizationService, KeycloakOrganizationService>();
         services.AddScoped<KeycloakService>();
+        services.AddScoped<KeycloakRolesService>();
 
         services.AddHangfire(config => config
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)

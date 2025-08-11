@@ -4,6 +4,7 @@ using Domain.HelpRequests;
 using Domain.Schools;
 using Domain.Subscriptions;
 using Domain.Todos;
+using Domain.Roles;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,8 @@ public interface IApplicationDbContext
     DbSet<Schools> Schools { get; }
     DbSet<Subscriptions> Subscriptions { get; }
     DbSet<HelpRequests> HelpRequests { get; }
+    DbSet<Domain.Roles.Role> Roles { get; }
+    DbSet<Domain.Roles.Permission> Permissions { get; }
     DbSet<HelpRequestMessages> HelpRequestMessages { get; }
     DbSet<Blog> Blog { get; }
     DbSet<AuditLog> Auditlog { get; }

@@ -18,7 +18,7 @@ public class CreateTenantMessage
     public string SchoolEmail { get; set; }
     public string? SchoolPhoneNumber { get; set; }
     public AddressDto? SchoolAddress { get; set; }
-    public Roles SchoolAdminRole { get; set; }
+    public SharedKernel.Enums.Roles SchoolAdminRole { get; set; }
     public ICollection<Modules> Modules { get; set; }
     public SubscriptionDto Subscriptions { get; set; }
 }
