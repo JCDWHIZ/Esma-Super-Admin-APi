@@ -18,7 +18,9 @@ public sealed class ScheduleBlogCommandHandler(IApplicationDbContext _dbContext)
         if (command.PublishDate.HasValue && command.PublishDate > DateTime.UtcNow)
         {
             BackgroundJob.Schedule(() => PublishBlog(existingBlog.PublicId, cancellationToken), command.PublishDate.Value - DateTime.UtcNow);
+            existingBlog.Status = BlogStatus.SCHEDULED;
         }
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success("Blog Scheduled");
     }
