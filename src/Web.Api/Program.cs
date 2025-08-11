@@ -38,10 +38,10 @@ WebApplication app = builder.Build();
 app.UseSwaggerWithUi();
 app.MapEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.ApplyMigrations();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//}
+app.ApplyMigrations();
 app.UseHttpsRedirection();
 app.UseHsts();
 
