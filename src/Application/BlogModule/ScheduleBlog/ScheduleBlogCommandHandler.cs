@@ -20,7 +20,11 @@ public sealed class ScheduleBlogCommandHandler(IApplicationDbContext _dbContext)
             BackgroundJob.Schedule(() => PublishBlog(existingBlog.PublicId, cancellationToken), command.PublishDate.Value - DateTime.UtcNow);
             existingBlog.Status = BlogStatus.SCHEDULED;
         }
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        else
+        {
+            Result.Failure<string>(BlogErrors.InvalidPublishDate(command.PublishDate)); 
+        }
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success("Blog Scheduled");
     }

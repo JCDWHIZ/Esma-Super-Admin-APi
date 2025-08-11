@@ -31,4 +31,10 @@ public static class BlogErrors
     public static readonly Error InvalidStatus = Error.Failure(
         "Blog.InvalidStatus",
         "The specified blog status is not valid.");
+
+    public static Error InvalidPublishDate(DateTime? publishDate) => Error.Failure(
+        "Blog.InvalidPublishDate",
+        publishDate.HasValue
+            ? $"The publish date '{publishDate.Value.ToString("o")}' is in the past or not specified."
+            : "The publish date must be specified and cannot be in the past.");
 }
