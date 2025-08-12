@@ -1,5 +1,8 @@
 using System;
 using Application.Auth.Login;
+using Application.Interfaces;
+using Infrastructure.Services;
+using Web.Api.Attributes;
 
 namespace Web.Api.Endpoints.Auth;
 
@@ -10,7 +13,7 @@ internal sealed class LoginEndpoint : IEndpoint
         public string Email { get; init; } = default!;
         public string Password { get; init; } = default!;
     }
-
+    [Audit("Created Draft Blog on endpoint")]
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("auth/login", async (
@@ -24,7 +27,7 @@ internal sealed class LoginEndpoint : IEndpoint
             );
 
             Result<LoginCommandResponseDto> result = await handler.Handle(command, cancellationToken);
-
+          
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auth)

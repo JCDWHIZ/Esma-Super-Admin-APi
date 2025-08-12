@@ -1,11 +1,12 @@
 using System;
+using Application.Auth.Login;
 using Application.Interfaces;
 using Application.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.RefreshToken;
 
-public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, RefreshTokenResponseDto>
+public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, LoginCommandResponseDto>
 {
     private readonly KeycloakService _keycloakService;
     private readonly ILogger<RefreshTokenCommandHandler> _logger;
@@ -16,13 +17,13 @@ public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCom
         _logger = logger;
     }
 
-    public async Task<Result<RefreshTokenResponseDto>> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
+    public async Task<Result<LoginCommandResponseDto>> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
     {
         try
         {
             _logger.LogInformation("Attempting to refresh token");
 
-            RefreshTokenResponseDto refreshedToken = await _keycloakService.RefreshTokenAsync(command.RefreshToken);
+            LoginCommandResponseDto refreshedToken = await _keycloakService.RefreshTokenAsync(command.RefreshToken);
 
             _logger.LogInformation("Token refreshed successfully");
 
@@ -31,7 +32,7 @@ public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCom
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error refreshing token");
-            return Result.Failure<RefreshTokenResponseDto>(UserErrors.ErrorOccured());
+            return Result.Failure<LoginCommandResponseDto>(UserErrors.ErrorOccured());
         }
     }
 }

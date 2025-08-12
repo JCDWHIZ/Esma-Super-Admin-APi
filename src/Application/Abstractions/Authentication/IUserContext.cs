@@ -3,4 +3,5 @@
 public interface IUserContext
 {
     Guid? UserPublicId { get; }
+    string? UserRole { get; }
 }

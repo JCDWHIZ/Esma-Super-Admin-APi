@@ -18,6 +18,7 @@ internal sealed class ApproveSchool : IEndpoint
         .WithName("ApproveSchool")
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
+        .WithAudit("Approved School")
         .RequireAuthorization();
     }
 }

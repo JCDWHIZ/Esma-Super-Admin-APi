@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Web.Api.Endpoints;
 
@@ -39,5 +40,21 @@ public static class EndpointExtensions
     public static RouteHandlerBuilder HasPermission(this RouteHandlerBuilder app, string permission)
     {
         return app.RequireAuthorization(permission);
+    }
+
+    public static RouteHandlerBuilder WithAudit(this RouteHandlerBuilder builder, string actionDescription)
+    {
+        return builder.AddEndpointFilter(async (context, next) =>
+        {
+            object? result = await next(context);
+
+            if (context.HttpContext.Response.StatusCode >= 200 && context.HttpContext.Response.StatusCode < 300)
+            {
+                IAuditLogService auditService = context.HttpContext.RequestServices.GetRequiredService<IAuditLogService>();
+                await auditService.LogAsync(actionDescription);
+            }
+
+            return result;
+        });
     }
 }

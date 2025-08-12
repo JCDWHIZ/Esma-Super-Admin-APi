@@ -622,7 +622,7 @@ public class KeycloakService
         }
     }
 
-    public async Task<RefreshTokenResponseDto> RefreshTokenAsync(string refreshToken)
+    public async Task<LoginCommandResponseDto> RefreshTokenAsync(string refreshToken)
     {
         var parameters = new Dictionary<string, string>
         {
@@ -632,12 +632,29 @@ public class KeycloakService
             { "refresh_token", refreshToken }
         };
 
+
         try
         {
-            return await _keycloakApi.RefreshTokenAsync(_configuration["Keycloak:Realm"]!, parameters);
+            RefreshTokenResponseDto response = await _keycloakApi.RefreshTokenAsync(_configuration["Keycloak:Realm"]!, parameters);
+
+            return new LoginCommandResponseDto
+            {
+                AccessToken = response.AccessToken,
+                RefreshToken = response.RefreshToken,
+                IdToken = response.IdToken,
+                ExpiresIn = response.ExpiresIn,
+                RefreshExpiresIn = response.RefreshExpiresIn,
+                TokenType = response.TokenType,
+                SessionState = response.SessionState,
+                Scope = response.Scope
+            };
         }
         catch (Refit.ApiException ex)
         {
+            if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException("Invalid refresh token");
+            }
             throw new Exception($"Token refresh failed: {ex.Message}");
         }
     }

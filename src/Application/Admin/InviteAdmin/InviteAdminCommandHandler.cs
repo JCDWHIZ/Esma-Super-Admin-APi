@@ -11,7 +11,9 @@ using Domain.Users;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 
-
+// add softdelete and restore for admin endpoint
+// add status for user so that super admin can approve 
+// add bulk approval for approve school change publicId to array of string ids
 namespace Application.Admin.InviteAdmin;
 
 public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : ICommandHandler<InviteAdminCommand, UserDto>

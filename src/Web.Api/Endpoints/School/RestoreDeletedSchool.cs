@@ -20,6 +20,7 @@ internal sealed class RestoreDeletedSchool : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
+        .WithAudit("Restored Temporary Deleted School")
         .RequireAuthorization();
     }
 }

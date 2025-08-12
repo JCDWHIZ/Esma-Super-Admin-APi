@@ -17,4 +17,10 @@ internal sealed class UserContext : IUserContext
             .HttpContext?
             .User
             .GetUserPublicId();
+
+    public string? UserRole => 
+        _httpContextAccessor
+           .HttpContext?
+           .User
+           .GetUserRole();
 }

@@ -17,6 +17,7 @@ internal sealed class CreateBlogForApproval : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
+        .WithAudit("Submitted Blog for Approval")
         .RequireAuthorization();
     }
 }

@@ -272,6 +272,7 @@ public static class DependencyInjection
     public class FakeUserContext : IUserContext
     {
         public Guid? UserPublicId => Guid.Empty;
+        public string? UserRole => "FakeRole";
     }
 
     public class NoOpAuditingInterceptor : AuditingInterceptor

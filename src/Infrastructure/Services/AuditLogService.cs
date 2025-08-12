@@ -1,18 +1,22 @@
 using System;
-using Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
+using Application.Interfaces;
 using Domain.AuditLogs;
+using Infrastructure.Authentication;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Services;
 
 public class AuditLogService : IAuditLogService
 {
     private readonly IApplicationDbContext _context;
+    private readonly IUserContext _userContext;
 
-    public AuditLogService(IApplicationDbContext context)
+    public AuditLogService(IApplicationDbContext context, IUserContext userContext)
     {
         _context = context;
+        _userContext = userContext;
     }
 
     public async Task LogAsync(string actionDescription)
@@ -20,9 +24,9 @@ public class AuditLogService : IAuditLogService
         var auditLog = new AuditLog
         {
             Action = actionDescription,
-            CreatedBy = Guid.Empty,
+            CreatedBy = _userContext.UserPublicId,
             Created = DateTimeOffset.UtcNow,
-            Role = "Unknown"
+            Role = _userContext.UserRole ?? "unknown"
         };
 
         _context.Auditlog.Add(auditLog);

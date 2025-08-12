@@ -1,4 +1,5 @@
 using System;
+using Application.Auth.Login;
 using Application.Auth.RefreshToken;
 using Application.Interfaces;
 
@@ -15,16 +16,16 @@ internal sealed class RefreshTokenEndpoint : IEndpoint
     {
         app.MapPost("auth/refresh-token", async (
             Request request,
-            ICommandHandler<RefreshTokenCommand, RefreshTokenResponseDto> handler,
+            ICommandHandler<RefreshTokenCommand, LoginCommandResponseDto> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new RefreshTokenCommand(request.RefreshToken);
 
-            Result<RefreshTokenResponseDto> result = await handler.Handle(command, cancellationToken);
+            Result<LoginCommandResponseDto> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
-        .Produces<RefreshTokenResponseDto>(StatusCodes.Status200OK);
+        .Produces<LoginCommandResponseDto>(StatusCodes.Status200OK);
     }
 }

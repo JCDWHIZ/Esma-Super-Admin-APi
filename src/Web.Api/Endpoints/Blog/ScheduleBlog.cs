@@ -17,6 +17,7 @@ public class ScheduleBlog : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
+        .WithAudit("Scheduled Blog")
         .RequireAuthorization();
     }
 }

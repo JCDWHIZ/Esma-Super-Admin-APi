@@ -59,7 +59,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 Enabled = true,
                 Attributes = new()
                 {
-                    { "internal_user_id", new() { user.PublicId.ToString() } }
+                    { "internal_user_id", new() { user.PublicId.ToString() } },
+                    {"internal_user_role", new() { user.Role.ToString() } }
                 },
                 RequiredActions = new List<string>
                 {

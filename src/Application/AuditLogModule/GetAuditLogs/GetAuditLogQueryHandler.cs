@@ -27,7 +27,10 @@ public sealed class GetAuditLogQueryHandler(IApplicationDbContext _context) : IQ
             Auditquery.Select(a => new AuditLogDto
             {
                 Role = a.Role,
-                Action = a.Action
+                Action = a.Action,
+                CreatedAt = a.Created,
+                CreatedBy = a.CreatedBy,
+                PublicId = a.PublicId
             }),
             query.PageNumber ?? 1,
             query.PageSize ?? 10

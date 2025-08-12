@@ -47,6 +47,7 @@ internal sealed class EditSchool : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
+        .WithAudit("Edited School")
         .RequireAuthorization();
     }
 }

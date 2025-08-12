@@ -12,4 +12,10 @@ internal static class ClaimsPrincipalExtensions
             ? parsedUserId
             : null;
     }
+    public static string GetUserRole(this ClaimsPrincipal? principal)
+    {
+        string? role = principal?.FindFirst("app_user_role")?.Value;
+
+        return role ?? "unknow";
+    }
 }
