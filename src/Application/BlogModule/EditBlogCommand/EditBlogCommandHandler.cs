@@ -16,11 +16,6 @@ public sealed class EditBlogCommandHandler(IApplicationDbContext _dbContext) : I
             return Result.Failure<string>(BlogErrors.NotFound(command.PublicId));
         }
 
-        if (await _dbContext.Blog.AnyAsync(x => x.Title == command.Title && x.PublicId != command.PublicId, cancellationToken))
-        {
-            return Result.Failure<string>(BlogErrors.BlogAlreadyExists(command.Title));
-        }
-
         blog.Title = command.Title;
         blog.Content = command.Content;
         blog.BackdropUrl = command.BackdropUrl;
@@ -31,9 +26,23 @@ public sealed class EditBlogCommandHandler(IApplicationDbContext _dbContext) : I
 
         if (command.Status == BlogStatus.SCHEDULED && command.PublishDate.HasValue && command.PublishDate > DateTime.UtcNow)
         {
-            BackgroundJob.Schedule(() => PublishBlog(blog.PublicId, cancellationToken), command.PublishDate.Value - DateTime.UtcNow);
-        }
+            blog.Status = BlogStatus.SCHEDULED;
 
+            BackgroundJob.Schedule(
+                () => PublishBlog(blog.PublicId, CancellationToken.None),
+                command.PublishDate.Value - DateTime.UtcNow
+            );
+        }
+        else if (command.Status == BlogStatus.DRAFT)
+        {
+            blog.Status = BlogStatus.DRAFT;
+        }
+        else if (command.Status == BlogStatus.PUBLISHED)
+        {
+            // Optional: Only allow publishing immediately if explicitly triggered
+            blog.Status = BlogStatus.PUBLISHED;
+            blog.PublishDate = DateTime.UtcNow;
+        }
         return Result.Success("Blog updated successfully");
     }
 

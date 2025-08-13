@@ -113,4 +113,6 @@ public class KafkaSettings
     public required string CreateTenantTopic { get; set; }
     public required string EmailTopic { get; set; }
     public required string TenantResponseTopic { get; set; }
+    public required string HelpRequestGetTopic { get; set; }
+    public required string HelpRequestRespondTopic { get; set; }
 }

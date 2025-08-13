@@ -8,6 +8,12 @@ public static class SchoolErrors
     public static Error NotFound(Guid publicId) => Error.NotFound(
         "School.NotFound",
         $"The school with the PublicId = '{publicId}' was not found.");
+    public static Error NotFoundList(List<Guid>? ids)
+    {
+        return Error.NotFound(
+       "School.NotFound",
+       $"The school with the PublicId = '{string.Join(", ", ids ?? new List<Guid>())}' was not found.");
+    }
 
     public static Error NotFoundByOrganization(string organizationId) => Error.NotFound(
         "School.NotFoundByOrganization",

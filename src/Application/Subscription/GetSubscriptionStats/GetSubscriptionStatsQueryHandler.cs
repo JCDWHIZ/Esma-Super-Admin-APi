@@ -11,7 +11,7 @@ public sealed class GetSubscriptionStatsQueryHandler(IApplicationDbContext _cont
         DateTime currentDate = DateTime.UtcNow;
         DateTime expiryThreshold = currentDate.AddDays(15);
 
-        SubscriptionStatsDto? subscriptionStats = await _context.Subscriptions
+        SubscriptionStatsDto? subscriptionStats = await _context.Subscriptions.Where(x => !x.IsDeleted)
             .GroupBy(_ => true)
             .Select(g => new SubscriptionStatsDto
             {

@@ -85,7 +85,6 @@ public static class DependencyInjection
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddHostedService<RunDataSeederTask>();
-
         services.AddSingleton(TimeProvider.System);
         // services.AddTransient<IIdentityService, IdentityService>();
 
@@ -146,7 +145,8 @@ public static class DependencyInjection
         services.AddScoped<IMessageProducer, KafkaProducer>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddSingleton<IKafkaAdminService, KafkaAdminService>();
-        services.AddHostedService<TenantResponseHandlerService>();
+        services.AddHostedService<HelpRequestGetHandler>();
+        services.AddHostedService<HelpRequestRespondHandler>();
 
         return services;
     }

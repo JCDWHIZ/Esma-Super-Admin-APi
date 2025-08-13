@@ -86,7 +86,9 @@ public class TenantResponseHandlerService : BackgroundService
                 _kafkaSettings.CreateOrganizationTopic,
                 _kafkaSettings.CreateTenantTopic,
                 _kafkaSettings.EmailTopic,
-                _kafkaSettings.TenantResponseTopic
+                _kafkaSettings.TenantResponseTopic,
+                _kafkaSettings.HelpRequestGetTopic,
+                _kafkaSettings.HelpRequestRespondTopic
             );
 
             _consumer.Subscribe(_kafkaSettings.TenantResponseTopic);
@@ -165,6 +167,7 @@ public class TenantResponseHandlerService : BackgroundService
             if (message.Data.Success)
             {
                 school.TenantId = message.Data.TenantId;
+                school.Status = SharedKernel.Enums.SchoolStatus.ACTIVE;
 
                 await dbContext.SaveChangesAsync(cancellationToken);
                 var payload = new Dictionary<string, object>

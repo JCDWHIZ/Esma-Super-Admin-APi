@@ -15,9 +15,15 @@ public sealed class GetHelpRequestByIdQueryHandler(IApplicationDbContext _contex
                 TicketId = hr.TicketId,
                 Status = hr.Status,
                 PublicId = hr.PublicId,
+                Category = hr.Category,
+                TenantHelpRequestId = hr.TenantHelpRequestId,
+                SchoolId = hr.SchoolId,
+                UserName = hr.UserName,
+                UserProfilePic = hr.UserProfilePic,
                 Messages = (hr.Messages ?? new List<HelpRequestMessages>()).Select(m => new HelpRequestMessageDto
                 {
                     Id = m.Id,
+                    PublicId = m.PublicId,
                     Title = m.Title,
                     Attachments = m.Attachments,
                 }).ToList()

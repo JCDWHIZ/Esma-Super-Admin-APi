@@ -9,5 +9,8 @@ public enum SchoolStatus
     REJECTED,
     APPROVED,
     PENDING,
-    SUSPENDED
+    ACTIVE,
+    INACTIVE,
+    SUSPENDED,
+    PROCESSING
 }

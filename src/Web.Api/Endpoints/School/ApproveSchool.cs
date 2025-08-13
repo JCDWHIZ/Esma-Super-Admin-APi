@@ -5,11 +5,14 @@ namespace Web.Api.Endpoints.School;
 
 internal sealed class ApproveSchool : IEndpoint
 {
+    public class Request {
+        public List<Guid> PublicIds { get; set; }
+    }
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("/schools/approve/{PublicId:guid}", async (Guid PublicId, ICommandHandler<ApproveSchoolCommand, string> handler, CancellationToken cancellationToken) =>
+        app.MapPut("/schools/approve", async (Request request, ICommandHandler<ApproveSchoolCommand, string> handler, CancellationToken cancellationToken) =>
         {
-            var command = new ApproveSchoolCommand(PublicId);
+            var command = new ApproveSchoolCommand(request.PublicIds);
 
             Result<string> result = await handler.Handle(command, cancellationToken);
 

@@ -8,6 +8,9 @@ using Hangfire;
 
 namespace Application.School.CreateSchool;
 
+
+// disable school if they haven't paid for their subscription
+// add a background job to check for unpaid subscriptions and disable the school if necessary
 public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContext) : ICommandHandler<CreateSchoolCommand, string>
 {
     public async Task<Result<string>> Handle(CreateSchoolCommand command, CancellationToken cancellationToken)
