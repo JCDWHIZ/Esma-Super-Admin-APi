@@ -29,31 +29,24 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
                 s => s.EndDate > now && s.EndDate <= now.AddDays(15), cancellationToken)
         };
 
+        List<double> resolvedTickets = await context.HelpRequests
+            .Where(t => t.Status == HelpStatus.RESOLVED)
+            .Select(t => (t.LastModified - t.Created).TotalMinutes)
+            .ToListAsync(cancellationToken);
+
+        double averageResolutionMinutes = resolvedTickets.Any()
+            ? resolvedTickets.Average()
+            : 0;
+
         var ticketStats = new TicketStatsDto
         {
             Open = await context.HelpRequests.CountAsync(t => t.Status == HelpStatus.OPEN_REQUEST, cancellationToken),
             InProgress = await context.HelpRequests.CountAsync(t => t.Status == HelpStatus.IN_PROGRESS, cancellationToken),
-            Resolved = await context.HelpRequests.CountAsync(t => t.Status == HelpStatus.RESOLVED, cancellationToken),
-            AverageResolutionMinutes = await context.HelpRequests
-            .Where(t => t.Status == HelpStatus.RESOLVED)
-            .Select(t => (t.LastModified - t.Created).TotalMinutes)
-            .AverageAsync(cancellationToken)
+            Resolved = resolvedTickets.Count,
+            AverageResolutionMinutes = averageResolutionMinutes
         };
 
 
-        // In the AverageAsync call, change EF.Functions.DateDiffMinute to EF.Functions.DateDiffMinute(t.Created, t.LastModified)
-        // However, the error indicates that DateDiffMinute is not available. 
-        // The correct method is DateDiffMinute, but it is only available in Microsoft.EntityFrameworkCore.SqlServer.
-        // If you are not using SQL Server, you need to calculate the difference in C# instead.
-
-        //AverageResolutionMinutes = await context.HelpRequests
-        //    .Where(t => t.Status == HelpStatus.RESOLVED)
-        //    .Select(t => (double)(EF.Functions.DateDiffMinute(t.Created, t.LastModified)))
-        //    .AverageAsync(cancellationToken)
-        //AverageResolutionMinutes = await context.HelpRequests
-        //    .Where(t => t.Status == HelpStatus.RESOLVED)
-        //    .Select(t => (t.LastModified - t.Created).TotalMinutes)
-        //    .AverageAsync(cancellationToken)
         var result = new DashboardStatsDto
         {
             Schools = schoolStats,
@@ -64,3 +57,17 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
         return Result.Success(result);
     }
 }
+
+// In the AverageAsync call, change EF.Functions.DateDiffMinute to EF.Functions.DateDiffMinute(t.Created, t.LastModified)
+// However, the error indicates that DateDiffMinute is not available. 
+// The correct method is DateDiffMinute, but it is only available in Microsoft.EntityFrameworkCore.SqlServer.
+// If you are not using SQL Server, you need to calculate the difference in C# instead.
+
+//AverageResolutionMinutes = await context.HelpRequests
+//    .Where(t => t.Status == HelpStatus.RESOLVED)
+//    .Select(t => (double)(EF.Functions.DateDiffMinute(t.Created, t.LastModified)))
+//    .AverageAsync(cancellationToken)
+//AverageResolutionMinutes = await context.HelpRequests
+//    .Where(t => t.Status == HelpStatus.RESOLVED)
+//    .Select(t => (t.LastModified - t.Created).TotalMinutes)
+//    .AverageAsync(cancellationToken)
