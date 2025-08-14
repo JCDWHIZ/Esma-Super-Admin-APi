@@ -23,6 +23,7 @@ public class HelpRequestRespondHandler : BackgroundService
     private readonly IConsumer<string, string> _consumer;
     private readonly ILogger<HelpRequestRespondHandler> _logger;
     private readonly KafkaSettings _kafkaSettings;
+    private readonly IKafkaAdminService _kafkaAdminService;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -31,12 +32,12 @@ public class HelpRequestRespondHandler : BackgroundService
     public HelpRequestRespondHandler(
         IServiceProvider serviceProvider,
         IOptions<KafkaSettings> kafkaSettings,
-        ILogger<HelpRequestRespondHandler> logger)
+        ILogger<HelpRequestRespondHandler> logger, IKafkaAdminService kafkaAdminService)
     {
         _serviceProvider = serviceProvider;
         _kafkaSettings = kafkaSettings.Value;
         _logger = logger;
-
+        _kafkaAdminService = kafkaAdminService;
         var config = new ConsumerConfig
         {
             BootstrapServers = _kafkaSettings.BootstrapServers,
@@ -51,6 +52,15 @@ public class HelpRequestRespondHandler : BackgroundService
         await Task.Delay(5000, stoppingToken);
         try
         {
+            await _kafkaAdminService.EnsureTopicsExistAsync(
+                _kafkaSettings.DefaultTopic,
+                _kafkaSettings.CreateOrganizationTopic,
+                _kafkaSettings.CreateTenantTopic,
+                _kafkaSettings.EmailTopic,
+                _kafkaSettings.TenantResponseTopic,
+                _kafkaSettings.HelpRequestGetTopic,
+                _kafkaSettings.HelpRequestRespondTopic
+            );
             _consumer.Subscribe(_kafkaSettings.HelpRequestRespondTopic);
             _logger.LogInformation("Started consuming from topic: {Topic}", _kafkaSettings.HelpRequestRespondTopic);
 

@@ -21,6 +21,7 @@ public class HelpRequestGetHandler : BackgroundService
     private readonly IConsumer<string, string> _consumer;
     private readonly ILogger<HelpRequestGetHandler> _logger;
     private readonly KafkaSettings _kafkaSettings;
+    private readonly IKafkaAdminService _kafkaAdminService;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -29,7 +30,8 @@ public class HelpRequestGetHandler : BackgroundService
     public HelpRequestGetHandler(
         IServiceProvider serviceProvider,
         IOptions<KafkaSettings> kafkaSettings,
-        ILogger<HelpRequestGetHandler> logger)
+        ILogger<HelpRequestGetHandler> logger,
+        IKafkaAdminService kafkaAdminService)
     {
         _serviceProvider = serviceProvider;
         _kafkaSettings = kafkaSettings.Value;
@@ -43,12 +45,22 @@ public class HelpRequestGetHandler : BackgroundService
         };
 
         _consumer = new ConsumerBuilder<string, string>(config).Build();
+        _kafkaAdminService = kafkaAdminService;
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Delay(5000, stoppingToken);
         try
         {
+            await _kafkaAdminService.EnsureTopicsExistAsync(
+                _kafkaSettings.DefaultTopic,
+                _kafkaSettings.CreateOrganizationTopic,
+                _kafkaSettings.CreateTenantTopic,
+                _kafkaSettings.EmailTopic,
+                _kafkaSettings.TenantResponseTopic,
+                _kafkaSettings.HelpRequestGetTopic,
+                _kafkaSettings.HelpRequestRespondTopic
+            );
             _consumer.Subscribe(_kafkaSettings.HelpRequestGetTopic);
             _logger.LogInformation("Started consuming from topic: {Topic}", _kafkaSettings.HelpRequestGetTopic);
 

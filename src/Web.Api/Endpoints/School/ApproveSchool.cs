@@ -5,7 +5,7 @@ namespace Web.Api.Endpoints.School;
 
 internal sealed class ApproveSchool : IEndpoint
 {
-    public class Request {
+    public sealed class Request {
         public List<Guid> PublicIds { get; set; }
     }
     public void MapEndpoint(IEndpointRouteBuilder app)
