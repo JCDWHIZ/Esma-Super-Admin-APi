@@ -8,7 +8,7 @@ public sealed class UpdateHelpRequestStatus(IApplicationDbContext context) : ICo
 {
     public async Task<Result<HelpRequestDto>> Handle(UpdateHelpRequestStatusCommand command, CancellationToken cancellationToken)
     {
-        HelpRequests? entity = await context.HelpRequests.FindAsync([command.PublicId], cancellationToken);
+        HelpRequests? entity = await context.HelpRequests.FirstOrDefaultAsync(hr => hr.PublicId == command.PublicId, cancellationToken);
         if (entity == null)
         {
             return Result.Failure<HelpRequestDto>(HelpRequestErrors.NotFound(command.PublicId));
