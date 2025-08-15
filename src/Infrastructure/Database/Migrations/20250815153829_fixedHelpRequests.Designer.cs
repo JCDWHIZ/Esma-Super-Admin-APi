@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250813222558_fixedHelpRequests")]
+    [Migration("20250815153829_fixedHelpRequests")]
     partial class fixedHelpRequests
     {
         /// <inheritdoc />
@@ -201,6 +201,18 @@ namespace Infrastructure.Database.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("title");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("user_name");
+
+                    b.Property<string>("UserProfilePic")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("user_profile_pic");
 
                     b.HasKey("Id")
                         .HasName("pk_help_request_messages");

@@ -148,6 +148,8 @@ public class HelpRequestGetHandler : BackgroundService
                     new HelpRequestMessages
                     {
                         Title = helpRequestData.InitialMessage.Title,
+                        UserProfilePic = helpRequestData.InitialMessage.UserProfilePic,
+                        UserName = helpRequestData.InitialMessage.UserName,
                         Attachments = helpRequestData.InitialMessage.Attachments ?? new List<string>(),
                     }
                 }
@@ -190,6 +192,8 @@ public class HelpRequestGetMessage
 public class HelpRequestMessageData
 {
     public string? Title { get; set; }
+    public string UserName { get; set; }
+    public string UserProfilePic { get; set; }
     public List<string> Attachments { get; set; } = new();
 }
 

@@ -43,6 +43,24 @@ namespace Infrastructure.Database.Migrations
                 maxLength: 200,
                 nullable: false,
                 defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "user_name",
+                schema: "public",
+                table: "help_request_messages",
+                type: "character varying(100)",
+                maxLength: 100,
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "user_profile_pic",
+                schema: "public",
+                table: "help_request_messages",
+                type: "character varying(255)",
+                maxLength: 255,
+                nullable: false,
+                defaultValue: "");
         }
 
         /// <inheritdoc />
@@ -67,6 +85,16 @@ namespace Infrastructure.Database.Migrations
                 name: "user_profile_pic",
                 schema: "public",
                 table: "help_requests");
+
+            migrationBuilder.DropColumn(
+                name: "user_name",
+                schema: "public",
+                table: "help_request_messages");
+
+            migrationBuilder.DropColumn(
+                name: "user_profile_pic",
+                schema: "public",
+                table: "help_request_messages");
         }
     }
 }

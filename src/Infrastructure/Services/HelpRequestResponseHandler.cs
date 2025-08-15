@@ -123,8 +123,6 @@ public class HelpRequestRespondHandler : BackgroundService
 
             using IServiceScope scope = _serviceProvider.CreateScope();
             IApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
-
-            // Find the existing help request
             HelpRequests? helpRequest = await dbContext.HelpRequests
                 .Include(hr => hr.Messages)
                 .FirstOrDefaultAsync(hr => hr.TenantHelpRequestId == messageData.TenantHelpRequestId
@@ -137,12 +135,13 @@ public class HelpRequestRespondHandler : BackgroundService
                 return;
             }
 
-            // Add the new message to the existing help request
             var newMessage = new HelpRequestMessages
             {
                 Title = messageData.Title,
                 Attachments = messageData.Attachments ?? new List<string>(),
-                HelpRequestId = helpRequest.Id
+                HelpRequestId = helpRequest.Id,
+                UserName = messageData.UserName,
+                UserProfilePic = messageData.UserProfilePic
             };
 
             dbContext.HelpRequestMessages.Add(newMessage);
@@ -175,6 +174,8 @@ public class HelpRequestMessageResponse
 {
     public string? Title { get; set; }
     public List<string> Attachments { get; set; } = new();
+    public string UserName { get; set; }
+    public string UserProfilePic { get; set; }
     public string TenantHelpRequestId { get; set; }
     public string SchoolId { get; set; }
 }

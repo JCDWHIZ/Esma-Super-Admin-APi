@@ -221,11 +221,11 @@ public sealed class DataSeeder(
     {
         // Check for existing help requests to avoid duplicates
         List<string?> existingTicketIds = await context.HelpRequests
-            .Select(hr => hr.TicketId)
-            .ToListAsync(cancellationToken);
+             .Select(hr => hr.TicketId)
+             .ToListAsync(cancellationToken);
 
         // Define help requests to seed
-        var helpRequestsToSeed = new List<(string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments)> Messages)>
+        var helpRequestsToSeed = new List<(string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)> Messages)>
         {
             (
                 TicketId: "TICKET-001",
@@ -235,12 +235,12 @@ public sealed class DataSeeder(
                 UserName: "John Doe",
                 TenantHelpRequestId: "TENANT-001",
                 SchoolId: "SCHOOL-001",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Login Issue", new List<string> { "https://example.com/attachments/screenshot1.png", "https://example.com/attachments/error_log.txt" }),
-                    ("Follow-up on Login Issue", new List<string> { "https://example.com/attachments/screenshot2.png" }),
-                    ("Request for Admin Assistance", new List<string>()),
-                    ("Additional Details", new List<string> { "https://example.com/attachments/config.json" })
+                    ("Login Issue", new List<string> { "https://example.com/attachments/screenshot1.png", "https://example.com/attachments/error_log.txt" }, "John Doe", "https://example.com/profiles/user1.jpg"),
+                    ("Follow-up on Login Issue", new List<string> { "https://example.com/attachments/screenshot2.png" }, "John Doe", "https://example.com/profiles/user1.jpg"),
+                    ("Request for Admin Assistance", new List<string>(), "Admin Support", "https://example.com/profiles/admin1.jpg"),
+                    ("Additional Details", new List<string> { "https://example.com/attachments/config.json" }, "John Doe", "https://example.com/profiles/user1.jpg")
                 }
             ),
             (
@@ -251,11 +251,11 @@ public sealed class DataSeeder(
                 UserName: "Jane Smith",
                 TenantHelpRequestId: "TENANT-002",
                 SchoolId: "SCHOOL-002",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Billing Query", new List<string> { "https://example.com/attachments/invoice.pdf" }),
-                    ("Payment Confirmation", new List<string> { "https://example.com/attachments/receipt.pdf" }),
-                    ("Clarification Needed", new List<string>())
+                    ("Billing Query", new List<string> { "https://example.com/attachments/invoice.pdf" }, "Jane Smith", "https://example.com/profiles/user2.jpg"),
+                    ("Payment Confirmation", new List<string> { "https://example.com/attachments/receipt.pdf" }, "Jane Smith", "https://example.com/profiles/user2.jpg"),
+                    ("Clarification Needed", new List<string>(), "Billing Team", "https://example.com/profiles/billing1.jpg")
                 }
             ),
             (
@@ -266,12 +266,12 @@ public sealed class DataSeeder(
                 UserName: "Alice Johnson",
                 TenantHelpRequestId: "TENANT-003",
                 SchoolId: "SCHOOL-003",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Account Activation Request", new List<string> { "https://example.com/attachments/id_scan.jpg" }),
-                    ("Verification Follow-up", new List<string>()),
-                    ("Issue Resolved", new List<string> { "https://example.com/attachments/confirmation_email.pdf" }),
-                    ("Feedback on Resolution", new List<string>())
+                    ("Account Activation Request", new List<string> { "https://example.com/attachments/id_scan.jpg" }, "Alice Johnson", "https://example.com/profiles/user3.jpg"),
+                    ("Verification Follow-up", new List<string>(), "Alice Johnson", "https://example.com/profiles/user3.jpg"),
+                    ("Issue Resolved", new List<string> { "https://example.com/attachments/confirmation_email.pdf" }, "Admin Support", "https://example.com/profiles/admin1.jpg"),
+                    ("Feedback on Resolution", new List<string>(), "Alice Johnson", "https://example.com/profiles/user3.jpg")
                 }
             ),
             (
@@ -282,32 +282,27 @@ public sealed class DataSeeder(
                 UserName: "Bob Wilson",
                 TenantHelpRequestId: "TENANT-004",
                 SchoolId: "SCHOOL-004",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Network Connectivity Issue", new List<string> { "https://example.com/attachments/network_log.txt" }),
-                    ("Ping Test Results", new List<string> { "https://example.com/attachments/ping_results.csv" }),
-                    ("Router Configuration", new List<string> { "https://example.com/attachments/router_config.pdf" })
+                    ("Network Connectivity Issue", new List<string> { "https://example.com/attachments/network_log.txt" }, "Bob Wilson", "https://example.com/profiles/user4.jpg"),
+                    ("Ping Test Results", new List<string> { "https://example.com/attachments/ping_results.csv" }, "Bob Wilson", "https://example.com/profiles/user4.jpg"),
+                    ("Router Configuration", new List<string> { "https://example.com/attachments/router_config.pdf" }, "Tech Support", "https://example.com/profiles/tech1.jpg")
                 }
             ),
             (
                 TicketId: "TICKET-005",
                 Status: HelpStatus.IN_PROGRESS,
-               Category: HelpCategory.OTHER,
-                UserProfilePic:
-        "https://example.com/profiles/user5.jpg",
-                UserName:
-        "Emma Davis",
-                TenantHelpRequestId:
-        "TENANT-005",
-                SchoolId:
-        "SCHOOL-005",
-                Messages:
-        new List<(string Title, List<string> Attachments)>
+                Category: HelpCategory.OTHER,
+                UserProfilePic: "https://example.com/profiles/user5.jpg",
+                UserName: "Emma Davis",
+                TenantHelpRequestId: "TENANT-005",
+                SchoolId: "SCHOOL-005",
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("General Inquiry", new List<string>()),
-                    ("Request for Training Materials", new List<string> { "https://example.com/attachments/training_request_form.pdf" }),
-                    ("Follow-up on Training", new List<string>()),
-                    ("Feedback on Materials", new List<string> { "https://example.com/attachments/feedback_form.docx" })
+                    ("General Inquiry", new List<string>(), "Emma Davis", "https://example.com/profiles/user5.jpg"),
+                    ("Request for Training Materials", new List<string> { "https://example.com/attachments/training_request_form.pdf" }, "Emma Davis", "https://example.com/profiles/user5.jpg"),
+                    ("Follow-up on Training", new List<string>(), "Training Team", "https://example.com/profiles/trainer1.jpg"),
+                    ("Feedback on Materials", new List<string> { "https://example.com/attachments/feedback_form.docx" }, "Emma Davis", "https://example.com/profiles/user5.jpg")
                 }
             ),
             (
@@ -318,11 +313,11 @@ public sealed class DataSeeder(
                 UserName: "Michael Brown",
                 TenantHelpRequestId: "TENANT-006",
                 SchoolId: "SCHOOL-006",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Software Crash Report", new List<string> { "https://example.com/attachments/crash_log.txt", "https://example.com/attachments/screenshot3.png" }),
-                    ("Attempted Fixes", new List<string>()),
-                    ("Request for Patch", new List<string>())
+                    ("Software Crash Report", new List<string> { "https://example.com/attachments/crash_log.txt", "https://example.com/attachments/screenshot3.png" }, "Michael Brown", "https://example.com/profiles/user6.jpg"),
+                    ("Attempted Fixes", new List<string>(), "Michael Brown", "https://example.com/profiles/user6.jpg"),
+                    ("Request for Patch", new List<string>(), "Tech Support", "https://example.com/profiles/tech1.jpg")
                 }
             ),
             (
@@ -333,11 +328,11 @@ public sealed class DataSeeder(
                 UserName: "Sarah Miller",
                 TenantHelpRequestId: "TENANT-007",
                 SchoolId: "SCHOOL-007",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Overcharge Dispute", new List<string> { "https://example.com/attachments/invoice_dispute.pdf" }),
-                    ("Response from Billing Team", new List<string> { "https://example.com/attachments/billing_response.pdf" }),
-                    ("Resolution Confirmation", new List<string>())
+                    ("Overcharge Dispute", new List<string> { "https://example.com/attachments/invoice_dispute.pdf" }, "Sarah Miller", "https://example.com/profiles/user7.jpg"),
+                    ("Response from Billing Team", new List<string> { "https://example.com/attachments/billing_response.pdf" }, "Billing Team", "https://example.com/profiles/billing1.jpg"),
+                    ("Resolution Confirmation", new List<string>(), "Sarah Miller", "https://example.com/profiles/user7.jpg")
                 }
             ),
             (
@@ -348,12 +343,12 @@ public sealed class DataSeeder(
                 UserName: "David Lee",
                 TenantHelpRequestId: "TENANT-008",
                 SchoolId: "SCHOOL-008",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Password Reset Request", new List<string>()),
-                    ("Security Question Issue", new List<string> { "https://example.com/attachments/security_question_screenshot.png" }),
-                    ("Admin Follow-up", new List<string>()),
-                    ("Temporary Access Request", new List<string> { "https://example.com/attachments/temp_access_form.pdf" })
+                    ("Password Reset Request", new List<string>(), "David Lee", "https://example.com/profiles/user8.jpg"),
+                    ("Security Question Issue", new List<string> { "https://example.com/attachments/security_question_screenshot.png" }, "David Lee", "https://example.com/profiles/user8.jpg"),
+                    ("Admin Follow-up", new List<string>(), "Admin Support", "https://example.com/profiles/admin1.jpg"),
+                    ("Temporary Access Request", new List<string> { "https://example.com/attachments/temp_access_form.pdf" }, "David Lee", "https://example.com/profiles/user8.jpg")
                 }
             ),
             (
@@ -364,10 +359,10 @@ public sealed class DataSeeder(
                 UserName: "Lisa Taylor",
                 TenantHelpRequestId: "TENANT-009",
                 SchoolId: "SCHOOL-009",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Database Access Error", new List<string> { "https://example.com/attachments/db_error_log.txt" }),
-                    ("Query Performance Issue", new List<string> { "https://example.com/attachments/query_plan.pdf" })
+                    ("Database Access Error", new List<string> { "https://example.com/attachments/db_error_log.txt" }, "Lisa Taylor", "https://example.com/profiles/user9.jpg"),
+                    ("Query Performance Issue", new List<string> { "https://example.com/attachments/query_plan.pdf" }, "Lisa Taylor", "https://example.com/profiles/user9.jpg")
                 }
             ),
             (
@@ -378,19 +373,19 @@ public sealed class DataSeeder(
                 UserName: "Chris Evans",
                 TenantHelpRequestId: "TENANT-010",
                 SchoolId: "SCHOOL-010",
-                Messages: new List<(string Title, List<string> Attachments)>
+                Messages: new List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)>
                 {
-                    ("Feature Request", new List<string> { "https://example.com/attachments/feature_proposal.docx" }),
-                    ("Clarification on Requirements", new List<string>()),
-                    ("Mockup Submission", new List<string> { "https://example.com/attachments/mockup.png" }),
-                    ("Feedback on Proposal", new List<string>())
+                    ("Feature Request", new List<string> { "https://example.com/attachments/feature_proposal.docx" }, "Chris Evans", "https://example.com/profiles/user10.jpg"),
+                    ("Clarification on Requirements", new List<string>(), "Chris Evans", "https://example.com/profiles/user10.jpg"),
+                    ("Mockup Submission", new List<string> { "https://example.com/attachments/mockup.png" }, "Chris Evans", "https://example.com/profiles/user10.jpg"),
+                    ("Feedback on Proposal", new List<string>(), "Product Team", "https://example.com/profiles/product1.jpg")
                 }
             )
         };
 
-    var helpRequestsToAdd = new List<HelpRequests>();
+        var helpRequestsToAdd = new List<HelpRequests>();
 
-        foreach ((string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments)> Messages) helpRequestData in helpRequestsToSeed)
+        foreach ((string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic)> Messages) helpRequestData in helpRequestsToSeed)
         {
             // Skip if help request already exists
             if (existingTicketIds.Contains(helpRequestData.TicketId))
@@ -413,20 +408,22 @@ public sealed class DataSeeder(
             };
 
             // Add messages to the help request
-            foreach ((string Title, List<string> Attachments) messageData in helpRequestData.Messages)
+            foreach ((string Title, List<string> Attachments, string MessageUserName, string MessageUserProfilePic) messageData in helpRequestData.Messages)
             {
                 var message = new HelpRequestMessages
                 {
                     Title = messageData.Title,
                     Attachments = messageData.Attachments,
+                    UserName = messageData.MessageUserName,
+                    UserProfilePic = messageData.MessageUserProfilePic,
                 };
-        helpRequest.Messages.Add(message);
-                    }
+                helpRequest.Messages.Add(message);
+            }
 
-                    helpRequestsToAdd.Add(helpRequest);
-                }
+            helpRequestsToAdd.Add(helpRequest);
+        }
 
-                if (helpRequestsToAdd.Any())
+        if (helpRequestsToAdd.Any())
         {
             await context.HelpRequests.AddRangeAsync(helpRequestsToAdd, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);

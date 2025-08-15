@@ -12,6 +12,14 @@ internal sealed class HelpRequestMessagesConfiguration : IEntityTypeConfiguratio
         builder.Property(hrm => hrm.Title)
             .HasMaxLength(255);
 
+        builder.Property(hrm => hrm.UserName)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(hrm => hrm.UserProfilePic)
+            .IsRequired()
+            .HasMaxLength(255);
+
         builder.Property(hrm => hrm.Attachments)
             .HasConversion(
                 v => string.Join(';', v),

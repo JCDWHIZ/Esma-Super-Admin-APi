@@ -199,6 +199,18 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("title");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("user_name");
+
+                    b.Property<string>("UserProfilePic")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("user_profile_pic");
+
                     b.HasKey("Id")
                         .HasName("pk_help_request_messages");
 
