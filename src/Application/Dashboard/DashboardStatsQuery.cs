@@ -12,8 +12,16 @@ public class DashboardStatsDto
     public SchoolStatsDto Schools { get; set; } = new();
     public SubscriptionStatsDto Subscriptions { get; set; } = new();
     public TicketStatsDto Tickets { get; set; } = new();
+    public SubscriptionUsageDto SubscriptionUsage { get; set; } = new();
 }
 
+public class SubscriptionUsageDto
+{
+    public int Basic { get; set; }
+    public int Premium { get; set; }
+    public int Standard { get; set; }
+    public int Custom { get; set; }
+}
 public class SchoolStatsDto
 {
     public int Total { get; set; }

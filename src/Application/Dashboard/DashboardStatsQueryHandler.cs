@@ -46,12 +46,28 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
             AverageResolutionMinutes = averageResolutionMinutes
         };
 
+        var subscriptionUsage = new SubscriptionUsageDto
+        {
+            Basic = await context.Subscriptions
+                .Where(s => s.SubscriptionType == SubscriptionType.BASIC)
+                .CountAsync(cancellationToken),
+            Premium = await context.Subscriptions
+                .Where(s => s.SubscriptionType == SubscriptionType.PREMIUM)
+                .CountAsync(cancellationToken),
+            Standard = await context.Subscriptions
+                .Where(s => s.SubscriptionType == SubscriptionType.STANDARD)
+                .CountAsync(cancellationToken),
+            Custom = await context.Subscriptions
+                .Where(s => s.SubscriptionType == SubscriptionType.CUSTOMIZED)
+                .CountAsync(cancellationToken)
+        };
 
         var result = new DashboardStatsDto
         {
             Schools = schoolStats,
             Subscriptions = subscriptionStats,
-            Tickets = ticketStats
+            Tickets = ticketStats,
+            SubscriptionUsage = subscriptionUsage
         };
 
         return Result.Success(result);
