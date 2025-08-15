@@ -8,6 +8,7 @@ public sealed class GetHelpRequestByIdQueryHandler(IApplicationDbContext _contex
     public async Task<Result<HelpRequestDto>> Handle(GetHelpRequestByIdQuery query, CancellationToken cancellationToken)
     {
         HelpRequestDto? entity = await _context.HelpRequests
+            .Include(hr => hr.Messages) // Eagerly load Messages
             .Where(hr => hr.PublicId == query.PublicId)
             .Select(hr => new HelpRequestDto
             {
@@ -19,14 +20,15 @@ public sealed class GetHelpRequestByIdQueryHandler(IApplicationDbContext _contex
                 TenantHelpRequestId = hr.TenantHelpRequestId,
                 SchoolId = hr.SchoolId,
                 UserName = hr.UserName,
-                UserProfilePic = hr.UserProfilePic,
-                Messages = (hr.Messages ?? new List<HelpRequestMessages>()).Select(m => new HelpRequestMessageDto
-                {
-                    Id = m.Id,
-                    PublicId = m.PublicId,
-                    Title = m.Title,
-                    Attachments = m.Attachments,
-                }).ToList()
+                Messages = hr.Messages == null
+                    ? new List<HelpRequestMessageDto>()
+                    : hr.Messages.Select(m => new HelpRequestMessageDto
+                    {
+                        Id = m.Id,
+                        PublicId = m.PublicId,
+                        Title = m.Title,
+                        Attachments = m.Attachments ?? new List<string>()
+                    }).ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
 

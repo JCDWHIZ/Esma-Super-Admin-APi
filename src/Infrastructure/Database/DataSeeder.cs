@@ -1,9 +1,14 @@
+using System.Threading;
 using Application.Abstractions.Data;
 using Application.Interfaces.Services;
+using Domain.HelpRequests;
 using Domain.Roles;
 using iText.Commons.Actions.Contexts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Serilog.Core;
+using SharedKernel.Enums;
 
 namespace Infrastructure.Data;
 
@@ -18,6 +23,7 @@ public sealed class DataSeeder(
             await SeedPermissions(cancellationToken);
             await SeedRoles(cancellationToken);
             await SyncToKeycloak();
+            await SeedHelpRequests(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -154,6 +160,281 @@ public sealed class DataSeeder(
         else
         {
             logger.LogInformation("No new roles to add");
+        }
+    }
+
+    //private async Task SeedHelpRequests(CancellationToken cancellationToken)
+    //{
+    //    List<string?> existingTicketIds = await context.HelpRequests
+    //        .Select(hr => hr.TicketId)
+    //        .ToListAsync(cancellationToken);
+
+
+
+    //    var helpRequestsToAdd = new List<HelpRequests>();
+
+    //    foreach ((string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments)> Messages) helpRequestData in helpRequestsToSeed)
+    //    {
+    //        if (existingTicketIds.Contains(helpRequestData.TicketId))
+    //        {
+    //            logger.LogInformation("Help request with TicketId '{TicketId}' already exists, skipping", helpRequestData.TicketId);
+    //            continue;
+    //        }
+    //        var helpRequest = new HelpRequests
+    //        {
+    //            TicketId = helpRequestData.TicketId,
+    //            Status = helpRequestData.Status,
+    //            Category = helpRequestData.Category,
+    //            UserProfilePic = helpRequestData.UserProfilePic,
+    //            UserName = helpRequestData.UserName,
+    //            TenantHelpRequestId = helpRequestData.TenantHelpRequestId,
+    //            SchoolId = helpRequestData.SchoolId,
+    //            Messages = new List<HelpRequestMessages>()
+    //        };
+    //        foreach ((string Title, List<string> Attachments) messageData in helpRequestData.Messages)
+    //        {
+    //            var message = new HelpRequestMessages
+    //            {
+    //                Title = messageData.Title,
+    //                Attachments = messageData.Attachments
+    //            };
+    //            helpRequest.Messages.Add(message);
+    //        }
+
+    //        helpRequestsToAdd.Add(helpRequest);
+    //    }
+
+    //    if (helpRequestsToAdd.Any())
+    //    {
+    //        await context.HelpRequests.AddRangeAsync(helpRequestsToAdd, cancellationToken);
+    //        await context.SaveChangesAsync(cancellationToken);
+    //        logger.LogInformation("Added {Count} new help requests with their messages", helpRequestsToAdd.Count);
+    //    }
+    //    else
+    //    {
+    //        logger.LogInformation("No new help requests to add");
+    //    }
+    //}
+
+
+    private async Task SeedHelpRequests(CancellationToken cancellationToken)
+    {
+        // Check for existing help requests to avoid duplicates
+        List<string?> existingTicketIds = await context.HelpRequests
+            .Select(hr => hr.TicketId)
+            .ToListAsync(cancellationToken);
+
+        // Define help requests to seed
+        var helpRequestsToSeed = new List<(string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments)> Messages)>
+        {
+            (
+                TicketId: "TICKET-001",
+                Status: HelpStatus.OPEN_REQUEST,
+                Category: HelpCategory.TECHNICAL_ISSUE,
+                UserProfilePic: "https://example.com/profiles/user1.jpg",
+                UserName: "John Doe",
+                TenantHelpRequestId: "TENANT-001",
+                SchoolId: "SCHOOL-001",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Login Issue", new List<string> { "https://example.com/attachments/screenshot1.png", "https://example.com/attachments/error_log.txt" }),
+                    ("Follow-up on Login Issue", new List<string> { "https://example.com/attachments/screenshot2.png" }),
+                    ("Request for Admin Assistance", new List<string>()),
+                    ("Additional Details", new List<string> { "https://example.com/attachments/config.json" })
+                }
+            ),
+            (
+                TicketId: "TICKET-002",
+                Status: HelpStatus.IN_PROGRESS,
+                Category: HelpCategory.TECHNICAL_ISSUE,
+                UserProfilePic: "https://example.com/profiles/user2.jpg",
+                UserName: "Jane Smith",
+                TenantHelpRequestId: "TENANT-002",
+                SchoolId: "SCHOOL-002",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Billing Query", new List<string> { "https://example.com/attachments/invoice.pdf" }),
+                    ("Payment Confirmation", new List<string> { "https://example.com/attachments/receipt.pdf" }),
+                    ("Clarification Needed", new List<string>())
+                }
+            ),
+            (
+                TicketId: "TICKET-003",
+                Status: HelpStatus.RESOLVED,
+                Category: HelpCategory.OTHER,
+                UserProfilePic: "https://example.com/profiles/user3.jpg",
+                UserName: "Alice Johnson",
+                TenantHelpRequestId: "TENANT-003",
+                SchoolId: "SCHOOL-003",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Account Activation Request", new List<string> { "https://example.com/attachments/id_scan.jpg" }),
+                    ("Verification Follow-up", new List<string>()),
+                    ("Issue Resolved", new List<string> { "https://example.com/attachments/confirmation_email.pdf" }),
+                    ("Feedback on Resolution", new List<string>())
+                }
+            ),
+            (
+                TicketId: "TICKET-004",
+                Status: HelpStatus.OPEN_REQUEST,
+                Category: HelpCategory.TECHNICAL_ISSUE,
+                UserProfilePic: "https://example.com/profiles/user4.jpg",
+                UserName: "Bob Wilson",
+                TenantHelpRequestId: "TENANT-004",
+                SchoolId: "SCHOOL-004",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Network Connectivity Issue", new List<string> { "https://example.com/attachments/network_log.txt" }),
+                    ("Ping Test Results", new List<string> { "https://example.com/attachments/ping_results.csv" }),
+                    ("Router Configuration", new List<string> { "https://example.com/attachments/router_config.pdf" })
+                }
+            ),
+            (
+                TicketId: "TICKET-005",
+                Status: HelpStatus.IN_PROGRESS,
+               Category: HelpCategory.OTHER,
+                UserProfilePic:
+        "https://example.com/profiles/user5.jpg",
+                UserName:
+        "Emma Davis",
+                TenantHelpRequestId:
+        "TENANT-005",
+                SchoolId:
+        "SCHOOL-005",
+                Messages:
+        new List<(string Title, List<string> Attachments)>
+                {
+                    ("General Inquiry", new List<string>()),
+                    ("Request for Training Materials", new List<string> { "https://example.com/attachments/training_request_form.pdf" }),
+                    ("Follow-up on Training", new List<string>()),
+                    ("Feedback on Materials", new List<string> { "https://example.com/attachments/feedback_form.docx" })
+                }
+            ),
+            (
+                TicketId: "TICKET-006",
+                Status: HelpStatus.OPEN_REQUEST,
+                Category: HelpCategory.TECHNICAL_ISSUE,
+                UserProfilePic: "https://example.com/profiles/user6.jpg",
+                UserName: "Michael Brown",
+                TenantHelpRequestId: "TENANT-006",
+                SchoolId: "SCHOOL-006",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Software Crash Report", new List<string> { "https://example.com/attachments/crash_log.txt", "https://example.com/attachments/screenshot3.png" }),
+                    ("Attempted Fixes", new List<string>()),
+                    ("Request for Patch", new List<string>())
+                }
+            ),
+            (
+                TicketId: "TICKET-007",
+                Status: HelpStatus.RESOLVED,
+                Category: HelpCategory.BUG_REPORT,
+                UserProfilePic: "https://example.com/profiles/user7.jpg",
+                UserName: "Sarah Miller",
+                TenantHelpRequestId: "TENANT-007",
+                SchoolId: "SCHOOL-007",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Overcharge Dispute", new List<string> { "https://example.com/attachments/invoice_dispute.pdf" }),
+                    ("Response from Billing Team", new List<string> { "https://example.com/attachments/billing_response.pdf" }),
+                    ("Resolution Confirmation", new List<string>())
+                }
+            ),
+            (
+                TicketId: "TICKET-008",
+                Status: HelpStatus.IN_PROGRESS,
+                Category: HelpCategory.BUG_REPORT,
+                UserProfilePic: "https://example.com/profiles/user8.jpg",
+                UserName: "David Lee",
+                TenantHelpRequestId: "TENANT-008",
+                SchoolId: "SCHOOL-008",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Password Reset Request", new List<string>()),
+                    ("Security Question Issue", new List<string> { "https://example.com/attachments/security_question_screenshot.png" }),
+                    ("Admin Follow-up", new List<string>()),
+                    ("Temporary Access Request", new List<string> { "https://example.com/attachments/temp_access_form.pdf" })
+                }
+            ),
+            (
+                TicketId: "TICKET-009",
+                Status: HelpStatus.OPEN_REQUEST,
+                Category: HelpCategory.TECHNICAL_ISSUE,
+                UserProfilePic: "https://example.com/profiles/user9.jpg",
+                UserName: "Lisa Taylor",
+                TenantHelpRequestId: "TENANT-009",
+                SchoolId: "SCHOOL-009",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Database Access Error", new List<string> { "https://example.com/attachments/db_error_log.txt" }),
+                    ("Query Performance Issue", new List<string> { "https://example.com/attachments/query_plan.pdf" })
+                }
+            ),
+            (
+                TicketId: "TICKET-010",
+                Status: HelpStatus.IN_PROGRESS,
+                Category: HelpCategory.OTHER,
+                UserProfilePic: "https://example.com/profiles/user10.jpg",
+                UserName: "Chris Evans",
+                TenantHelpRequestId: "TENANT-010",
+                SchoolId: "SCHOOL-010",
+                Messages: new List<(string Title, List<string> Attachments)>
+                {
+                    ("Feature Request", new List<string> { "https://example.com/attachments/feature_proposal.docx" }),
+                    ("Clarification on Requirements", new List<string>()),
+                    ("Mockup Submission", new List<string> { "https://example.com/attachments/mockup.png" }),
+                    ("Feedback on Proposal", new List<string>())
+                }
+            )
+        };
+
+    var helpRequestsToAdd = new List<HelpRequests>();
+
+        foreach ((string TicketId, HelpStatus Status, HelpCategory Category, string UserProfilePic, string UserName, string TenantHelpRequestId, string SchoolId, List<(string Title, List<string> Attachments)> Messages) helpRequestData in helpRequestsToSeed)
+        {
+            // Skip if help request already exists
+            if (existingTicketIds.Contains(helpRequestData.TicketId))
+            {
+                logger.LogInformation("Help request with TicketId '{TicketId}' already exists, skipping", helpRequestData.TicketId);
+                continue;
+            }
+
+            // Create new help request
+            var helpRequest = new HelpRequests
+            {
+                TicketId = helpRequestData.TicketId,
+                Status = helpRequestData.Status,
+                Category = helpRequestData.Category,
+                UserProfilePic = helpRequestData.UserProfilePic,
+                UserName = helpRequestData.UserName,
+                TenantHelpRequestId = helpRequestData.TenantHelpRequestId,
+                SchoolId = helpRequestData.SchoolId,
+                Messages = new List<HelpRequestMessages>()
+            };
+
+            // Add messages to the help request
+            foreach ((string Title, List<string> Attachments) messageData in helpRequestData.Messages)
+            {
+                var message = new HelpRequestMessages
+                {
+                    Title = messageData.Title,
+                    Attachments = messageData.Attachments,
+                };
+        helpRequest.Messages.Add(message);
+                    }
+
+                    helpRequestsToAdd.Add(helpRequest);
+                }
+
+                if (helpRequestsToAdd.Any())
+        {
+            await context.HelpRequests.AddRangeAsync(helpRequestsToAdd, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Added {Count} new help requests with their messages", helpRequestsToAdd.Count);
+        }
+        else
+        {
+            logger.LogInformation("No new help requests to add");
         }
     }
 
