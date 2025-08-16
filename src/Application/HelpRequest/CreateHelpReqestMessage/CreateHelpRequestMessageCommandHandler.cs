@@ -1,7 +1,9 @@
 using System;
 using Application.Abstractions.Authentication;
+using Application.BackgroundJobs;
 using Application.Interfaces;
 using Domain.HelpRequests;
+using Hangfire;
 
 namespace Application.HelpRequest.CreateHelpReqestMessage;
 
@@ -34,14 +36,29 @@ public class AddHelpRequestMessageCommandHandler(IApplicationDbContext _context,
 
         _context.HelpRequestMessages.Add(message);
         await _context.SaveChangesAsync(cancellationToken);
-        return Result.Success(new HelpRequestMessageDto
+        //BackgroundJob.Enqueue<IHelpRequestJobHandler>(
+        //service => service.SendHelpRequestMessage(helpRequest.Id, message, cancellationToken));
+        //return Result.Success(new HelpRequestMessageDto
+        //{
+        //    Id = message.Id,
+        //    PublicId = message.PublicId,
+        //    Title = message.Title,
+        //    UserName = message.UserName,
+        //    UserProfilePic = message.UserProfilePic,
+        //    Attachments = message.Attachments,
+        //});
+        var messageDto = new HelpRequestMessageDto
         {
             Id = message.Id,
             PublicId = message.PublicId,
             Title = message.Title,
             UserName = message.UserName,
             UserProfilePic = message.UserProfilePic,
-            Attachments = message.Attachments,
-        });
+            Attachments = message.Attachments
+        };
+        BackgroundJob.Enqueue<IHelpRequestJobHandler>(
+            service => service.SendHelpRequestMessage(helpRequest.Id, messageDto, cancellationToken));
+        return Result.Success(messageDto);
     }
 }
+

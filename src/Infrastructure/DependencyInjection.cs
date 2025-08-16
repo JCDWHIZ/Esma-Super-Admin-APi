@@ -5,6 +5,7 @@ using Application.Abstractions.Data;
 using Application.BackgroundJobs;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Confluent.Kafka;
 using Domain.Schools;
 using Domain.Users;
 using Hangfire;
@@ -26,6 +27,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
 using SharedKernel;
@@ -99,7 +101,19 @@ public static class DependencyInjection
         // builder.Services.AddHttpClient<IEmailService, EmailServices>();
         services.AddRefitClient<IKeycloakApi>()
         .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["Keycloak:BaseUrl"]!));
+        //services.addsingleton<iproducer<string, string>>(sp =>
+        //{
+        //    var kafkasettings = sp.getrequiredservice<ioptions<kafkasettings>>().value;
+        //    var config = new producerconfig
+        //    {
+        //        bootstrapservers = kafkasettings.bootstrapservers,
+        //        acks = acks.leader
+        //    };
+        //    return new producerbuilder<string, string>(config).build();
+        //});
         services.AddScoped<IKeycloakOrganizationService, KeycloakOrganizationService>();
+        services.AddScoped<IHelpRequestJobHandler, HelpRequestJob>();
+        services.AddScoped<IHelpRequestMessagePublisher, HelpRequestMessagePublisher>();
         services.AddScoped<KeycloakService>();
         services.AddScoped<KeycloakRolesService>();
 

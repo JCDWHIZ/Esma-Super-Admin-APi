@@ -26,7 +26,7 @@ public sealed class GetHelpRequestByIdQueryHandler(IApplicationDbContext _contex
                     {
                         Id = m.Id,
                         PublicId = m.PublicId,
-                        Title = m.Title,
+                        Title = m.Title ?? string.Empty,
                         UserName = m.UserName,
                         UserProfilePic = m.UserProfilePic,
                         Attachments = m.Attachments ?? new List<string>()
