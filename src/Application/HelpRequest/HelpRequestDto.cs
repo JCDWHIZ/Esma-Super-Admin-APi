@@ -13,5 +13,6 @@ public class HelpRequestDto
     public string SchoolId { get; set; }
     public string UserProfilePic { get; set; }
     public string UserName { get; set; } = string.Empty;
+    public DateTimeOffset? CreatedAt { get; set; }
     public ICollection<HelpRequestMessageDto> Messages { get; set; } = new List<HelpRequestMessageDto>();
 }

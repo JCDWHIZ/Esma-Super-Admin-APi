@@ -10,5 +10,6 @@ public class HelpRequestMessageDto
     public string UserName { get; set; }
     public string UserProfilePic { get; set; }
     public ICollection<string> Attachments { get; set; } = new List<string>();
+    public DateTimeOffset? CreatedAt { get; set; }
 }
 

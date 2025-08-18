@@ -38,6 +38,7 @@ public sealed class GetHelpRequestWithPaginationQueryHandler(IApplicationDbConte
                 SchoolId = s.SchoolId,
                 UserName = s.UserName,
                 UserProfilePic = s.UserProfilePic,
+                CreatedAt = s.Created
                  //Messages = new List<HelpRequestMessageDto>()
              }),
              query.PageNumber ?? 1,

@@ -20,6 +20,8 @@ public sealed class GetHelpRequestByIdQueryHandler(IApplicationDbContext _contex
                 TenantHelpRequestId = hr.TenantHelpRequestId,
                 SchoolId = hr.SchoolId,
                 UserName = hr.UserName,
+                UserProfilePic = hr.UserProfilePic ?? string.Empty,
+                CreatedAt = hr.Created,
                 Messages = hr.Messages == null
                     ? new List<HelpRequestMessageDto>()
                     : hr.Messages.Select(m => new HelpRequestMessageDto
@@ -29,7 +31,8 @@ public sealed class GetHelpRequestByIdQueryHandler(IApplicationDbContext _contex
                         Title = m.Title ?? string.Empty,
                         UserName = m.UserName,
                         UserProfilePic = m.UserProfilePic,
-                        Attachments = m.Attachments ?? new List<string>()
+                        Attachments = m.Attachments ?? new List<string>(),
+                        CreatedAt = hr.Created,
                     }).ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
