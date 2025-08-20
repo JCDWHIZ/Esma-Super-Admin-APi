@@ -38,6 +38,19 @@ public interface IKeycloakApi
         [Body] InviteUserRequestDto request,
         [Header("Authorization")] string authorization);
 
+    [Put("/admin/realms/{realm}/users/{id}")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> UpdateUserAsync(
+    [AliasAs("realm")] string realm,
+    [AliasAs("id")] string userId,
+    [Body] UpdateUserRequestDto request,
+    [Header("Authorization")] string authorization);
+
+    [Delete("/admin/realms/{realm}/users/{id}")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> DeleteUserAsync(
+        [AliasAs("realm")] string realm,
+        [AliasAs("id")] string userId,
+        [Header("Authorization")] string authorization);
+
     // [Put("/admin/realms/{realm}/organizations/{organizationId}/members/{userId}")]
     // Task<Refit.ApiResponse<HttpResponseMessage>> AddUserToOrganizationAsync(
     //     [AliasAs("realm")] string realm,
@@ -488,5 +501,15 @@ public class UpdateKeycloakRoleDto
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public bool Composite { get; set; }
+    public Dictionary<string, List<string>>? Attributes { get; set; }
+}
+
+public class UpdateUserRequestDto
+{
+    public string? Username { get; set; }
+    public string? Email { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public bool? Enabled { get; set; }
     public Dictionary<string, List<string>>? Attributes { get; set; }
 }

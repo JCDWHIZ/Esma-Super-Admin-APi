@@ -563,6 +563,39 @@ public class KeycloakService
         throw new Exception("User creation succeeded but no ID returned");
     }
 
+    public async Task UpdateUserAsync(string keycloakUserId, UpdateUserRequestDto request)
+    {
+        string token = await GetAdminAccessTokenAsync();
+        Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.UpdateUserAsync(
+            _configuration["Keycloak:Realm"]!,
+            keycloakUserId,
+            request,
+            $"Bearer {token}"
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Failed to update Keycloak user: {response.Error?.Message ?? response.StatusCode.ToString()}");
+        }
+    }
+
+    public async Task DeleteUserAsync(string keycloakUserId)
+    {
+        string token = await GetAdminAccessTokenAsync();
+        Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.DeleteUserAsync(
+            _configuration["Keycloak:Realm"]!,
+            keycloakUserId,
+            $"Bearer {token}"
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Failed to delete Keycloak user: {response.Error?.Message ?? response.StatusCode.ToString()}");
+        }
+    }
+
+
+
     public async Task AddUserToOrganizationAsync(string userId)
     {
         string token = await GetAdminAccessTokenAsync();

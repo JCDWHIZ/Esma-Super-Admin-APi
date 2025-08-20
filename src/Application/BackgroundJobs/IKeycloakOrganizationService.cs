@@ -16,6 +16,8 @@ public interface IKeycloakOrganizationService
 {
     Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken);
     Task CreateAdmin(int userId, CancellationToken cancellationToken);
+    Task EditAdmin(int userId, CancellationToken cancellationToken);
+    Task DeleteAdmin(int userId, CancellationToken cancellationToken);
 }
 
 public class KeycloakOrganizationService : IKeycloakOrganizationService
@@ -101,6 +103,62 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task EditAdmin(int userId, CancellationToken cancellationToken)
+    {
+        User? user = await _dbContext.Users.FindAsync([userId], cancellationToken: cancellationToken);
+        if (user == null || user.KeycloakUserId == Guid.Empty)
+        {
+            return;
+        }
+
+        var updateRequest = new UpdateUserRequestDto
+        {
+            Username = user.Email,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Enabled = true,
+            Attributes = new()
+            {
+                { "internal_user_id", new() { user.PublicId.ToString() } },
+                { "internal_user_role", new() { user.Role.ToString() } }
+            }
+        };
+
+        try
+        {
+            await _keycloakService.UpdateUserAsync(user.KeycloakUserId.ToString()!, updateRequest);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update admin in Keycloak");
+            Console.WriteLine(ex);
+        }
+    }
+
+    public async Task DeleteAdmin(int userId, CancellationToken cancellationToken)
+    {
+        User? user = await _dbContext.Users.FindAsync([userId], cancellationToken: cancellationToken);
+        if (user == null || user.KeycloakUserId == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            await _keycloakService.DeleteUserAsync(user.KeycloakUserId.ToString()!);
+
+            // optionally also remove from DB
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete admin in Keycloak");
+            Console.WriteLine(ex);
         }
     }
 
