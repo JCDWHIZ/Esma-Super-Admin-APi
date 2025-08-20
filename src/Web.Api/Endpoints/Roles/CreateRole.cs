@@ -1,4 +1,5 @@
 using System;
+using Application.Dashboard;
 using Application.Roles.CreateRole;
 using Domain.Users;
 
@@ -24,6 +25,8 @@ internal sealed class CreateRole : IEndpoint
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .RequireAuthorization()
+            .WithAudit("A role was created")
+            .Produces<RoleDto>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);
     }
 

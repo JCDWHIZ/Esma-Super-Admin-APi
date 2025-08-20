@@ -36,6 +36,7 @@ public class UpdateSubscriptionById : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Subscription)
+        .WithAudit("Subscription details was just updated for a school")
         .Produces<string>()
         .RequireAuthorization();
     }

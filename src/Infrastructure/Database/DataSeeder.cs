@@ -35,22 +35,32 @@ public sealed class DataSeeder(
     {
         var permissionsToSeed = new List<(string Name, string Description)>
         {
+            ("ViewDashboard", "Permission to view dashboard"),
             ("CreateSchool", "Permission to create a school"),
-            //("users:read", "Read users information"),
-            //("users:create", "Create new users"),
-            //("users:update", "Update users"),
-            //("users:delete", "Delete users"),
-            //("roles:read", "Read roles information"),
-            //("roles:create", "Create new roles"),
-            //("roles:update", "Update roles"),
-            //("roles:delete", "Delete roles"),
-            //("dashboard:view", "View dashboard"),
-            //("reports:generate", "Generate reports"),
-            //("care:read", "Read care information"),
-            //("care:create", "Create care records"),
-            //("care:update", "Update care records"),
-            //("profile:read", "Read own profile"),
-            //("profile:update", "Update own profile")
+            ("ViewSchool", "Permission to view schools"),
+            ("ViewSchoolProfile", "Permission to view schools profile"),
+            ("DeleteSchool", "Permission to delete school"),
+            ("EditSchool", "Permission to edit school"),
+            ("ApproveSchool", "Permission to approve a school"),
+            ("ViewSchoolSubscription", "Permission to view schools subscription"),
+            ("EditSchoolSubscriptionPackage", "Permission to update schools subscription"),
+            ("ViewAdmins", "Permission to view admins"),
+            ("EditAdmin", "Permission to edit admin information"),
+            ("InviteAdmin", "Permission to invite an admin"),
+            ("DeleteAdmin", "Permission to delete an admin"),
+            ("ApproveBlogs", "Permission to approve blogs"),
+            ("ViewBlogs", "Permission to view blogs"),
+            ("CreateBlogs", "Permission to create blogs"),
+            ("EditBlogs", "Permission to edit blogs"),
+            ("ViewHelpRequests", "Permission to view help requests"),
+            ("ResolveHelpRequests", "Permission to resolve help requests"),
+            ("ViewAuditLogs", "Permission to view audit logs"),
+            ("CreateRole", "Permission to create roles"),
+            ("AssignPermissions", "Permission to assign permissions"),
+            ("Enable2FA", "Permission to enable Two Factor Authentication"),
+            ("CreateEmailTemplates", "Permission to create Email Template"),
+            ("EditEmailTemplates", "Permission to edit Email Template"),
+            ("DeleteEmailTemplates", "Permission to Delete Email Template"),
         };
 
         List<string> existingPermissions = await context.Permissions
@@ -84,37 +94,87 @@ public sealed class DataSeeder(
                 "Super admin",
                 ("System administrator with full access", new List<string>
                 {
-                    "CreateSchool"
+                    "ViewDashboard","CreateSchool", "ViewSchool", "ViewSchoolProfile", "DeleteSchool", "EditSchool",
+                    "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
+                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                    "ApproveBlogs", "ViewBlogs", "CreateBlogs", "EditBlogs",
+                    "ViewHelpRequests", "ResolveHelpRequests",
+                    "ViewAuditLogs",
+                    "CreateRole", "AssignPermissions",
+                    "Enable2FA",
+                    "CreateEmailTemplates", "EditEmailTemplates", "DeleteEmailTemplates"
                 })
             },
-            //{
-            //    "Manager",
-            //    ("Manager with limited administrative access", new List<string>
-            //    {
-            //        "users:read", "users:create", "dashboard:view", "reports:generate", "care:read"
-            //    })
-            //},
-            //{
-            //    "Care Giver",
-            //    ("Care Giver with standard privileges", new List<string>
-            //    {
-            //        "users:read", "dashboard:view", "care:read", "care:create", "care:update", "profile:read", "profile:update"
-            //    })
-            //},
-            //{
-            //    "User",
-            //    ("Regular system user", new List<string>
-            //    {
-            //        "dashboard:view", "profile:read", "profile:update"
-            //    })
-            //},
-            //{
-            //    "Service User",
-            //    ("Service user with limited access to their own information", new List<string>
-            //    {
-            //        "dashboard:view", "profile:read", "profile:update", "care:read"
-            //    })
-            //}
+            {
+                "System Admin",
+                ("System Admin with limited administrative access", new List<string>
+                {
+                    "ViewDashboard",
+                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                    "ViewAuditLogs",
+                    "Enable2FA",
+                })
+            },
+            {
+                "Business Administrator",
+                ("Business Admin", new List<string>
+                {
+                    "ViewDashboard",
+                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                    "ViewAuditLogs",
+                    "Enable2FA",
+                    "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
+                })
+            },
+            {
+                "User and Role Manager",
+                ("User and Role Manager ", new List<string>
+                {
+                    "ViewDashboard",
+                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                    "ViewAuditLogs",
+                    "Enable2FA",
+                    "CreateRole", "AssignPermissions",
+                })
+            },
+             {
+                "Security Officer",
+                ("Security Officer", new List<string>
+                {
+                    "ViewDashboard",
+                    "ViewAuditLogs",
+                    "Enable2FA",
+                    "CreateRole", "AssignPermissions",
+                })
+            },
+              {
+                "Contet and Media Manager",
+                ("Content and Media Manager", new List<string>
+                {
+                    "ViewDashboard",
+                    "Enable2FA",
+                    "CreateRole", "AssignPermissions",
+                })
+            },
+              {
+                "Support Manager",
+                ("Content and Media Manager", new List<string>
+                {
+                    "ViewDashboard",
+                    "ViewHelpRequests", "ResolveHelpRequests",
+                    "Enable2FA",
+                })
+            },
+              {
+                "Reports Manager",
+                ("Content and Media Manager", new List<string>
+                {
+                    "ViewDashboard",
+                    "ViewAuditLogs",
+                    "ViewHelpRequests", "ResolveHelpRequests",
+                    "Enable2FA",
+                })
+            },
         };
 
         var rolesToAdd = new List<Role>();

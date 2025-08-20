@@ -1,4 +1,5 @@
-﻿using Application.Templates.CreateTemplateCommand;
+﻿using Application.Dashboard;
+using Application.Templates.CreateTemplateCommand;
 
 namespace Web.Api.Endpoints.Templates;
 
@@ -28,6 +29,8 @@ internal sealed class CreateTemplateEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Templates)
+        .WithAudit("A new template was created")
+        .Produces<string>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

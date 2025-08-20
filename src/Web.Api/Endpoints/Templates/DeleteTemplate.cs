@@ -1,4 +1,5 @@
-﻿using Application.Templates.DeleteTemplate;
+﻿using Application.Dashboard;
+using Application.Templates.DeleteTemplate;
 
 namespace Web.Api.Endpoints.Templates;
 
@@ -18,6 +19,8 @@ internal sealed class DeleteTemplateEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Templates)
+        .WithAudit("A template was deleted")
+        .Produces<string>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

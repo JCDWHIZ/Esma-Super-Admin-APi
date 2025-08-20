@@ -1,5 +1,6 @@
 using System;
 using Application;
+using Application.Dashboard;
 using Application.Roles.GetRolesWithPermission;
 using Domain.Users;
 
@@ -22,6 +23,7 @@ internal sealed class GetRoles : IEndpoint
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .WithTags(Tags.Roles)
+            .Produces<PaginatedList<RoleDto>>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

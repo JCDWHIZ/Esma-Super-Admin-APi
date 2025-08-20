@@ -1,4 +1,5 @@
-﻿using Application.Templates.UpdateTemplateCommand;
+﻿using Application.Dashboard;
+using Application.Templates.UpdateTemplateCommand;
 
 namespace Web.Api.Endpoints.Templates;
 
@@ -31,6 +32,8 @@ internal sealed class UpdateTemplateEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Templates)
+        .WithAudit("A template was updated")
+        .Produces<string>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Application.Dashboard;
 using Application.Roles.CreatePermission;
 using Domain.Users;
 
@@ -24,6 +25,8 @@ internal sealed class CreatePermission : IEndpoint
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .RequireAuthorization()
+            .WithAudit("A permission was created")
+            .Produces<PermissionDto>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);
     }
 

@@ -1,4 +1,5 @@
 ﻿using Application;
+using Application.Dashboard;
 using Application.Templates;
 using Application.Templates.GetTemplates;
 using Web.Api.Extensions;
@@ -29,6 +30,7 @@ internal sealed class GetTemplatesWithPaginationEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Templates)
+        .Produces<PaginatedList<TemplateDto>>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }

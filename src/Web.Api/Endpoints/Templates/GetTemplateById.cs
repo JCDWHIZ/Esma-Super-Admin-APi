@@ -1,4 +1,5 @@
-﻿using Application.Templates;
+﻿using Application.Dashboard;
+using Application.Templates;
 using Application.Templates.GetTemplateById;
 using Web.Api.Extensions;
 
@@ -20,6 +21,7 @@ internal sealed class GetTemplateByIdEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Templates)
+        .Produces<TemplateDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }
