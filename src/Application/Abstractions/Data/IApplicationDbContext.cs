@@ -7,6 +7,7 @@ using Domain.Todos;
 using Domain.Roles;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Domain.Templates;
 
 namespace Application.Abstractions.Data;
 
@@ -23,5 +24,6 @@ public interface IApplicationDbContext
     DbSet<Blog> Blog { get; }
     DbSet<AuditLog> Auditlog { get; }
     DbSet<SchoolAdmins> SchoolAdmins { get; }
+    DbSet<Template> Templates { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

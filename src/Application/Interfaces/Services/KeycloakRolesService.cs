@@ -194,6 +194,7 @@ public class KeycloakRolesService
 
             var syncResults = new List<bool>();
 
+            // --- CREATE or UPDATE ---
             foreach (Role? localRole in localRoles)
             {
                 bool result;
@@ -217,9 +218,24 @@ public class KeycloakRolesService
                 }
             }
 
+            // --- DELETE missing roles in Keycloak ---
+            var dbRoleNamesSet = localRoles.Select(r => r.Name).ToHashSet();
+            var orphanRolesSet = existingKeycloakRoleNames.Except(dbRoleNamesSet).ToList();
+
+            foreach (string? orphan in orphanRolesSet)
+            {
+                _logger.LogInformation("Deleting orphan role '{Role}' from Keycloak", orphan);
+                bool deleteResult = await DeleteRealmRoleAsync(orphan);
+                syncResults.Add(deleteResult);
+            }
+
             bool overallSuccess = syncResults.All(r => r);
-            _logger.LogInformation("Sync completed. Success: {Success}. Synced {Count} roles",
-                overallSuccess, localRoles.Count);
+            _logger.LogInformation(
+                "Sync completed. Success: {Success}. Synced {SyncedCount} roles. Deleted {DeletedCount} orphan roles.",
+                overallSuccess,
+                localRoles.Count,
+                orphanRolesSet.Count
+            );
 
             return overallSuccess;
         }

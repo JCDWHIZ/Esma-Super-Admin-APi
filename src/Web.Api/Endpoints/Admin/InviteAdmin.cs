@@ -39,7 +39,7 @@ internal sealed class InviteAdmin : IEndpoint
         public string? ProfilePic { get; set; }
         public string? PhoneNumber { get; set; }
         public string LastName { get; set; }
-        public Roles Role { get; set; }
+        public SharedKernel.Enums.Roles Role { get; set; }
     }
 
 }

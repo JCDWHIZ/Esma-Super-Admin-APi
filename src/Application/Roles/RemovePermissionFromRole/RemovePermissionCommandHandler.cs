@@ -3,7 +3,7 @@ using Domain.Roles;
 
 namespace Application.Roles.RemovePermissionFromRole;
 
-public sealed class RemovePermissionCommandHandler(IApplicationDbContext context) : ICommandHandler<RemovePermissionCommand, string>
+public class RemovePermissionCommandHandler(IApplicationDbContext context) : ICommandHandler<RemovePermissionCommand, string>
 {
     public async Task<Result<string>> Handle(RemovePermissionCommand command, CancellationToken cancellationToken)
     {
@@ -26,7 +26,7 @@ public sealed class RemovePermissionCommandHandler(IApplicationDbContext context
 
         entity.RemovePermission(permission);
         await context.SaveChangesAsync(cancellationToken);
-
+        entity.Raise(new SyncRolesDomainEvent());
         return Result.Success("Permission removed successfully");
     }
 }

@@ -6,6 +6,7 @@ using Domain.HelpRequests;
 using Domain.Roles;
 using Domain.Schools;
 using Domain.Subscriptions;
+using Domain.Templates;
 using Domain.Todos;
 using Domain.Users;
 using Infrastructure.DomainEvents;
@@ -36,6 +37,7 @@ public sealed class ApplicationDbContext(
     public DbSet<SchoolAdmins> SchoolAdmins { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
+    public DbSet<Template> Templates { get; set;  }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

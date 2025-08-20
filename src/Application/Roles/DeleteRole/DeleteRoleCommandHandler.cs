@@ -3,10 +3,9 @@ using Domain.Roles;
 
 namespace Application.Roles.DeleteRole;
 
-public sealed class DeleteRoleCommandHandler(IApplicationDbContext context) : ICommandHandler<DeleteRoleCommand, string>
+public class DeleteRoleCommandHandler(IApplicationDbContext context) : ICommandHandler<DeleteRoleCommand, string>
 {
-
-    async Task<Result<string>> ICommandHandler<DeleteRoleCommand, string>.Handle(DeleteRoleCommand command, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(DeleteRoleCommand command, CancellationToken cancellationToken)
     {
         Role? entity = await context.Roles.FirstOrDefaultAsync(x => x.PublicId == command.PublicId, cancellationToken);
 
@@ -18,6 +17,7 @@ public sealed class DeleteRoleCommandHandler(IApplicationDbContext context) : IC
         context.Roles.Remove(entity);
 
         await context.SaveChangesAsync(cancellationToken);
+        entity.Raise(new SyncRolesDomainEvent());
         return Result.Success("Done");
     }
 }

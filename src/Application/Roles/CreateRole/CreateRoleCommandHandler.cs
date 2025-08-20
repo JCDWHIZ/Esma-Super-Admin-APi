@@ -1,21 +1,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Users;
+using Application.BackgroundJobs;
+using Application.Interfaces.Services;
 using Domain.Roles;
+using Domain.Users;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.CreateRole;
 
-internal sealed class CreateRoleCommandHandler : ICommandHandler<CreateRoleCommand, RoleDto>
+public class CreateRoleCommandHandler(IApplicationDbContext _dbContext) : ICommandHandler<CreateRoleCommand, RoleDto>
 {
-    private readonly IApplicationDbContext _dbContext;
-
-    public CreateRoleCommandHandler(IApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public async Task<Result<RoleDto>> Handle(CreateRoleCommand command, CancellationToken cancellationToken)
     {
         bool roleExists = await _dbContext.Roles
@@ -30,7 +26,7 @@ internal sealed class CreateRoleCommandHandler : ICommandHandler<CreateRoleComma
 
         _dbContext.Roles.Add(role);
         await _dbContext.SaveChangesAsync(cancellationToken);
-
+        role.Raise(new SyncRolesDomainEvent());
         return RoleMapper.MapToRoleDto(role);
     }
 }

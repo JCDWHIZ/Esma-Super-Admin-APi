@@ -14,7 +14,7 @@ public sealed class GetAdmins : IEndpoint
             int? pageNumber,
             int? pageSize,
             string? username,
-            Roles? role,
+            SharedKernel.Enums.Roles? role,
             IQueryHandler<GetAdminsQuery, PaginatedList<UserDto>> handler,
             CancellationToken cancellationToken
         ) =>

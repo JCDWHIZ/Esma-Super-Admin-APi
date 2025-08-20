@@ -12,7 +12,7 @@ using SharedKernel;
 
 namespace Application.Roles.GetRolesWithPermission;
 
-internal sealed class GetRolesWithPermissionQueryHandler(IApplicationDbContext context)
+public class GetRolesWithPermissionQueryHandler(IApplicationDbContext context)
     : IQueryHandler<GetRolesWithPermissionQuery, PaginatedList<RoleDto>>
 {
     public async Task<Result<PaginatedList<RoleDto>>> Handle(GetRolesWithPermissionQuery query, CancellationToken cancellationToken)

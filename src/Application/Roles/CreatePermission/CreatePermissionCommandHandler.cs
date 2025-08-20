@@ -3,7 +3,7 @@ using Domain.Roles;
 
 namespace Application.Roles.CreatePermission;
 
-public sealed class CreatePermissionCommandHandler(IApplicationDbContext context) : ICommandHandler<CreatePermissionCommand, PermissionDto>
+public class CreatePermissionCommandHandler(IApplicationDbContext context) : ICommandHandler<CreatePermissionCommand, PermissionDto>
 {
     public async Task<Result<PermissionDto>> Handle(CreatePermissionCommand command, CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ public sealed class CreatePermissionCommandHandler(IApplicationDbContext context
             Name = newPermission.Name,
             Description = newPermission.Description
         };
-
+        newPermission.Raise(new SyncRolesDomainEvent());
         return Result.Success(result);
     }
 }

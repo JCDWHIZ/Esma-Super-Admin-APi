@@ -26,7 +26,7 @@ public class AssignPermissionToRoleCommandHandler(IApplicationDbContext context)
 
         entity.AddPermission(permission);
         await context.SaveChangesAsync(cancellationToken);
-
+        entity.Raise(new SyncRolesDomainEvent());
         return Result.Success("Permission assigned successfully");
     }
 }

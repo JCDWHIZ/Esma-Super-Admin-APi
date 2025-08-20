@@ -22,11 +22,20 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
 
         var subscriptionStats = new SubscriptionStatsDto
         {
-            Total = await context.Subscriptions.CountAsync(cancellationToken),
-            Active = await context.Subscriptions.CountAsync(s => s.EndDate > now, cancellationToken),
-            Expired = await context.Subscriptions.CountAsync(s => s.EndDate <= now, cancellationToken),
-            ExpiringIn15Days = await context.Subscriptions.CountAsync(
-                s => s.EndDate > now && s.EndDate <= now.AddDays(15), cancellationToken)
+            Total = await context.Subscriptions
+        .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted, cancellationToken),
+
+            Active = await context.Subscriptions
+        .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted && s.EndDate > now, cancellationToken),
+
+            Expired = await context.Subscriptions
+        .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted && s.EndDate <= now, cancellationToken),
+
+            ExpiringIn15Days = await context.Subscriptions
+        .CountAsync(s => s.Schools != null
+                      && !s.Schools.IsDeleted
+                      && s.EndDate > now
+                      && s.EndDate <= now.AddDays(15), cancellationToken)
         };
 
         List<double> resolvedTickets = await context.HelpRequests
@@ -34,8 +43,9 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
             .Select(t => (t.LastModified - t.Created).TotalMinutes)
             .ToListAsync(cancellationToken);
 
+        // With this block:
         double averageResolutionMinutes = resolvedTickets.Any()
-            ? resolvedTickets.Average()
+            ? Math.Round(resolvedTickets.Average(), 0)
             : 0;
 
         var ticketStats = new TicketStatsDto
@@ -87,3 +97,12 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
 //    .Where(t => t.Status == HelpStatus.RESOLVED)
 //    .Select(t => (t.LastModified - t.Created).TotalMinutes)
 //    .AverageAsync(cancellationToken)
+
+//double averageResolutionMinutes = resolvedTickets.Any()
+//    ? resolvedTickets.Average().ToString("F2", System.Globalization.CultureInfo.InvariantCulture) // Format to 2 decimal places
+//    : 0
+//    
+// Replace this block:
+//double averageResolutionMinutes = resolvedTickets.Any()
+//    ? resolvedTickets.Average().ToString("F2", System.Globalization.CultureInfo.InvariantCulture) // Format to 2 decimal places
+//    : 0;
