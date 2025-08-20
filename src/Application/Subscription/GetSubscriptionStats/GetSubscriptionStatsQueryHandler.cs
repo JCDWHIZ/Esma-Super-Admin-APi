@@ -9,7 +9,7 @@ public sealed class GetSubscriptionStatsQueryHandler(IApplicationDbContext _cont
     async Task<Result<SubscriptionStatsDto>> ICommandHandler<GetSubscriptionStatsQuery, SubscriptionStatsDto>.Handle(GetSubscriptionStatsQuery command, CancellationToken cancellationToken)
     {
         DateTime currentDate = DateTime.UtcNow;
-        //DateTime expiryThreshold = currentDate.AddDays(15);
+        DateTime expiryThreshold = currentDate.AddDays(15);
 
         SubscriptionStatsDto? subscriptionStats = await _context.Subscriptions.Where(x => !x.IsDeleted)
             .GroupBy(_ => true)
@@ -20,7 +20,7 @@ public sealed class GetSubscriptionStatsQueryHandler(IApplicationDbContext _cont
                 ExpiringIn15Days = g.Count(x => x.Schools != null
                       && !x.Schools.IsDeleted
                       && x.EndDate > currentDate
-                      && x.Schools != null && !x.Schools.IsDeleted && x.EndDate > currentDate),
+                      && x.EndDate <= expiryThreshold),
                 ExpiredSubscriptions = g.Count(x => x.EndDate < currentDate)
             })
             .FirstOrDefaultAsync(cancellationToken);
