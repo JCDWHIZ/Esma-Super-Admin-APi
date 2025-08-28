@@ -21,6 +21,7 @@ public sealed class EditBlogCommandHandler(IApplicationDbContext _dbContext) : I
         blog.BackdropUrl = command.BackdropUrl;
         blog.Status = command.Status;
         blog.PublishDate = command.PublishDate;
+        blog.RejectReason = string.Empty;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

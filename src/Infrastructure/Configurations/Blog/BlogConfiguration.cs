@@ -19,6 +19,8 @@ internal sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
         builder.Property(b => b.BackdropUrl)
             .HasMaxLength(500);
 
+        builder.Property(b => b.RejectReason);
+
         builder.Property(b => b.Status)
             .HasConversion<string>();
 
