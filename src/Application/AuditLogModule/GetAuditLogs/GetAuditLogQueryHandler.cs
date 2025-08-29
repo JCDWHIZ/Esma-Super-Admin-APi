@@ -9,18 +9,36 @@ public sealed class GetAuditLogQueryHandler(IApplicationDbContext _context) : IQ
     {
         IQueryable<Domain.AuditLogs.AuditLog> Auditquery = _context.Auditlog.AsQueryable();
 
-        if (!string.IsNullOrEmpty(query.UserName))
+        // Combined search term for username or action
+        if (!string.IsNullOrEmpty(query.SearchTerm))
         {
-            Auditquery = Auditquery.Where(a => _context.Users.Any(u => u.Username.Contains(query.UserName)));
+            Auditquery = Auditquery.Where(a =>
+                _context.Users.Any(u => u.Username.Contains(query.SearchTerm)) ||
+                a.Action.Contains(query.SearchTerm));
+        }
+
+        if (query.TimeFilter.HasValue)
+        {
+            DateTime currentDate = DateTime.UtcNow;
+            switch (query.TimeFilter)
+            {
+                case TimeFilter.LAST_30_DAYS:
+                    Auditquery = Auditquery.Where(a => a.Created >= currentDate.AddDays(-30));
+                    break;
+                case TimeFilter.LAST_60_DAYS:
+                    Auditquery = Auditquery.Where(a => a.Created >= currentDate.AddDays(-60));
+                    break;
+                case TimeFilter.LAST_90_DAYS:
+                    Auditquery = Auditquery.Where(a => a.Created >= currentDate.AddDays(-90));
+                    break;
+                case TimeFilter.OVER_90_DAYS:
+                    Auditquery = Auditquery.Where(a => a.Created < currentDate.AddDays(-90));
+                    break;
+            }
         }
         if (!string.IsNullOrEmpty(query.Role))
         {
             Auditquery = Auditquery.Where(a => a.Role.Contains(query.Role));
-        }
-
-        if (!string.IsNullOrEmpty(query.Action))
-        {
-            Auditquery = Auditquery.Where(a => a.Action.Contains(query.Action));
         }
 
         PaginatedList<AuditLogDto> pagedAuditLogs = await PaginatedList<AuditLogDto>.CreateAsync(

@@ -47,6 +47,7 @@ public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _co
                 Status = b.Status,
                 PublishDate = b.PublishDate,
                 CreatedAt = b.Created,
+                RejectReason = b.RejectReason,
                 CreatedBy = b.CreatedBy
             }),
             query.PageNumber ?? 1,

@@ -10,19 +10,21 @@ internal sealed class GetAuditLogs : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("audit-logs", async (
-            string? userName,
+            string? searchTerm,
             string? action,
             string? role,
-            int? pageNumber,
+            TimeFilter ? timeFilter,
+            int ? pageNumber,
             int? pageSize,
             IQueryHandler<GetAuditLogsQuery, PaginatedList<AuditLogDto>> handler,
             CancellationToken cancellationToken) =>
         {
             var query = new GetAuditLogsQuery
             {
-                UserName = userName,
+                SearchTerm = searchTerm,
                 Action = action,
                 Role = role,
+                TimeFilter = timeFilter,
                 PageNumber = pageNumber ?? 1,
                 PageSize = pageSize ?? 10
             };

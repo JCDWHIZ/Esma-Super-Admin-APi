@@ -22,6 +22,7 @@ public sealed class GetBlogByIdQueryHandler(IApplicationDbContext _context) : IQ
             BackdropUrl = entity.BackdropUrl,
             Status = entity.Status,
             PublishDate = entity.PublishDate,
+            RejectReason = entity.RejectReason,
             CreatedAt = entity.Created,
             CreatedBy = entity.CreatedBy
         });
