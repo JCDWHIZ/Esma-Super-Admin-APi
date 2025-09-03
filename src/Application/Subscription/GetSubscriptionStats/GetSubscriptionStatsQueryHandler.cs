@@ -21,7 +21,7 @@ public sealed class GetSubscriptionStatsQueryHandler(IApplicationDbContext _cont
                       && !x.Schools.IsDeleted
                       && x.EndDate > currentDate
                       && x.EndDate <= expiryThreshold),
-                ExpiredSubscriptions = g.Count(x => x.EndDate < currentDate)
+                ExpiredSubscriptions = g.Count(x => x.Schools != null && !x.Schools.IsDeleted && x.EndDate < currentDate)
             })
             .FirstOrDefaultAsync(cancellationToken);
 

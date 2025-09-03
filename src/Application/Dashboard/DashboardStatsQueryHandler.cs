@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Dashboard;
+
 public class GetDashboardStatsHandler(IApplicationDbContext context)
     : IQueryHandler<DashboardStatsQuery, DashboardStatsDto>
 {
@@ -60,16 +61,16 @@ public class GetDashboardStatsHandler(IApplicationDbContext context)
         {
             Basic = await context.Subscriptions
                 .Where(s => s.SubscriptionType == SubscriptionType.BASIC)
-                .CountAsync(cancellationToken),
+                .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted, cancellationToken),
             Premium = await context.Subscriptions
                 .Where(s => s.SubscriptionType == SubscriptionType.PREMIUM)
-                .CountAsync(cancellationToken),
+                .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted, cancellationToken),
             Standard = await context.Subscriptions
                 .Where(s => s.SubscriptionType == SubscriptionType.STANDARD)
-                .CountAsync(cancellationToken),
+                .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted, cancellationToken),
             Custom = await context.Subscriptions
                 .Where(s => s.SubscriptionType == SubscriptionType.CUSTOMIZED)
-                .CountAsync(cancellationToken)
+                .CountAsync(s => s.Schools != null && !s.Schools.IsDeleted, cancellationToken),
         };
 
         var result = new DashboardStatsDto
