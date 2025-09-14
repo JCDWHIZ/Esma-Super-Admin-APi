@@ -11,19 +11,17 @@ internal sealed class GetRoles : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("roles", async (
-                int? page,
-                int? pageSize,
-                IQueryHandler<GetRolesWithPermissionQuery, PaginatedList<RoleDto>> handler,
+                IQueryHandler<GetRolesWithPermissionQuery, List<RoleDto>> handler,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetRolesWithPermissionQuery(page, pageSize);
+                var query = new GetRolesWithPermissionQuery();
 
-                Result<PaginatedList<RoleDto>> result = await handler.Handle(query, cancellationToken);
+                Result<List<RoleDto>> result = await handler.Handle(query, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .WithTags(Tags.Roles)
-            .Produces<PaginatedList<RoleDto>>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+            .Produces<PaginatedList<RoleDto>>(StatusCodes.Status200OK);
+        //.RequireAuthorization();
     }
 }

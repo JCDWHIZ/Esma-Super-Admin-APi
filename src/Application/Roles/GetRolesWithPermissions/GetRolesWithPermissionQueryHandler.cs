@@ -13,16 +13,16 @@ using SharedKernel;
 namespace Application.Roles.GetRolesWithPermission;
 
 public class GetRolesWithPermissionQueryHandler(IApplicationDbContext context)
-    : IQueryHandler<GetRolesWithPermissionQuery, PaginatedList<RoleDto>>
+    : IQueryHandler<GetRolesWithPermissionQuery, List<RoleDto>>
 {
-    public async Task<Result<PaginatedList<RoleDto>>> Handle(GetRolesWithPermissionQuery query, CancellationToken cancellationToken)
+    public async Task<Result<List<RoleDto>>> Handle(GetRolesWithPermissionQuery query, CancellationToken cancellationToken)
     {
         IQueryable<Role> rolesQuery = context.Roles
             .Include(r => r.Permissions)
             .AsNoTracking();
 
         // Project to RoleDto
-        IQueryable<RoleDto> roleDtosQuery = rolesQuery.Select(role => new RoleDto
+        List<RoleDto> roleDtosQuery = await rolesQuery.Select(role => new RoleDto
         {
             PublicId = role.PublicId,
             Name = role.Name,
@@ -33,15 +33,8 @@ public class GetRolesWithPermissionQueryHandler(IApplicationDbContext context)
                 Name = p.Name,
                 Description = p.Description
             }).ToList()
-        });
+        }).ToListAsync(cancellationToken);
 
-        // Paginate the result
-        PaginatedList<RoleDto> paginatedRoles = await PaginatedList<RoleDto>.CreateAsync(
-            roleDtosQuery,
-            query.Page ?? 1,
-            query.PageSize ?? 10
-        );
-
-        return Result.Success(paginatedRoles);
+        return Result.Success(roleDtosQuery);
     }
 }
