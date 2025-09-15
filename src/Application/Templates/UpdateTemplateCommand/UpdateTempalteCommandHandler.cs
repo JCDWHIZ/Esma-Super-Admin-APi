@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Domain.Templates;
 
 namespace Application.Templates.UpdateTemplateCommand;
-internal sealed class UpdateTemplateCommandHandler(IApplicationDbContext context) : ICommandHandler<UpdateTemplateCommand, string>
+
+public sealed class UpdateTemplateCommandHandler(IApplicationDbContext context) : ICommandHandler<UpdateTemplateCommand, string>
 {
     public async Task<Result<string>> Handle(UpdateTemplateCommand command, CancellationToken cancellationToken)
     {

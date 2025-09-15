@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Domain.Templates;
 
 namespace Application.Templates.CreateTemplateCommand;
-internal sealed class CreateTemplateCommandHandler(IApplicationDbContext _context) : ICommandHandler<CreateTemplateCommand, string>
+
+public sealed class CreateTemplateCommandHandler(IApplicationDbContext _context) : ICommandHandler<CreateTemplateCommand, string>
 {
     public async Task<Result<string>> Handle(CreateTemplateCommand command, CancellationToken cancellationToken)
     {

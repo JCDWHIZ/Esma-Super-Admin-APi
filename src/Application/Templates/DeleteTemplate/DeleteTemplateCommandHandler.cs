@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Domain.Templates;
 
 namespace Application.Templates.DeleteTemplate;
-internal sealed class DeleteTemplateCommandHandler(IApplicationDbContext context) : ICommandHandler<DeleteTemplateCommand, string>
+
+public sealed class DeleteTemplateCommandHandler(IApplicationDbContext context) : ICommandHandler<DeleteTemplateCommand, string>
 {
     public async Task<Result<string>> Handle(DeleteTemplateCommand command, CancellationToken cancellationToken)
     {

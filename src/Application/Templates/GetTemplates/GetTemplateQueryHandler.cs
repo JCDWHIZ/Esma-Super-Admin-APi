@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Domain.Templates;
 
 namespace Application.Templates.GetTemplates;
-internal sealed class GetTemplatesWithPaginationQueryHandler(IApplicationDbContext context) : IQueryHandler<GetTemplatesWithPaginationQuery, PaginatedList<TemplateDto>>
+
+public sealed class GetTemplatesWithPaginationQueryHandler(IApplicationDbContext context) : IQueryHandler<GetTemplatesWithPaginationQuery, PaginatedList<TemplateDto>>
 {
     public async Task<Result<PaginatedList<TemplateDto>>> Handle(GetTemplatesWithPaginationQuery query, CancellationToken cancellationToken)
     {

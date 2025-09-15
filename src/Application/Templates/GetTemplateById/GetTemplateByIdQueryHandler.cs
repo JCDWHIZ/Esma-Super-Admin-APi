@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Domain.Templates;
 
 namespace Application.Templates.GetTemplateById;
-internal sealed class GetTemplateByIdQueryHandler(IApplicationDbContext context) : IQueryHandler<GetTemplateByIdQuery, TemplateDto>
+
+public sealed class GetTemplateByIdQueryHandler(IApplicationDbContext context) : IQueryHandler<GetTemplateByIdQuery, TemplateDto>
 {
     public async Task<Result<TemplateDto>> Handle(GetTemplateByIdQuery query, CancellationToken cancellationToken)
     {
