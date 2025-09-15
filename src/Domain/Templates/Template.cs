@@ -8,6 +8,7 @@ using SharedKernel.Enums;
 using SharedKernel.Models;
 
 namespace Domain.Templates;
+
 public class Template : BaseAuditableEntity
 {
     public string TemplateName { get; set; }

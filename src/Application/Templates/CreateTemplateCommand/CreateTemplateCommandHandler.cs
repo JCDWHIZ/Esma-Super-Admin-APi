@@ -11,15 +11,21 @@ public sealed class CreateTemplateCommandHandler(IApplicationDbContext _context)
 {
     public async Task<Result<string>> Handle(CreateTemplateCommand command, CancellationToken cancellationToken)
     {
-        Domain.Templates.Template? existingTemplate = await _context.Templates.FirstOrDefaultAsync(t => t.TemplateName == command.TemplateName || t.TemplateTrigger == command.TemplateTrigger, cancellationToken);
+        Template? existingTemplate = await _context.Templates.FirstOrDefaultAsync(t => t.TemplateName == command.TemplateName || t.TemplateTrigger == command.TemplateTrigger, cancellationToken);
 
         if (existingTemplate != null)
         {
             return Result.Failure<string>(TemplateErrors.AlreadyExists());
         }
 
-        Template.Create(command.TemplateName, command.TemplateName, command.TemplateTrigger);
+        var template = new Template
+        {
+            TemplateBody = command.TemplateBody,
+            TemplateName = command.TemplateName,
+            TemplateTrigger = command.TemplateTrigger
+        };
 
+        _context.Templates.Add(template);
         await _context.SaveChangesAsync(cancellationToken);
         return Result.Success("Template Created Successfully");
     }
