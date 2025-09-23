@@ -1,12 +1,34 @@
-﻿namespace Infrastructure.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
-internal sealed class PermissionProvider
+namespace Infrastructure.Authorization;
+
+public class PermissionProvider : IAuthorizationPolicyProvider
 {
-    public Task<HashSet<string>> GetForUserIdAsync(Guid userId)
-    {
-        // TODO: Here you'll implement your logic to fetch permissions.
-        HashSet<string> permissionsSet = [];
+    public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
 
-        return Task.FromResult(permissionsSet);
+    public PermissionProvider(IOptions<AuthorizationOptions> options)
+    {
+        FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
+    }
+
+    public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
+        FallbackPolicyProvider.GetDefaultPolicyAsync();
+
+    public Task<AuthorizationPolicy?> GetFallbackPolicyAsync() =>
+        FallbackPolicyProvider.GetFallbackPolicyAsync();
+
+    public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
+    {
+        if (policyName.StartsWith("Permission:", StringComparison.OrdinalIgnoreCase))
+        {
+            string permission = policyName["Permission:".Length..];
+            AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
+                .AddRequirements(new PermissionRequirement(permission))
+                .Build();
+            return Task.FromResult<AuthorizationPolicy?>(policy);
+        }
+
+        return FallbackPolicyProvider.GetPolicyAsync(policyName);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application;
 using Application.Roles.GetPermissions;
 using Domain.Users;
+using Infrastructure.Authorization;
 namespace Web.Api.Endpoints.Roles;
 
 internal sealed class GetPermissionsEndpoint : IEndpoint
@@ -18,7 +19,7 @@ internal sealed class GetPermissionsEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Roles)
-        .Produces<List<PermissionDto>>(StatusCodes.Status200OK);
-        //.RequireAuthorization();
+        .Produces<List<PermissionDto>>(StatusCodes.Status200OK)
+        .RequireAuthorization(new RequirePermissionAttribute("ViewRoles"));
     }
 }

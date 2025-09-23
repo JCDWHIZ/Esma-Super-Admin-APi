@@ -1,5 +1,6 @@
 using System;
 using Application.School.GetSchoolDashboard;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.School;
 
@@ -19,6 +20,6 @@ internal sealed class GetSchoolDashboard : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<List<YearlyOverviewDto>>()
-        .RequireAuthorization(); // Remove if public dashboard access is allowed
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
     }
 }

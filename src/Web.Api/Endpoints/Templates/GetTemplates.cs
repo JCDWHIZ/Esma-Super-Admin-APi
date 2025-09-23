@@ -2,6 +2,7 @@
 using Application.Dashboard;
 using Application.Templates;
 using Application.Templates.GetTemplates;
+using Infrastructure.Authorization;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Templates;
@@ -31,6 +32,6 @@ internal sealed class GetTemplatesWithPaginationEndpoint : IEndpoint
         })
         .WithTags(Tags.Templates)
         .Produces<PaginatedList<TemplateDto>>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewEmailTemplates"));
     }
 }

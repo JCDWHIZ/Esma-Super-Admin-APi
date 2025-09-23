@@ -1,6 +1,7 @@
 using System;
 using Application.Dashboard;
 using Application.Roles.RemovePermissionFromRole;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Roles;
 
@@ -20,7 +21,7 @@ internal sealed class RemovePermission : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
-            .RequireAuthorization()
+            .RequireAuthorization(new RequirePermissionAttribute("RemovePermissions"))
             .WithAudit("A permssion was removed from a role")
             .Produces<string>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);

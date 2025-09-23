@@ -1,6 +1,7 @@
 ﻿using Application.Dashboard;
 using Application.Templates;
 using Application.Templates.GetTemplateById;
+using Infrastructure.Authorization;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Templates;
@@ -22,6 +23,6 @@ internal sealed class GetTemplateByIdEndpoint : IEndpoint
         })
         .WithTags(Tags.Templates)
         .Produces<TemplateDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewEmailTemplates"));
     }
 }

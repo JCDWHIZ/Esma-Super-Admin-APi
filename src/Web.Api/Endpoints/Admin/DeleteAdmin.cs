@@ -1,4 +1,5 @@
 ﻿using Application.Admin.DeleteAdmin;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Admin;
 
@@ -20,6 +21,6 @@ internal sealed class DeleteAdminEndpoint : IEndpoint
         .WithTags(Tags.Admin)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("An admin was deleted")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("DeleteAdmin"));
     }
 }

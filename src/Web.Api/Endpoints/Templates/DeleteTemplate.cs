@@ -1,5 +1,6 @@
 ﻿using Application.Dashboard;
 using Application.Templates.DeleteTemplate;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Templates;
 
@@ -21,6 +22,6 @@ internal sealed class DeleteTemplateEndpoint : IEndpoint
         .WithTags(Tags.Templates)
         .WithAudit("A template was deleted")
         .Produces<string>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("DeleteEmailTemplates"));
     }
 }

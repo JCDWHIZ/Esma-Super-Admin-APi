@@ -2,6 +2,7 @@ using System;
 using Application;
 using Application.AuditLogModule;
 using Application.AuditLogModule.GetAuditLogs;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.AuditLogs;
 
@@ -35,6 +36,6 @@ internal sealed class GetAuditLogs : IEndpoint
         })
         .WithTags(Tags.AuditLogs)
         .Produces<PaginatedList<AuditLogDto>>()
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewAuditLogs"));
     }
 }

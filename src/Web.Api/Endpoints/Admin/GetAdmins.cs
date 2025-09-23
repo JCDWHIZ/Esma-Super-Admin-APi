@@ -2,6 +2,7 @@ using System;
 using Application;
 using Application.Admin;
 using Application.Admin.GetAdmins;
+using Infrastructure.Authorization;
 using SharedKernel.Enums;
 
 namespace Web.Api.Endpoints.Admin;
@@ -34,6 +35,6 @@ public sealed class GetAdmins : IEndpoint
         .WithName("GetAdmins")
         .WithTags(Tags.Admin)
         .Produces<PaginatedList<UserDto>>()
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewAdmins"));
     }
 }

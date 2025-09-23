@@ -1,4 +1,5 @@
 ﻿using Application.BlogModule.RejectBlogCommand;
+using Infrastructure.Authorization;
 namespace Web.Api.Endpoints.Blog;
 
 
@@ -26,6 +27,6 @@ internal sealed class RejectBlogEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("RejectBlogs"));
     }
 }

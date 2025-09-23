@@ -5,6 +5,7 @@ using Application.School.CreateSchool;
 using Domain.Schools;
 using Domain.Subscriptions;
 using Domain.Users;
+using Infrastructure.Authorization;
 using SharedKernel;
 using SharedKernel.Enums;
 using Web.Api.Infrastructure;
@@ -60,7 +61,7 @@ internal sealed class CreateSchool : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status201Created)
         .WithAudit("Created School")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("CreateSchool"));
     }
 
     public sealed class Request()

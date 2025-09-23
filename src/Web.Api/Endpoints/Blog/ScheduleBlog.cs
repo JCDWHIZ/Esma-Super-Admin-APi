@@ -1,5 +1,6 @@
 using System;
 using Application.BlogModule.ScheduleBlog;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Blog;
 
@@ -18,6 +19,6 @@ public class ScheduleBlog : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .WithAudit("Scheduled Blog")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ScheduleBlogs"));
     }
 }

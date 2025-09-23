@@ -211,18 +211,6 @@ public static class DependencyInjection
 
             });
 
-        services.AddAuthorization(options =>
-        {
-            // options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
-            // options.AddPolicy("ManagerOnly", policy => policy.RequireRole("Manager"));
-            // options.AddPolicy("CanCreateBlog", policy => policy.RequireRole("CreateBlog"));
-            // options.AddPolicy("CanDelteBlog", policy => policy.RequireRole("DeleteBlog"));
-            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
-            options.AddPolicy("ManagerOnly", policy => policy.RequireRole("MANAGER"));
-            options.AddPolicy("CanCreateBlog", policy => policy.RequireRole("CREATE_BLOG"));
-            options.AddPolicy("CanDeleteBlog", policy => policy.RequireRole("DELETE_BLOG"));
-        });
-
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<AuditingInterceptor>();
@@ -236,7 +224,7 @@ public static class DependencyInjection
     {
         services.AddAuthorization();
 
-        services.AddScoped<PermissionProvider>();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionProvider>();
 
         services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
 

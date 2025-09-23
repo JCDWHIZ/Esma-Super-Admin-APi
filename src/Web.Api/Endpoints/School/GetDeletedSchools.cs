@@ -2,6 +2,7 @@ using System;
 using Application;
 using Application.School;
 using Application.School.GetDeletedSchoolWithPagination;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.School;
 
@@ -49,6 +50,6 @@ internal sealed class GetDeletedSchools : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<PaginatedList<SchoolItemDto>>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
     }
 }

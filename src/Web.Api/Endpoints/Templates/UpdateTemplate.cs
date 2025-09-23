@@ -1,5 +1,6 @@
 ﻿using Application.Dashboard;
 using Application.Templates.UpdateTemplateCommand;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Templates;
 
@@ -34,6 +35,6 @@ internal sealed class UpdateTemplateEndpoint : IEndpoint
         .WithTags(Tags.Templates)
         .WithAudit("A template was updated")
         .Produces<string>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("EditEmailTemplates"));
     }
 }

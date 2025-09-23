@@ -22,7 +22,7 @@ public sealed class DataSeeder(
         {
             await SeedPermissions(cancellationToken);
             await SeedRoles(cancellationToken);
-            await SyncToKeycloak();
+            //await SyncToKeycloak();
             await SeedHelpRequests(cancellationToken);
         }
         catch (Exception ex)
@@ -48,17 +48,25 @@ public sealed class DataSeeder(
             ("EditAdmin", "Permission to edit admin information"),
             ("InviteAdmin", "Permission to invite an admin"),
             ("DeleteAdmin", "Permission to delete an admin"),
-            ("ApproveBlogs", "Permission to approve blogs"),
+            ("PublishBlogs", "Permission to publish blogs"),
+            ("UpdateBlogs", "Permission to update blogs"),
+            ("ScheduleBlogs", "Permission to schedule blogs"),
             ("ViewBlogs", "Permission to view blogs"),
+            ("RejectBlogs", "Permission to reject blogs"),
             ("CreateBlogs", "Permission to create blogs"),
             ("EditBlogs", "Permission to edit blogs"),
+            ("DeleteBlogs", "Permission to delete blogs"),
             ("ViewHelpRequests", "Permission to view help requests"),
             ("ResolveHelpRequests", "Permission to resolve help requests"),
             ("ViewAuditLogs", "Permission to view audit logs"),
             ("CreateRole", "Permission to create roles"),
+            ("ViewRoles", "Permission to view roles"),
             ("AssignPermissions", "Permission to assign permissions"),
+            ("DeleteRole", "Permission to delete role"),
+            ("RemovePermissions", "Permission to remove permission from a role"),
             ("Enable2FA", "Permission to enable Two Factor Authentication"),
             ("CreateEmailTemplates", "Permission to create Email Template"),
+            ("ViewEmailTemplates", "Permission to view Email Template"),
             ("EditEmailTemplates", "Permission to edit Email Template"),
             ("DeleteEmailTemplates", "Permission to Delete Email Template"),
         };
@@ -83,143 +91,154 @@ public sealed class DataSeeder(
     private async Task SeedRoles(CancellationToken cancellationToken)
     {
         List<Permission> permissions = await context.Permissions.ToListAsync(cancellationToken);
-        List<string> existingRoles = await context.Roles
-            .Select(r => r.Name)
+        List<Role> existingRoles = await context.Roles
+            .Include(r => r.Permissions)  // Eager-load to check/update permissions
             .ToListAsync(cancellationToken);
 
-        // Define roles and their permissions
+        // Define roles and their permissions (unchanged)
         var rolesToSeed = new Dictionary<string, (string Description, List<string> PermissionNames)>
+    {
         {
+            "Super admin",
+            ("System administrator with full access", new List<string>
             {
-                "Super admin",
-                ("System administrator with full access", new List<string>
-                {
-                    "ViewDashboard","CreateSchool", "ViewSchool", "ViewSchoolProfile", "DeleteSchool", "EditSchool",
-                    "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
-                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                    "ApproveBlogs", "ViewBlogs", "CreateBlogs", "EditBlogs",
-                    "ViewHelpRequests", "ResolveHelpRequests",
-                    "ViewAuditLogs",
-                    "CreateRole", "AssignPermissions",
-                    "Enable2FA",
-                    "CreateEmailTemplates", "EditEmailTemplates", "DeleteEmailTemplates"
-                })
-            },
+                "ViewDashboard","CreateSchool", "ViewSchool", "ViewSchoolProfile", "DeleteSchool", "EditSchool",
+                "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
+                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                "ApproveBlogs", "ViewBlogs", "CreateBlogs", "EditBlogs", "DeleteBlogs", "PublishBlogs", "RejectBlogs", "UpdateBlogs", "ScheduleBlogs",
+                "ViewHelpRequests", "ResolveHelpRequests",
+                "ViewAuditLogs",
+                "CreateRole", "AssignPermissions", "DeleteRole", "ViewRoles", "RemovePermissions",
+                "Enable2FA",
+                "CreateEmailTemplates", "EditEmailTemplates", "DeleteEmailTemplates", "ViewEmailTemplates"
+            })
+        },
+        {
+            "System Admin",
+            ("System Admin with limited administrative access", new List<string>
             {
-                "System Admin",
-                ("System Admin with limited administrative access", new List<string>
-                {
-                    "ViewDashboard",
-                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                    "ViewAuditLogs",
-                    "Enable2FA",
-                })
-            },
+                "ViewDashboard",
+                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                "ViewAuditLogs",
+                "Enable2FA",
+            })
+        },
+        {
+            "Business Administrator",
+            ("Business Admin", new List<string>
             {
-                "Business Administrator",
-                ("Business Admin", new List<string>
-                {
-                    "ViewDashboard",
-                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                    "ViewAuditLogs",
-                    "Enable2FA",
-                    "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
-                })
-            },
+                "ViewDashboard",
+                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                "ViewAuditLogs",
+                "Enable2FA",
+                "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
+            })
+        },
+        {
+            "User and Role Manager",
+            ("User and Role Manager ", new List<string>
             {
-                "User and Role Manager",
-                ("User and Role Manager ", new List<string>
-                {
-                    "ViewDashboard",
-                    "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                    "ViewAuditLogs",
-                    "Enable2FA",
-                    "CreateRole", "AssignPermissions",
-                })
-            },
-             {
-                "Security Officer",
-                ("Security Officer", new List<string>
-                {
-                    "ViewDashboard",
-                    "ViewAuditLogs",
-                    "Enable2FA",
-                    "CreateRole", "AssignPermissions",
-                })
-            },
-              {
-                "Contet and Media Manager",
-                ("Content and Media Manager", new List<string>
-                {
-                    "ViewDashboard",
-                    "Enable2FA",
-                    "CreateRole", "AssignPermissions",
-                })
-            },
-              {
-                "Support Manager",
-                ("Content and Media Manager", new List<string>
-                {
-                    "ViewDashboard",
-                    "ViewHelpRequests", "ResolveHelpRequests",
-                    "Enable2FA",
-                })
-            },
-              {
-                "Reports Manager",
-                ("Content and Media Manager", new List<string>
-                {
-                    "ViewDashboard",
-                    "ViewAuditLogs",
-                    "ViewHelpRequests", "ResolveHelpRequests",
-                    "Enable2FA",
-                })
-            },
-        };
+                "ViewDashboard",
+                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
+                "ViewAuditLogs",
+                "Enable2FA",
+                "CreateRole", "AssignPermissions",
+            })
+        },
+        {
+            "Security Officer",
+            ("Security Officer", new List<string>
+            {
+                "ViewDashboard",
+                "ViewAuditLogs",
+                "Enable2FA",
+                "CreateRole", "AssignPermissions",
+            })
+        },
+        {
+            "Content and Media Manager",
+            ("Content and Media Manager", new List<string>
+            {
+                "ViewDashboard",
+                "Enable2FA",
+                "ApproveBlogs", "ViewBlogs", "CreateBlogs", "EditBlogs",
+                "CreateRole", "AssignPermissions",
+            })
+        },
+        {
+            "Support Manager",
+            ("Support Manager", new List<string>
+            {
+                "ViewDashboard",
+                "ViewHelpRequests", "ResolveHelpRequests",
+                "Enable2FA",
+            })
+        },
+        {
+            "Reports Manager",
+            ("Reports Manager", new List<string>
+            {
+                "ViewDashboard",
+                "ViewAuditLogs",
+                "ViewHelpRequests", "ResolveHelpRequests",
+                "Enable2FA",
+            })
+        },
+    };
 
-        var rolesToAdd = new List<Role>();
+        bool changesMade = false;
 
         foreach (KeyValuePair<string, (string Description, List<string> PermissionNames)> roleData in rolesToSeed)
         {
             string roleName = roleData.Key;
             (string description, List<string> permissionNames) = roleData.Value;
 
-            // Skip if role already exists
-            if (existingRoles.Contains(roleName))
+            Role? role = existingRoles.FirstOrDefault(r => r.Name == roleName);
+
+            if (role == null)
             {
-                logger.LogInformation("Role '{RoleName}' already exists, skipping", roleName);
-                continue;
+                // Create new role
+                role = Role.Create(roleName, description);
+                context.Roles.Add(role);
+                logger.LogInformation("Creating new role '{RoleName}'", roleName);
+                changesMade = true;
+            }
+            else
+            {
+                // Update description if changed
+                if (role.Description != description)
+                {
+                    role.Description = description;
+                    changesMade = true;
+                }
             }
 
-            var role = Role.Create(roleName, description);
-
-            // Add permissions to role
+            // Add missing permissions
             foreach (string permissionName in permissionNames)
             {
                 Permission? permission = permissions.FirstOrDefault(p => p.Name == permissionName);
-                if (permission != null)
+                if (permission == null)
+                {
+                    logger.LogWarning("Permission '{PermissionName}' not found for role '{RoleName}'", permissionName, roleName);
+                    continue;
+                }
+
+                if (!role.Permissions.Any(p => p.Name == permissionName))
                 {
                     role.AddPermission(permission);
-                }
-                else
-                {
-                    logger.LogWarning("Permission '{PermissionName}' not found for role '{RoleName}'", 
-                        permissionName, roleName);
+                    changesMade = true;
                 }
             }
-
-            rolesToAdd.Add(role);
         }
 
-        if (rolesToAdd.Any())
+        if (changesMade)
         {
-            await context.Roles.AddRangeAsync(rolesToAdd, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Added {Count} new roles", rolesToAdd.Count);
+            logger.LogInformation("Updated roles and permissions");
         }
         else
         {
-            logger.LogInformation("No new roles to add");
+            logger.LogInformation("No changes needed for roles");
         }
     }
 
@@ -495,99 +514,145 @@ public sealed class DataSeeder(
         }
     }
 
-    private async Task SyncToKeycloak()
-    {
-        try
-        {
-            logger.LogInformation("Starting synchronization with Keycloak");
+    //private async Task SyncToKeycloak()
+    //{
+    //    try
+    //    {
+    //        logger.LogInformation("Starting synchronization with Keycloak");
 
-            List<Role> roles = await context.Roles.Include(r => r.Permissions).ToListAsync();
-            List<Permission> permissions = await context.Permissions.ToListAsync();
+    //        List<Role> roles = await context.Roles.Include(r => r.Permissions).ToListAsync();
+    //        List<Permission> permissions = await context.Permissions.ToListAsync();
 
-            bool updated = false;
+    //        bool updated = false;
 
-            foreach (Role role in roles)
-            {
-                // Check if the role exists in Keycloak before syncing
-                Application.Interfaces.KeycloakRoleDto? existingKeycloakRole = await _keycloakRolesService.GetRealmRoleByNameAsync(role.Name);
+    //        // Step 1: Sync individual roles to Keycloak
+    //        foreach (Role role in roles)
+    //        {
+    //            Application.Interfaces.KeycloakRoleDto? existingKeycloakRole = await _keycloakRolesService.GetRealmRoleByNameAsync(role.Name);
 
-                if (existingKeycloakRole != null)
-                {
-                    logger.LogInformation("Role '{RoleName}' already exists in Keycloak with ID '{KeycloakId}'.",
-                        role.Name, existingKeycloakRole.Id);
+    //            if (existingKeycloakRole != null)
+    //            {
+    //                logger.LogInformation("Role '{RoleName}' already exists in Keycloak with ID '{KeycloakId}'.",
+    //                    role.Name, existingKeycloakRole.Id);
 
-                    // Update KeycloakId in local DB if missing or outdated
-                    if (string.IsNullOrWhiteSpace(role.KeycloakId) || role.KeycloakId != existingKeycloakRole.Id)
-                    {
-                        role.KeycloakId = existingKeycloakRole.Id;
-                        updated = true;
-                    }
-                }
-                else
-                {
-                    // Role does not exist ? create it
-                    bool created = await _keycloakRolesService.CreateRealmRoleAsync(role.Name, role.Description);
-                    if (created)
-                    {
-                        logger.LogInformation("Created role '{RoleName}' in Keycloak.", role.Name);
+    //                // Update KeycloakId in local DB if missing or outdated
+    //                if (string.IsNullOrWhiteSpace(role.KeycloakId) || role.KeycloakId != existingKeycloakRole.Id)
+    //                {
+    //                    role.KeycloakId = existingKeycloakRole.Id;
+    //                    updated = true;
+    //                }
 
-                        // Retrieve it again to get its ID
-                        Application.Interfaces.KeycloakRoleDto? newKeycloakRole = await _keycloakRolesService.GetRealmRoleByNameAsync(role.Name);
-                        if (newKeycloakRole != null)
-                        {
-                            role.KeycloakId = newKeycloakRole.Id;
-                            updated = true;
-                        }
-                    }
-                    else
-                    {
-                        logger.LogWarning("Failed to create role '{RoleName}' in Keycloak.", role.Name);
-                    }
-                }
-            }
+    //                // Optionally update description if changed (assuming UpdateRealmRoleAsync can handle it)
+    //                await _keycloakRolesService.UpdateRealmRoleAsync(role.Name, role.Description);
+    //            }
+    //            else
+    //            {
+    //                // Create new role
+    //                bool created = await _keycloakRolesService.CreateRealmRoleAsync(role.Name, role.Description);
+    //                if (created)
+    //                {
+    //                    logger.LogInformation("Created role '{RoleName}' in Keycloak.", role.Name);
 
-            // Sync permissions as well
-            foreach (Permission permission in permissions)
-            {
-                Application.Interfaces.KeycloakRoleDto? existingKeycloakPermission = await _keycloakRolesService.GetRealmRoleByNameAsync(permission.Name);
+    //                    // Retrieve to get ID
+    //                    Application.Interfaces.KeycloakRoleDto? newKeycloakRole = await _keycloakRolesService.GetRealmRoleByNameAsync(role.Name);
+    //                    if (newKeycloakRole != null)
+    //                    {
+    //                        role.KeycloakId = newKeycloakRole.Id;
+    //                        updated = true;
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    logger.LogWarning("Failed to create role '{RoleName}' in Keycloak.", role.Name);
+    //                }
+    //            }
+    //        }
 
-                if (existingKeycloakPermission != null)
-                {
-                    if (string.IsNullOrWhiteSpace(permission.KeycloakId) || permission.KeycloakId != existingKeycloakPermission.Id)
-                    {
-                        permission.KeycloakId = existingKeycloakPermission.Id;
-                        updated = true;
-                    }
-                }
-                else
-                {
-                    bool created = await _keycloakRolesService.CreateRealmRoleAsync(permission.Name, permission.Description);
-                    if (created)
-                    {
-                        Application.Interfaces.KeycloakRoleDto? newPermissionRole = await _keycloakRolesService.GetRealmRoleByNameAsync(permission.Name);
-                        if (newPermissionRole != null)
-                        {
-                            permission.KeycloakId = newPermissionRole.Id;
-                            updated = true;
-                        }
-                    }
-                }
-            }
+    //        // Step 2: Sync individual permissions as roles to Keycloak
+    //        foreach (Permission permission in permissions)
+    //        {
+    //            Application.Interfaces.KeycloakRoleDto? existingKeycloakPermission = await _keycloakRolesService.GetRealmRoleByNameAsync(permission.Name);
 
-            if (updated)
-            {
-                await context.SaveChangesAsync();
-                logger.LogInformation("Updated KeycloakId for roles and permissions after sync.");
-            }
+    //            if (existingKeycloakPermission != null)
+    //            {
+    //                if (string.IsNullOrWhiteSpace(permission.KeycloakId) || permission.KeycloakId != existingKeycloakPermission.Id)
+    //                {
+    //                    permission.KeycloakId = existingKeycloakPermission.Id;
+    //                    updated = true;
+    //                }
 
-            logger.LogInformation("Finished synchronization with Keycloak.");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to synchronize with Keycloak");
-            // Don't rethrow - we want local seeding to succeed even if Keycloak sync fails
-        }
-    }
+    //                // Optionally update description
+    //                await _keycloakRolesService.UpdateRealmRoleAsync(permission.Name, permission.Description);
+    //            }
+    //            else
+    //            {
+    //                bool created = await _keycloakRolesService.CreateRealmRoleAsync(permission.Name, permission.Description);
+    //                if (created)
+    //                {
+    //                    Application.Interfaces.KeycloakRoleDto? newPermissionRole = await _keycloakRolesService.GetRealmRoleByNameAsync(permission.Name);
+    //                    if (newPermissionRole != null)
+    //                    {
+    //                        permission.KeycloakId = newPermissionRole.Id;
+    //                        updated = true;
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    logger.LogWarning("Failed to create permission role '{PermissionName}' in Keycloak.", permission.Name);
+    //                }
+    //            }
+    //        }
+
+    //        // Step 3: Sync composite roles (add permissions as composites to each role)
+    //        foreach (Role role in roles)
+    //        {
+    //            if (!role.Permissions.Any())
+    //            {
+    //                continue;
+    //            }
+
+    //            var permissionRoleNames = role.Permissions.Select(p => p.Name).ToList();
+
+    //            // Ensure all permission roles exist (already handled in Step 2, but double-check)
+    //            foreach (string permissionName in permissionRoleNames)
+    //            {
+    //                Application.Interfaces.KeycloakRoleDto? existingPermissionRole = await _keycloakRolesService.GetRealmRoleByNameAsync(permissionName);
+    //                if (existingPermissionRole == null)
+    //                {
+    //                    logger.LogWarning("Permission role '{PermissionName}' not found in Keycloak for composite sync to role '{RoleName}'. Skipping composite add for this permission.", permissionName, role.Name);
+    //                    permissionRoleNames.Remove(permissionName);  // Avoid adding non-existent
+    //                }
+    //            }
+
+    //            if (permissionRoleNames.Any())
+    //            {
+    //                // Add as composites (this will make the role include these permission roles)
+    //                bool compositesAdded = await _keycloakRolesService.AddCompositeRolesAsync(role.Name, permissionRoleNames);
+    //                if (compositesAdded)
+    //                {
+    //                    logger.LogInformation("Added composite permissions to role '{RoleName}' in Keycloak.", role.Name);
+    //                }
+    //                else
+    //                {
+    //                    logger.LogWarning("Failed to add composite permissions to role '{RoleName}' in Keycloak.", role.Name);
+    //                }
+    //            }
+    //        }
+
+    //        if (updated)
+    //        {
+    //            await context.SaveChangesAsync();
+    //            logger.LogInformation("Updated KeycloakId for roles and permissions after sync.");
+    //        }
+
+    //        logger.LogInformation("Finished synchronization with Keycloak.");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        logger.LogError(ex, "Failed to synchronize with Keycloak");
+    //        // Don't rethrow - we want local seeding to succeed even if Keycloak sync fails
+    //    }
+    //}
 
 
     // Method to sync specific role to Keycloak

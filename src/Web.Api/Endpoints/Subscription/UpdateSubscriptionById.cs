@@ -1,5 +1,6 @@
 using System;
 using Application.Subscription.UpdateSchoolSubscription;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Subscription;
 
@@ -38,6 +39,6 @@ public class UpdateSubscriptionById : IEndpoint
         .WithTags(Tags.Subscription)
         .WithAudit("Subscription details was just updated for a school")
         .Produces<string>()
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("EditSchoolSubscriptionPackage"));
     }
 }

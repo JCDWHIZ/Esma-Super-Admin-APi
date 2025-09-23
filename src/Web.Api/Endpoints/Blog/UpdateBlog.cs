@@ -1,5 +1,6 @@
-using Application.BlogModule.EditBlogCommand;
 using Application.Abstractions.Messaging;
+using Application.BlogModule.EditBlogCommand;
+using Infrastructure.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Extensions;
@@ -34,6 +35,6 @@ internal sealed class UpdateBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Updated Blog")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("UpdateBlogs"));
     }
 }

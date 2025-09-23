@@ -1,5 +1,6 @@
-using Application.BlogModule.CreateBlogCommands.PublishBlog;
 using Application.Abstractions.Messaging;
+using Application.BlogModule.CreateBlogCommands.PublishBlog;
+using Infrastructure.Authorization;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -24,6 +25,6 @@ internal sealed class PublishBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Published Blog")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("PublishBlogs"));
     }
 }

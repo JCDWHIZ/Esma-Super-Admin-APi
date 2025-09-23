@@ -1,5 +1,6 @@
 ﻿
 using Application.Dashboard;
+using Infrastructure.Authorization;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Dashboard;
@@ -20,6 +21,6 @@ public class GetDashboardStats : IEndpoint
         })
         .WithTags(Tags.Dashboard)
         .Produces<DashboardStatsDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewDashboard"));
     }
 }

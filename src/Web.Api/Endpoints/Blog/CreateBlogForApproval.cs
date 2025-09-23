@@ -1,5 +1,6 @@
 using System;
 using Application.BlogModule.CreateBlogCommands.CreateBlogForApproval;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Blog;
 
@@ -18,6 +19,6 @@ internal sealed class CreateBlogForApproval : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .WithAudit("Submitted Blog for Approval")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("CreateBlogs"));
     }
 }

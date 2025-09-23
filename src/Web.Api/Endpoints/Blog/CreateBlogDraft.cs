@@ -1,6 +1,7 @@
 using System;
 using Application.BlogModule;
 using Application.BlogModule.CreateBlogCommands.CreateBlogDraft;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Blog;
 
@@ -27,7 +28,7 @@ internal sealed class CreateBlogDraft : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<BlogItemDto>(StatusCodes.Status200OK)
         .WithAudit("Create Blog Drafts")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("CreateBlogs"));
     }
 
     public sealed record Request(string Title, string Content, string BackdropUrl);

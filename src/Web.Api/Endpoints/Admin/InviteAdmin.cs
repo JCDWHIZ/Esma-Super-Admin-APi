@@ -1,6 +1,7 @@
 using System;
 using Application.Admin;
 using Application.Admin.InviteAdmin;
+using Infrastructure.Authorization;
 
 
 
@@ -29,7 +30,7 @@ internal sealed class InviteAdmin : IEndpoint
         .WithName("InviteAdmin")
         .WithTags(Tags.Admin)
         .Produces<UserDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewAdmins"));
     }
 
     public sealed class Request

@@ -1,5 +1,6 @@
 using System;
 using Application.School.SoftDeleteSchool;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.School;
 
@@ -21,6 +22,6 @@ public class SoftDeleteSchool : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Deleted School Temporary")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("DeleteSchool"));
     }
 }

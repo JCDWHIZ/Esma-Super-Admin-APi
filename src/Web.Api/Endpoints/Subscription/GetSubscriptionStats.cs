@@ -1,5 +1,6 @@
 using System;
 using Application.Subscription.GetSubscriptionStats;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Subscription;
 
@@ -19,6 +20,6 @@ internal sealed class GetSubscriptionStats : IEndpoint
         })
         .WithTags(Tags.Subscription)
         .Produces<SubscriptionStatsDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchoolSubscription"));
     }
 }

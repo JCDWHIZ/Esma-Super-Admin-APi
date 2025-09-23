@@ -1,5 +1,6 @@
 ﻿using Application.Dashboard;
 using Application.Templates.CreateTemplateCommand;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Templates;
 
@@ -31,6 +32,6 @@ internal sealed class CreateTemplateEndpoint : IEndpoint
         .WithTags(Tags.Templates)
         .WithAudit("A new template was created")
         .Produces<string>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("CreateEmailTemplates"));
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using Application.School;
 using Application.School.GetSchoolById;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.School;
 
@@ -21,6 +22,6 @@ public class GetSchoolById : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<SchoolItemDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
     }
 }

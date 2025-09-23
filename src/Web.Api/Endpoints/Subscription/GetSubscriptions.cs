@@ -2,6 +2,7 @@ using System;
 using Application;
 using Application.School.CreateSchool;
 using Application.Subscription.GetSubscriptionWithPagination;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Subscription;
 
@@ -37,6 +38,6 @@ public sealed class GetSubscriptions : IEndpoint
         })
         .WithTags(Tags.Subscription)
         .Produces<PaginatedList<SubscriptionDto>>()
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchoolSubscription"));
     }
 }

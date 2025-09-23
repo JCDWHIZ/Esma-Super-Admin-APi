@@ -1,5 +1,6 @@
-using Application.BlogModule.DeleteBlogCommand;
 using Application.Abstractions.Messaging;
+using Application.BlogModule.DeleteBlogCommand;
+using Infrastructure.Authorization;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -24,6 +25,6 @@ internal sealed class DeleteBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Deleted Blog")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("DeleteBlogs"));
     }
 }

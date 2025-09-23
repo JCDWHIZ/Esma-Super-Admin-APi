@@ -1,6 +1,7 @@
 using System;
 using Application.Dashboard;
 using Application.Roles.DeleteRole;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Roles;
 
@@ -19,7 +20,7 @@ internal sealed class DeleteRole : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
-            .RequireAuthorization()
+            .RequireAuthorization(new RequirePermissionAttribute("DeleteRole"))
             .WithAudit("A role was deleted")
             .Produces<string>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);

@@ -1,5 +1,6 @@
 using System;
 using Application.School.GetSchoolStats;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.School;
 
@@ -19,6 +20,6 @@ internal sealed class GetSchoolStats : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<SchoolStatsCountDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(); // Remove if stats should be public
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
     }
 }

@@ -1,10 +1,11 @@
-using Application.BlogModule.GetBlogById;
 using Application.Abstractions.Messaging;
+using Application.BlogModule;
+using Application.BlogModule.GetBlogById;
+using Infrastructure.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
-using Application.BlogModule;
 
 namespace Web.Api.Endpoints.Blog;
 
@@ -25,6 +26,6 @@ internal sealed class GetBlogById : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .Produces<BlogItemDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewBlogs"));
     }
 }

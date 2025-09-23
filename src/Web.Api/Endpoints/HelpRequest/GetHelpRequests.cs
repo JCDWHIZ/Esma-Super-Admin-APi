@@ -1,10 +1,11 @@
-using Application.HelpRequest.GetHelpRequestWithPagination;
+using Application;
 using Application.Abstractions.Messaging;
+using Application.HelpRequest;
+using Application.HelpRequest.GetHelpRequestWithPagination;
+using Infrastructure.Authorization;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
-using Application;
-using Application.HelpRequest;
 
 namespace Web.Api.Endpoints.HelpRequests;
 
@@ -36,6 +37,6 @@ internal sealed class GetPaginated : IEndpoint
         })
         .WithTags(Tags.HelpRequests)
         .Produces<PaginatedList<HelpRequestDto>>()
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewHelpRequests"));
     }
 }

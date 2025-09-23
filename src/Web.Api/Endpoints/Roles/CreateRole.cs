@@ -2,6 +2,7 @@ using System;
 using Application.Dashboard;
 using Application.Roles.CreateRole;
 using Domain.Users;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Roles;
 
@@ -24,7 +25,7 @@ internal sealed class CreateRole : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
-            .RequireAuthorization()
+            .RequireAuthorization(new RequirePermissionAttribute("CreateRole"))
             .WithAudit("A role was created")
             .Produces<RoleDto>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);

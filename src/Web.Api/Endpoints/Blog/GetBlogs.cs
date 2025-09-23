@@ -1,12 +1,13 @@
-using Application.BlogModule.GetBlogsWithPagination;
+using System.Globalization;
+using Application;
 using Application.Abstractions.Messaging;
+using Application.BlogModule;
+using Application.BlogModule.GetBlogsWithPagination;
+using Infrastructure.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
-using System.Globalization;
-using Application;
-using Application.BlogModule;
 
 namespace Web.Api.Endpoints.Blog;
 
@@ -44,6 +45,6 @@ internal sealed class GetBlogs : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .Produces<PaginatedList<BlogItemDto>>()
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewBlogs"));
     }
 }

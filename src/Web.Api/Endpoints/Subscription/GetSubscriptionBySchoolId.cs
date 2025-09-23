@@ -1,6 +1,7 @@
 using System;
 using Application.School.CreateSchool;
 using Application.Subscription.GetSubscriptionBySchoolId;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Subscription;
 
@@ -20,6 +21,6 @@ public class UpdateSubscriptionBySchoolId : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Subscription)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewSchoolSubscription"));
     }
 }

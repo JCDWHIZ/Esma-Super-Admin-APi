@@ -1,5 +1,6 @@
 using System;
 using Application.School.ApproveSchool;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.School;
 
@@ -22,6 +23,6 @@ internal sealed class ApproveSchool : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Approved School")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ApproveSchool"));
     }
 }

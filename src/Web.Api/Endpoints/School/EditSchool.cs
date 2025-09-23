@@ -1,6 +1,7 @@
 using System;
 using Application.School.CreateSchool;
 using Application.School.EditSchool;
+using Infrastructure.Authorization;
 using AddressDto = Application.School.EditSchool.AddressDto;
 using SubscriptionDto = Application.School.EditSchool.SubscriptionDto;
 
@@ -48,6 +49,6 @@ internal sealed class EditSchool : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Edited School")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("EditSchool"));
     }
 }

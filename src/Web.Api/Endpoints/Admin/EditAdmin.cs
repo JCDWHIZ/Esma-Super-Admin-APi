@@ -1,5 +1,6 @@
 ﻿using Application.Admin;
 using Application.Admin.EditAdmin;
+using Infrastructure.Authorization;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Admin;
@@ -42,6 +43,6 @@ internal sealed class EditAdminEndpoint : IEndpoint
         .WithTags(Tags.Admin)
         .Produces<UserDto>(StatusCodes.Status200OK)
         .WithAudit("An admin's details were edited")
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("EditAdmin"));
     }
 }

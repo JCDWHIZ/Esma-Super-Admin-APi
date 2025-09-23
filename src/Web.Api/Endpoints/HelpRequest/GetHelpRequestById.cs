@@ -1,9 +1,10 @@
-using Application.HelpRequest.GetHelpRequestById;
 using Application.Abstractions.Messaging;
+using Application.HelpRequest;
+using Application.HelpRequest.GetHelpRequestById;
+using Infrastructure.Authorization;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
-using Application.HelpRequest;
 
 namespace Web.Api.Endpoints.HelpRequest;
 
@@ -24,6 +25,6 @@ internal sealed class GetById : IEndpoint
         })
         .WithTags(Tags.HelpRequests)
         .Produces<HelpRequestDto>(StatusCodes.Status200OK)
-        .RequireAuthorization();
+        .RequireAuthorization(new RequirePermissionAttribute("ViewHelpRequests"));
     }
 }

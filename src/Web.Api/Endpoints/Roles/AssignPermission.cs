@@ -1,6 +1,7 @@
 using System;
 using Application.Dashboard;
 using Application.Roles.AssignPermissionToRole;
+using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Roles;
 
@@ -23,6 +24,6 @@ internal sealed class AssignPermission : IEndpoint
             .RequireAuthorization()
             .WithAudit("A permission was assigned to a role")
             .Produces<string>(StatusCodes.Status200OK)
-            .WithTags(Tags.Roles);
+            .RequireAuthorization(new RequirePermissionAttribute("AssignPermissions"));
     }
 }
