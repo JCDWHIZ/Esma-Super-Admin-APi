@@ -596,13 +596,13 @@ public class KeycloakService
 
 
 
-    public async Task AddUserToOrganizationAsync(string userId)
+    public async Task AddUserToOrganizationAsync(string userId, string? organizationId = null)
     {
         string token = await GetAdminAccessTokenAsync();
 
         await _keycloakApi.AddUserToOrganizationAsync(
             _configuration["Keycloak:Realm"]!,
-            _configuration["Keycloak:organizationId"]!,
+            organizationId ?? _configuration["Keycloak:organizationId"]!,
             userId,
             $"Bearer {token}"
         );

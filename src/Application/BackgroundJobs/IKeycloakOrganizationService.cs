@@ -6,6 +6,7 @@ using Application.Abstractions.Models;
 using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.School.CreateSchool;
+using Domain.Schools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
@@ -106,6 +107,47 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
     }
 
+    public async Task CreateSchoolAdmin(int userId, int schoolId, CancellationToken cancellationToken)
+    {
+
+        Domain.Schools.Schools? school = await _dbContext.Schools.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
+        if (school == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var inviteRequest = new InviteUserRequestDto
+            {
+                Username = school.User.Email,
+                Email = school.User.Email,
+                FirstName = school.User.FirstName,
+                LastName = school.User.LastName,
+                EmailVerified = true,
+                Enabled = true,
+                //Attributes = new()
+                //{
+                //    { "internal_user_id", new() { user.PublicId.ToString() } },
+                //    {"internal_user_role", new() { user.Role.ToString() } }
+                //},
+            };
+            string keycloakUserId = await _keycloakService.CreateUserAsync(inviteRequest);
+            await _keycloakService.AddUserToOrganizationAsync(keycloakUserId, school.OrganizationId);
+            //if (!Guid.TryParse(keycloakUserId, out Guid keycloakId))
+            //{
+            //    throw new InvalidOperationException("Returned Keycloak ID is not a valid GUID.");
+            //}
+
+            //user.KeycloakUserId = keycloakId;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
     public async Task EditAdmin(int userId, CancellationToken cancellationToken)
     {
         User? user = await _dbContext.Users.FindAsync([userId], cancellationToken: cancellationToken);
@@ -179,6 +221,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
             school.OrganizationId = organizationId;
             await _dbContext.SaveChangesAsync(cancellationToken);
+            await CreateSchoolAdmin(school.User.Id, schoolId, cancellationToken);
             //     var payload = new Dictionary<string, object>
             // {
             //     { "schoolId", school.Id },
