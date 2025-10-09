@@ -9,6 +9,7 @@ public class RolesDto
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public int UserCount { get; set; }
+    public bool IsDefault { get; set; }
     public int PermissionCount { get; set; }
 
     public List<GroupedPermissionDto> Permissions { get; set; } = new();

@@ -33,6 +33,7 @@ public class GetRolesWithPermissionQueryHandler(IApplicationDbContext context)
             PublicId = role.PublicId,
             Name = role.Name,
             Description = role.Description,
+            IsDefault = role.IsDefault,
             Permissions = role.Permissions
                 .GroupBy(p => p.Name.Split('_', StringSplitOptions.None)[0])
                 .Select(g => new GroupedPermissionDto
