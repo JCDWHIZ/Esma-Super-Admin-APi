@@ -1,14 +1,18 @@
+using System.Data;
 using System.Threading;
 using Application.Abstractions.Data;
 using Application.Interfaces.Services;
 using Domain.HelpRequests;
 using Domain.Roles;
+using Domain.Users;
 using iText.Commons.Actions.Contexts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
+using SharedKernel;
 using SharedKernel.Enums;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Infrastructure.Data;
 
@@ -22,6 +26,7 @@ public sealed class DataSeeder(
         {
             await SeedPermissions(cancellationToken);
             await SeedRoles(cancellationToken);
+            await SeedSuperadmin(cancellationToken);
             //await SyncToKeycloak();
             await SeedHelpRequests(cancellationToken);
         }
@@ -31,44 +36,73 @@ public sealed class DataSeeder(
         }
     }
 
+    private async Task SeedSuperadmin(CancellationToken cancellationToken)
+    {
+        if (await context.Users.AnyAsync(u => u.Email == "elsoftadmin@gmail.com", cancellationToken))
+        {
+            return;
+        }
+
+        Role? superadminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Super admin", cancellationToken);
+        if (superadminRole == null)
+        {
+            return;
+        }
+
+        var newUser = new User
+        {
+            Email = "elsoftadmin@gmail.com",
+            RoleId = superadminRole.Id, // Use the fetched or created role ID
+            Username = "elsoftadmin",
+            KeycloakUserId = new Guid("883bd72d-8be8-45e5-8cbe-36e6486ed6f4"),
+            FirstName = "elsoft",
+            LastName = "admin",
+            ProfilePic = "string",
+            PhoneNumber = null
+        };
+
+        context.Users.Add(newUser);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+
     private async Task SeedPermissions(CancellationToken cancellationToken)
     {
         var permissionsToSeed = new List<(string Name, string Description)>
         {
-            ("ViewDashboard", "Permission to view dashboard"),
-            ("CreateSchool", "Permission to create a school"),
-            ("ViewSchool", "Permission to view schools"),
-            ("ViewSchoolProfile", "Permission to view schools profile"),
-            ("DeleteSchool", "Permission to delete school"),
-            ("EditSchool", "Permission to edit school"),
-            ("ApproveSchool", "Permission to approve a school"),
-            ("ViewSchoolSubscription", "Permission to view schools subscription"),
-            ("EditSchoolSubscriptionPackage", "Permission to update schools subscription"),
-            ("ViewAdmins", "Permission to view admins"),
-            ("EditAdmin", "Permission to edit admin information"),
-            ("InviteAdmin", "Permission to invite an admin"),
-            ("DeleteAdmin", "Permission to delete an admin"),
-            ("PublishBlogs", "Permission to publish blogs"),
-            ("UpdateBlogs", "Permission to update blogs"),
-            ("ScheduleBlogs", "Permission to schedule blogs"),
-            ("ViewBlogs", "Permission to view blogs"),
-            ("RejectBlogs", "Permission to reject blogs"),
-            ("CreateBlogs", "Permission to create blogs"),
-            ("EditBlogs", "Permission to edit blogs"),
-            ("DeleteBlogs", "Permission to delete blogs"),
-            ("ViewHelpRequests", "Permission to view help requests"),
-            ("ResolveHelpRequests", "Permission to resolve help requests"),
-            ("ViewAuditLogs", "Permission to view audit logs"),
-            ("CreateRole", "Permission to create roles"),
-            ("ViewRoles", "Permission to view roles"),
-            ("AssignPermissions", "Permission to assign permissions"),
-            ("DeleteRole", "Permission to delete role"),
-            ("RemovePermissions", "Permission to remove permission from a role"),
-            ("Enable2FA", "Permission to enable Two Factor Authentication"),
-            ("CreateEmailTemplates", "Permission to create Email Template"),
-            ("ViewEmailTemplates", "Permission to view Email Template"),
-            ("EditEmailTemplates", "Permission to edit Email Template"),
-            ("DeleteEmailTemplates", "Permission to Delete Email Template"),
+            ("dashboard_view", "Permission to view dashboard"),
+            ("school_create", "Permission to create a school"),
+            ("school_view", "Permission to view schools"),
+            ("school_delete", "Permission to delete school"),
+            ("school_edit", "Permission to edit school"),
+            ("school_approve", "Permission to approve a school"),
+            ("school_subscription_view", "Permission to view schools subscription"),
+            ("school_subscription_edit", "Permission to update schools subscription"),
+            ("admin_view", "Permission to view admins"),
+            ("admin_edit", "Permission to edit admin information"),
+            ("admin_invite", "Permission to invite an admin"),
+            ("admin_delete", "Permission to delete an admin"),
+            ("blog_publish", "Permission to publish blogs"),
+            ("blog_update", "Permission to update blogs"),
+            ("blog_schedule", "Permission to schedule blogs"),
+            ("blog_view", "Permission to view blogs"),
+            ("blog_reject", "Permission to reject blogs"),
+            ("blog_create", "Permission to create blogs"),
+            ("blog_edit", "Permission to edit blogs"),
+            ("blog_delete", "Permission to delete blogs"),
+            ("help_request_view", "Permission to view help requests"),
+            ("help_request_resolve", "Permission to resolve help requests"),
+            ("audit_log_view", "Permission to view audit logs"),
+            ("role_create", "Permission to create roles"),
+            ("role_view", "Permission to view roles"),
+            ("role_assign_permissions", "Permission to assign permissions"),
+            ("role_delete", "Permission to delete role"),
+            ("role_remove_permissions", "Permission to remove permission from a role"),
+            ("auth_enable_2fa", "Permission to enable Two Factor Authentication"),
+            ("email_template_create", "Permission to create Email Template"),
+            ("email_template_view", "Permission to view Email Template"),
+            ("email_template_edit", "Permission to edit Email Template"),
+            ("email_template_delete", "Permission to Delete Email Template"),
         };
 
         List<string> existingPermissions = await context.Permissions
@@ -97,94 +131,95 @@ public sealed class DataSeeder(
 
         // Define roles and their permissions (unchanged)
         var rolesToSeed = new Dictionary<string, (string Description, List<string> PermissionNames)>
-    {
         {
-            "Super admin",
-            ("System administrator with full access", new List<string>
             {
-                "ViewDashboard","CreateSchool", "ViewSchool", "ViewSchoolProfile", "DeleteSchool", "EditSchool",
-                "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
-                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                "ApproveBlogs", "ViewBlogs", "CreateBlogs", "EditBlogs", "DeleteBlogs", "PublishBlogs", "RejectBlogs", "UpdateBlogs", "ScheduleBlogs",
-                "ViewHelpRequests", "ResolveHelpRequests",
-                "ViewAuditLogs",
-                "CreateRole", "AssignPermissions", "DeleteRole", "ViewRoles", "RemovePermissions",
-                "Enable2FA",
-                "CreateEmailTemplates", "EditEmailTemplates", "DeleteEmailTemplates", "ViewEmailTemplates"
-            })
-        },
-        {
-            "System Admin",
-            ("System Admin with limited administrative access", new List<string>
+                "Super admin",
+                ("System administrator with full access", new List<string>
+                {
+                    "dashboard_view",
+                    "school_create", "school_view", "school_view_profile", "school_delete", "school_edit",
+                    "school_approve", "school_subscription_view", "school_subscription_edit",
+                    "admin_view", "admin_edit", "admin_invite", "admin_delete",
+                    "blog_approve", "blog_view", "blog_create", "blog_edit", "blog_delete", "blog_publish", "blog_reject", "blog_update", "blog_schedule",
+                    "help_request_view", "help_request_resolve",
+                    "audit_log_view",
+                    "role_create", "role_assign_permissions", "role_delete", "role_view", "role_remove_permissions",
+                    "auth_enable_2fa",
+                    "email_template_create", "email_template_edit", "email_template_delete", "email_template_view"
+                })
+            },
             {
-                "ViewDashboard",
-                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                "ViewAuditLogs",
-                "Enable2FA",
-            })
-        },
-        {
-            "Business Administrator",
-            ("Business Admin", new List<string>
+                "System Admin",
+                ("System Admin with limited administrative access", new List<string>
+                {
+                    "dashboard_view",
+                    "admin_view", "admin_edit", "admin_invite", "admin_delete",
+                    "audit_log_view",
+                    "auth_enable_2fa",
+                })
+            },
             {
-                "ViewDashboard",
-                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                "ViewAuditLogs",
-                "Enable2FA",
-                "ApproveSchool", "ViewSchoolSubscription", "EditSchoolSubscriptionPackage",
-            })
-        },
-        {
-            "User and Role Manager",
-            ("User and Role Manager ", new List<string>
+                "Business Administrator",
+                ("Business Admin", new List<string>
+                {
+                    "dashboard_view",
+                    "admin_view", "admin_edit", "admin_invite", "admin_delete",
+                    "audit_log_view",
+                    "auth_enable_2fa",
+                    "school_approve", "school_subscription_view", "school_subscription_edit",
+                })
+            },
             {
-                "ViewDashboard",
-                "ViewAdmins", "EditAdmin", "InviteAdmin", "DeleteAdmin",
-                "ViewAuditLogs",
-                "Enable2FA",
-                "CreateRole", "AssignPermissions",
-            })
-        },
-        {
-            "Security Officer",
-            ("Security Officer", new List<string>
+                "User and Role Manager",
+                ("User and Role Manager ", new List<string>
+                {
+                    "dashboard_view",
+                    "admin_view", "admin_edit", "admin_invite", "admin_delete",
+                    "audit_log_view",
+                    "auth_enable_2fa",
+                    "role_create", "role_assign_permissions",
+                })
+            },
             {
-                "ViewDashboard",
-                "ViewAuditLogs",
-                "Enable2FA",
-                "CreateRole", "AssignPermissions",
-            })
-        },
-        {
-            "Content and Media Manager",
-            ("Content and Media Manager", new List<string>
+                "Security Officer",
+                ("Security Officer", new List<string>
+                {
+                    "dashboard_view",
+                    "audit_log_view",
+                    "auth_enable_2fa",
+                    "role_create", "role_assign_permissions",
+                })
+            },
             {
-                "ViewDashboard",
-                "Enable2FA",
-                "ApproveBlogs", "ViewBlogs", "CreateBlogs", "EditBlogs",
-                "CreateRole", "AssignPermissions",
-            })
-        },
-        {
-            "Support Manager",
-            ("Support Manager", new List<string>
+                "Content and Media Manager",
+                ("Content and Media Manager", new List<string>
+                {
+                    "dashboard_view",
+                    "auth_enable_2fa",
+                    "blog_approve", "blog_view", "blog_create", "blog_edit",
+                    "role_create", "role_assign_permissions",
+                })
+            },
             {
-                "ViewDashboard",
-                "ViewHelpRequests", "ResolveHelpRequests",
-                "Enable2FA",
-            })
-        },
-        {
-            "Reports Manager",
-            ("Reports Manager", new List<string>
+                "Support Manager",
+                ("Support Manager", new List<string>
+                {
+                    "dashboard_view",
+                    "help_request_view", "help_request_resolve",
+                    "auth_enable_2fa",
+                })
+            },
             {
-                "ViewDashboard",
-                "ViewAuditLogs",
-                "ViewHelpRequests", "ResolveHelpRequests",
-                "Enable2FA",
-            })
-        },
-    };
+                "Reports Manager",
+                ("Reports Manager", new List<string>
+                {
+                    "dashboard_view",
+                    "audit_log_view",
+                    "help_request_view", "help_request_resolve",
+                    "auth_enable_2fa",
+                })
+            },
+        };
 
         bool changesMade = false;
 
@@ -198,7 +233,7 @@ public sealed class DataSeeder(
             if (role == null)
             {
                 // Create new role
-                role = Role.Create(roleName, description);
+                role = Role.Create(roleName, description, true);
                 context.Roles.Add(role);
                 logger.LogInformation("Creating new role '{RoleName}'", roleName);
                 changesMade = true;

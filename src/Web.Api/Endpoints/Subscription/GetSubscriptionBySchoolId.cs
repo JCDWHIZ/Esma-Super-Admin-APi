@@ -21,6 +21,6 @@ public class UpdateSubscriptionBySchoolId : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Subscription)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchoolSubscription"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_subscription_view"));
     }
 }

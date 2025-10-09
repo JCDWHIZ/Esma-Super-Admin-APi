@@ -35,6 +35,6 @@ internal sealed class UpdateTemplateEndpoint : IEndpoint
         .WithTags(Tags.Templates)
         .WithAudit("A template was updated")
         .Produces<string>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("EditEmailTemplates"));
+        .RequireAuthorization(new RequirePermissionAttribute("email_template_edit"));
     }
 }

@@ -20,7 +20,7 @@ internal sealed class DeleteRole : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
-            .RequireAuthorization(new RequirePermissionAttribute("DeleteRole"))
+            .RequireAuthorization(new RequirePermissionAttribute("role_delete"))
             .WithAudit("A role was deleted")
             .Produces<string>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);

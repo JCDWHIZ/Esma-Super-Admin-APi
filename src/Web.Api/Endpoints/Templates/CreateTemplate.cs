@@ -32,6 +32,6 @@ internal sealed class CreateTemplateEndpoint : IEndpoint
         .WithTags(Tags.Templates)
         .WithAudit("A new template was created")
         .Produces<string>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("CreateEmailTemplates"));
+        .RequireAuthorization(new RequirePermissionAttribute("email_template_create"));
     }
 }

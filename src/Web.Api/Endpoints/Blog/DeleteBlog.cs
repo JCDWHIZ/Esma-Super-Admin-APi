@@ -25,6 +25,6 @@ internal sealed class DeleteBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Deleted Blog")
-        .RequireAuthorization(new RequirePermissionAttribute("DeleteBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_delete"));
     }
 }

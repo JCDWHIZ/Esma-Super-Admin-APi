@@ -19,6 +19,6 @@ public class ScheduleBlog : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .WithAudit("Scheduled Blog")
-        .RequireAuthorization(new RequirePermissionAttribute("ScheduleBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_schedule"));
     }
 }

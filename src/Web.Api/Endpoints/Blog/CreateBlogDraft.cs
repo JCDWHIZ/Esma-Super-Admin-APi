@@ -28,7 +28,7 @@ internal sealed class CreateBlogDraft : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<BlogItemDto>(StatusCodes.Status200OK)
         .WithAudit("Create Blog Drafts")
-        .RequireAuthorization(new RequirePermissionAttribute("CreateBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_create"));
     }
 
     public sealed record Request(string Title, string Content, string BackdropUrl);

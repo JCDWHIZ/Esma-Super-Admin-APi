@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Roles;
+using SharedKernel;
 using SharedKernel.Enums;
 using SharedKernel.Models;
 
@@ -12,7 +13,8 @@ public sealed class User : BaseAuditableEntity
     public Guid KeycloakUserId { get; set; }
     public string? PasswordHash { get; set; }
     public string? ProfilePic { get; set; }
-    public SharedKernel.Enums.Roles Role { get; set; }
     public string Username { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; } = string.Empty;
+    public Role Role { get; set; }
+    public int RoleId { get; set; }
 }

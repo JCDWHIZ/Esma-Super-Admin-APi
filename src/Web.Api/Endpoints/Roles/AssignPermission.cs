@@ -24,6 +24,6 @@ internal sealed class AssignPermission : IEndpoint
             .RequireAuthorization()
             .WithAudit("A permission was assigned to a role")
             .Produces<string>(StatusCodes.Status200OK)
-            .RequireAuthorization(new RequirePermissionAttribute("AssignPermissions"));
+            .RequireAuthorization(new RequirePermissionAttribute("role_assign_permissions"));
     }
 }

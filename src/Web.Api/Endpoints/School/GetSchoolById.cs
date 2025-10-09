@@ -22,6 +22,6 @@ public class GetSchoolById : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<SchoolItemDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_view"));
     }
 }

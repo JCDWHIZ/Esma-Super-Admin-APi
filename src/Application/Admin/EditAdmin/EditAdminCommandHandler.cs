@@ -13,6 +13,7 @@ public sealed class EditAdminCommandHandler(IApplicationDbContext _context) : IC
     public async Task<Result<UserDto>> Handle(EditAdminCommand command, CancellationToken cancellationToken)
     {
         User? user = await _context.Users
+          .Include(u => u.Role) // Include Role to access its properties
           .FirstOrDefaultAsync(u => u.PublicId == command.PublicId, cancellationToken);
 
         if (user is null)
@@ -25,22 +26,27 @@ public sealed class EditAdminCommandHandler(IApplicationDbContext _context) : IC
         user.Email = command.Email ?? user.Email;
         user.PhoneNumber = command.PhoneNumber ?? user.PhoneNumber;
         user.ProfilePic = command.ProfilePic ?? user.ProfilePic;
-        user.Role = command.Role;
+
+        Domain.Roles.Role? role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == command.RoleName, cancellationToken);
+        if (role != null)
+        {
+            user.RoleId = role.Id; // Update RoleId if a new role is provided
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
         BackgroundJob.Enqueue<IKeycloakOrganizationService>(
-        service => service.EditAdmin(user.Id, cancellationToken));
+            service => service.EditAdmin(user.Id, cancellationToken));
 
         return new UserDto
         {
             PublicId = user.PublicId,
             Email = user.Email,
-            Role = user.Role,
             Username = user.Username,
             FirstName = user.FirstName,
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber,
             ProfilePic = user.ProfilePic,
+            RoleName = user.Role?.Name, // Use Role.Name from navigation property
             CreatedAt = user.Created,
             CreatedBy = user.CreatedBy
         };

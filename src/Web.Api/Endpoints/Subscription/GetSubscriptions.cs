@@ -38,6 +38,6 @@ public sealed class GetSubscriptions : IEndpoint
         })
         .WithTags(Tags.Subscription)
         .Produces<PaginatedList<SubscriptionDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchoolSubscription"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_subscription_view"));
     }
 }

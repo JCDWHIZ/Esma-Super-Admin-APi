@@ -20,6 +20,6 @@ internal sealed class GetSchoolStats : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<SchoolStatsCountDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_view"));
     }
 }

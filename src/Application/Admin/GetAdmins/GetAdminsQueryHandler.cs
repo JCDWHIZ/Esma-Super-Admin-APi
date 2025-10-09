@@ -9,15 +9,17 @@ public class GetAdminsQueryHandler(IApplicationDbContext _context) : IQueryHandl
 {
     public async Task<Result<PaginatedList<UserDto>>> Handle(GetAdminsQuery query, CancellationToken cancellationToken)
     {
-        IQueryable<User> userQuery = _context.Users.AsQueryable();
+        IQueryable<User> userQuery = _context.Users
+            .Include(u => u.Role) // Include Role to access Role.Name
+            .AsQueryable();
 
         if (!string.IsNullOrEmpty(query.Username))
         {
             userQuery = userQuery.Where(x => x.Username.Contains(query.Username));
         }
-        if (query.Role.HasValue)
+        if (!string.IsNullOrEmpty(query.RoleName)) // Changed from Role enum to RoleName string
         {
-            userQuery = userQuery.Where(x => x.Role == query.Role.Value);
+            userQuery = userQuery.Where(x => x.Role.Name == query.RoleName);
         }
 
         PaginatedList<UserDto> pagedAdmins = await PaginatedList<UserDto>.CreateAsync(
@@ -25,12 +27,12 @@ public class GetAdminsQueryHandler(IApplicationDbContext _context) : IQueryHandl
             {
                 PublicId = r.PublicId,
                 Email = r.Email,
-                Role = r.Role,
                 Username = r.Username,
                 FirstName = r.FirstName,
                 LastName = r.LastName,
                 PhoneNumber = r.PhoneNumber,
                 ProfilePic = r.ProfilePic,
+                RoleName = r.Role!.Name,
                 CreatedAt = r.Created,
                 CreatedBy = r.CreatedBy
             }),

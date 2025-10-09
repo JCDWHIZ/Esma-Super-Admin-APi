@@ -30,6 +30,6 @@ internal sealed class UpdateStatus : IEndpoint
         })
         .WithTags(Tags.HelpRequests)
         .Produces<HelpRequestDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ResolveHelpRequests"));
+        .RequireAuthorization(new RequirePermissionAttribute("help_request_resolve"));
     }
 }

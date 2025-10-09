@@ -26,6 +26,6 @@ internal sealed class GetBlogById : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .Produces<BlogItemDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_view"));
     }
 }

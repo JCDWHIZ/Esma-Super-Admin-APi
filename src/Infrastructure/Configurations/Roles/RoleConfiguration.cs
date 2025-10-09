@@ -35,5 +35,10 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
                     j.ToTable("RolePermissions");
                     j.HasKey("RoleId", "PermissionId");
                 });
+
+        builder.HasMany(r => r.Users)
+            .WithOne(u => u.Role)
+            .HasForeignKey(u => u.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

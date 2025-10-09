@@ -13,5 +13,5 @@ public sealed record EditAdminCommand : ICommand<UserDto>
     public string? ProfilePic { get; set; }
     public string? PhoneNumber { get; set; }
     public string LastName { get; set; }
-    public SharedKernel.Enums.Roles Role { get; set; }
+    public string RoleName { get; set; }
 }

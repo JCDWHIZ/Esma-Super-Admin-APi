@@ -15,5 +15,11 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired(false);
 
         builder.HasIndex(u => u.Email).IsUnique();
+
+        builder.HasOne(u => u.Role)
+            .WithMany(r => r.Users) // One Role can have many Users
+            .HasForeignKey(u => u.RoleId)
+            .IsRequired() // User must have a Role
+            .OnDelete(DeleteBehavior.Restrict); // Prevent deletion of role if users exist
     }
 }

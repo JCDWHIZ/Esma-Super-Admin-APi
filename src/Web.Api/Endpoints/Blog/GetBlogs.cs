@@ -45,6 +45,6 @@ internal sealed class GetBlogs : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .Produces<PaginatedList<BlogItemDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_view"));
     }
 }

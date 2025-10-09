@@ -14,6 +14,11 @@ public class DeleteRoleCommandHandler(IApplicationDbContext context) : ICommandH
             return Result.Failure<string>(RoleErrors.NotFound(command.PublicId));
         }
 
+        if(entity.IsDefault)
+        {
+            return Result.Failure<string>(RoleErrors.CannotDeleteDefault());
+        }
+
         context.Roles.Remove(entity);
 
         await context.SaveChangesAsync(cancellationToken);

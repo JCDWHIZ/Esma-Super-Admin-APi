@@ -9,6 +9,7 @@ using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Domain.Users;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
+using Domain.Roles;
 
 
 // add softdelete and restore for admin endpoint
@@ -24,10 +25,17 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
         {
             return Result.Failure<UserDto>(UserErrors.AlreadyExists());
         }
+
+        Domain.Roles.Role? role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == command.RoleName, cancellationToken);
+        if (role == null)
+        {
+            return Result.Failure<UserDto>(RoleErrors.NotFound());
+        }
+
         var newUser = new User
         {
             Email = command.Email,
-            Role = command.Role,
+            RoleId = role.Id, // Assign RoleId instead of Role enum
             Username = command.Email,
             FirstName = command.FirstName,
             LastName = command.LastName,
@@ -39,20 +47,17 @@ public sealed class InviteAdminCommandHandler(IApplicationDbContext _context) : 
         await _context.SaveChangesAsync(cancellationToken);
 
         BackgroundJob.Enqueue<IKeycloakOrganizationService>(
-        service => service.CreateAdmin(newUser.Id, cancellationToken));
+            service => service.CreateAdmin(newUser.Id, cancellationToken));
 
         return new UserDto
         {
             PublicId = newUser.PublicId,
             Email = newUser.Email,
-            Role = newUser.Role,
             Username = newUser.Username,
             FirstName = newUser.FirstName,
             LastName = newUser.LastName,
             PhoneNumber = newUser.PhoneNumber,
-            ProfilePic = newUser.ProfilePic,
-            CreatedAt = newUser.Created,
-            CreatedBy = newUser.CreatedBy
+            ProfilePic = newUser.ProfilePic
         };
     }
 }

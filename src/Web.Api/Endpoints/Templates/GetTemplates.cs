@@ -32,6 +32,6 @@ internal sealed class GetTemplatesWithPaginationEndpoint : IEndpoint
         })
         .WithTags(Tags.Templates)
         .Produces<PaginatedList<TemplateDto>>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewEmailTemplates"));
+        .RequireAuthorization(new RequirePermissionAttribute("email_template_view"));
     }
 }

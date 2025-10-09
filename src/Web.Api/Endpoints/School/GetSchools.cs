@@ -50,6 +50,6 @@ internal sealed class GetSchools : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<PaginatedList<SchoolItemDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_view"));
     }
 }

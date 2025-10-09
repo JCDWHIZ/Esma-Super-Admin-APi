@@ -27,6 +27,6 @@ internal sealed class RejectBlogEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Blogs)
-        .RequireAuthorization(new RequirePermissionAttribute("RejectBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_reject"));
     }
 }

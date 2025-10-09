@@ -20,6 +20,6 @@ internal sealed class GetSchoolDashboard : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<List<YearlyOverviewDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_view"));
     }
 }

@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250811155629_addedRolesandPermissions")]
-    partial class addedRolesandPermissions
+    [Migration("20251009055745_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -134,6 +134,11 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("publish_date");
 
+                    b.Property<string>("RejectReason")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("reject_reason");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text")
@@ -202,6 +207,18 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("title");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("user_name");
+
+                    b.Property<string>("UserProfilePic")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("user_profile_pic");
+
                     b.HasKey("Id")
                         .HasName("pk_help_request_messages");
 
@@ -252,15 +269,37 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("public_id");
 
+                    b.Property<string>("SchoolId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("school_id");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("status");
 
+                    b.Property<string>("TenantHelpRequestId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tenant_help_request_id");
+
                     b.Property<string>("TicketId")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("ticket_id");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("user_name");
+
+                    b.Property<string>("UserProfilePic")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("user_profile_pic");
 
                     b.HasKey("Id")
                         .HasName("pk_help_requests");
@@ -354,6 +393,10 @@ namespace Infrastructure.Database.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("description");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_default");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -559,6 +602,72 @@ namespace Infrastructure.Database.Migrations
                         .HasDatabaseName("ix_subscriptions_school_id");
 
                     b.ToTable("subscriptions", "public");
+                });
+
+            modelBuilder.Entity("Domain.Templates.Template", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_id");
+
+                    b.Property<string>("TemplateBody")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("template_body");
+
+                    b.Property<string>("TemplateName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("template_name");
+
+                    b.Property<int>("TemplateTrigger")
+                        .HasColumnType("integer")
+                        .HasColumnName("template_trigger");
+
+                    b.HasKey("Id")
+                        .HasName("pk_templates");
+
+                    b.HasIndex("TemplateName")
+                        .IsUnique()
+                        .HasDatabaseName("ix_templates_template_name");
+
+                    b.HasIndex("TemplateTrigger")
+                        .IsUnique()
+                        .HasDatabaseName("ix_templates_template_trigger");
+
+                    b.ToTable("templates", "public");
                 });
 
             modelBuilder.Entity("Domain.Todos.TodoItem", b =>
@@ -771,9 +880,9 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("public_id");
 
-                    b.Property<int>("Role")
+                    b.Property<int>("RoleId")
                         .HasColumnType("integer")
-                        .HasColumnName("role");
+                        .HasColumnName("role_id");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -786,6 +895,9 @@ namespace Infrastructure.Database.Migrations
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("ix_users_email");
+
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("ix_users_role_id");
 
                     b.ToTable("users", "public");
                 });
@@ -893,6 +1005,18 @@ namespace Infrastructure.Database.Migrations
                         .HasConstraintName("fk_todo_items_users_user_id");
                 });
 
+            modelBuilder.Entity("Domain.Users.User", b =>
+                {
+                    b.HasOne("Domain.Roles.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_users_roles_role_id");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("RolePermissions", b =>
                 {
                     b.HasOne("Domain.Roles.Permission", null)
@@ -913,6 +1037,11 @@ namespace Infrastructure.Database.Migrations
             modelBuilder.Entity("Domain.HelpRequests.HelpRequests", b =>
                 {
                     b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Domain.Roles.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Domain.Schools.Schools", b =>

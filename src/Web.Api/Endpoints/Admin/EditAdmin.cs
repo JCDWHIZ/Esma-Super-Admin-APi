@@ -14,7 +14,7 @@ internal sealed class EditAdminEndpoint : IEndpoint
         public string? ProfilePic { get; init; }
         public string? PhoneNumber { get; init; }
         public string LastName { get; init; }
-        public SharedKernel.Enums.Roles Role { get; init; }
+        public string Role { get; init; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -33,7 +33,7 @@ internal sealed class EditAdminEndpoint : IEndpoint
                 ProfilePic = request.ProfilePic,
                 PhoneNumber = request.PhoneNumber,
                 LastName = request.LastName,
-                Role = request.Role
+                RoleName = request.Role
             };
 
             Result<UserDto> result = await handler.Handle(command, cancellationToken);
@@ -43,6 +43,6 @@ internal sealed class EditAdminEndpoint : IEndpoint
         .WithTags(Tags.Admin)
         .Produces<UserDto>(StatusCodes.Status200OK)
         .WithAudit("An admin's details were edited")
-        .RequireAuthorization(new RequirePermissionAttribute("EditAdmin"));
+        .RequireAuthorization(new RequirePermissionAttribute("admin_edit"));
     }
 }

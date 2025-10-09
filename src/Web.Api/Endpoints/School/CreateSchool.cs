@@ -61,7 +61,7 @@ internal sealed class CreateSchool : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status201Created)
         .WithAudit("Created School")
-        .RequireAuthorization(new RequirePermissionAttribute("CreateSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_create"));
     }
 
     public sealed class Request()

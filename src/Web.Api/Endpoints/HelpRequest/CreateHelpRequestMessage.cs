@@ -31,7 +31,7 @@ internal sealed class CreateHelpRequestMessage : IEndpoint
         })
         .WithTags(Tags.HelpRequests)
         .Produces<HelpRequestMessageDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ResolveHelpRequests"));
+        .RequireAuthorization(new RequirePermissionAttribute("help_request_resolve"));
     }
 }
 

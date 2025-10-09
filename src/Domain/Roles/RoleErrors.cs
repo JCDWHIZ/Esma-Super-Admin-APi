@@ -11,6 +11,18 @@ public static class RoleErrors
             "Role.NotFound",
             $"The Role with the ID {id} was not found");
     }
+    public static Error NotFound()
+    {
+        return Error.NotFound(
+            "Role.NotFound",
+            $"The Role was not found");
+    }
+    public static Error CannotDeleteDefault()
+    {
+        return Error.Failure(
+            "Role.CannotDeleteDefault",
+            $"This role can not be deleted");
+    }
 
     public static Error AlreadyExists()
     {

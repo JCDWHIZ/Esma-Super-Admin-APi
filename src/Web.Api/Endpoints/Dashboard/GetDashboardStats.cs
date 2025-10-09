@@ -21,6 +21,6 @@ public class GetDashboardStats : IEndpoint
         })
         .WithTags(Tags.Dashboard)
         .Produces<DashboardStatsDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewDashboard"));
+        .RequireAuthorization(new RequirePermissionAttribute("dashboard_view"));
     }
 }

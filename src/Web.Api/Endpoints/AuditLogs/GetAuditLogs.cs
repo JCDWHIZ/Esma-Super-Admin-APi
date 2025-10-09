@@ -36,6 +36,6 @@ internal sealed class GetAuditLogs : IEndpoint
         })
         .WithTags(Tags.AuditLogs)
         .Produces<PaginatedList<AuditLogDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewAuditLogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("audit_log_view"));
     }
 }

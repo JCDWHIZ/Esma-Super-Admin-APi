@@ -25,6 +25,6 @@ internal sealed class PublishBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Published Blog")
-        .RequireAuthorization(new RequirePermissionAttribute("PublishBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_publish"));
     }
 }

@@ -22,6 +22,6 @@ internal sealed class DeleteTemplateEndpoint : IEndpoint
         .WithTags(Tags.Templates)
         .WithAudit("A template was deleted")
         .Produces<string>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("DeleteEmailTemplates"));
+        .RequireAuthorization(new RequirePermissionAttribute("email_template_delete"));
     }
 }

@@ -21,7 +21,7 @@ internal sealed class RemovePermission : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
-            .RequireAuthorization(new RequirePermissionAttribute("RemovePermissions"))
+            .RequireAuthorization(new RequirePermissionAttribute("role_remove_permissions"))
             .WithAudit("A permssion was removed from a role")
             .Produces<string>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);

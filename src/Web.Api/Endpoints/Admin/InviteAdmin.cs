@@ -18,7 +18,7 @@ internal sealed class InviteAdmin : IEndpoint
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Role = request.Role,
+                RoleName = request.RoleName,
                 ProfilePic = request.ProfilePic,
                 PhoneNumber = request.PhoneNumber
             };
@@ -30,7 +30,7 @@ internal sealed class InviteAdmin : IEndpoint
         .WithName("InviteAdmin")
         .WithTags(Tags.Admin)
         .Produces<UserDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewAdmins"));
+        .RequireAuthorization(new RequirePermissionAttribute("admin_invite"));
     }
 
     public sealed class Request
@@ -40,7 +40,7 @@ internal sealed class InviteAdmin : IEndpoint
         public string? ProfilePic { get; set; }
         public string? PhoneNumber { get; set; }
         public string LastName { get; set; }
-        public SharedKernel.Enums.Roles Role { get; set; }
+        public string RoleName { get; set; }
     }
 
 }

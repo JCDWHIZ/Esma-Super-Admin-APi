@@ -22,6 +22,6 @@ public class SoftDeleteSchool : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Deleted School Temporary")
-        .RequireAuthorization(new RequirePermissionAttribute("DeleteSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_delete"));
     }
 }

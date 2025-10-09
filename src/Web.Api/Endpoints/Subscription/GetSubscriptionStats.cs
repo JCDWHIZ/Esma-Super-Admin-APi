@@ -20,6 +20,6 @@ internal sealed class GetSubscriptionStats : IEndpoint
         })
         .WithTags(Tags.Subscription)
         .Produces<SubscriptionStatsDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchoolSubscription"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_subscription_view"));
     }
 }

@@ -21,6 +21,6 @@ internal sealed class DeleteAdminEndpoint : IEndpoint
         .WithTags(Tags.Admin)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("An admin was deleted")
-        .RequireAuthorization(new RequirePermissionAttribute("DeleteAdmin"));
+        .RequireAuthorization(new RequirePermissionAttribute("admin_delete"));
     }
 }

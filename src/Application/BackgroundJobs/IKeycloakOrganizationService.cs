@@ -7,8 +7,10 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.School.CreateSchool;
 using Domain.Schools;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 namespace Application.BackgroundJobs;
@@ -44,7 +46,9 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     public async Task CreateAdmin(int userId, CancellationToken cancellationToken)
     {
 
-        User? user = await _dbContext.Users.FindAsync([userId], cancellationToken: cancellationToken);
+        User? user = await _dbContext.Users
+          .Include(u => u.Role) // Include Role to access its properties
+          .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
         if (user == null)
         {
             return;
@@ -63,7 +67,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 Attributes = new()
                 {
                     { "internal_user_id", new() { user.PublicId.ToString() } },
-                    {"internal_user_role", new() { user.Role.ToString() } }
+                    {"internal_user_role", new() { user.Role.Name } }
                 },
                 RequiredActions = new List<string>
                 {
@@ -150,7 +154,9 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
 
     public async Task EditAdmin(int userId, CancellationToken cancellationToken)
     {
-        User? user = await _dbContext.Users.FindAsync([userId], cancellationToken: cancellationToken);
+        User? user = await _dbContext.Users
+          .Include(u => u.Role)
+          .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
         if (user == null || user.KeycloakUserId == Guid.Empty)
         {
             return;
@@ -166,7 +172,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             Attributes = new()
             {
                 { "internal_user_id", new() { user.PublicId.ToString() } },
-                { "internal_user_role", new() { user.Role.ToString() } }
+                { "internal_user_role", new() { user.Role.Name } }
             }
         };
 

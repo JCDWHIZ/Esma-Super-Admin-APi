@@ -19,6 +19,6 @@ internal sealed class CreateBlogForApproval : IEndpoint
         })
         .WithTags(Tags.Blogs)
         .WithAudit("Submitted Blog for Approval")
-        .RequireAuthorization(new RequirePermissionAttribute("CreateBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_create"));
     }
 }

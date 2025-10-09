@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,6 +48,7 @@ namespace Infrastructure.Database.Migrations
                     title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     content = table.Column<string>(type: "text", nullable: false),
                     backdrop_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    reject_reason = table.Column<string>(type: "text", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false),
                     publish_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     public_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -73,6 +74,10 @@ namespace Infrastructure.Database.Migrations
                     ticket_id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     status = table.Column<string>(type: "text", nullable: false),
                     category = table.Column<string>(type: "text", nullable: true),
+                    user_profile_pic = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    user_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    tenant_help_request_id = table.Column<string>(type: "text", nullable: false),
+                    school_id = table.Column<string>(type: "text", nullable: false),
                     public_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -84,6 +89,53 @@ namespace Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_help_requests", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Permissions",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    keycloak_id = table.Column<string>(type: "text", nullable: false),
+                    public_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    last_modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_permissions", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    keycloak_id = table.Column<string>(type: "text", nullable: false),
+                    is_default = table.Column<bool>(type: "boolean", nullable: false),
+                    public_id = table.Column<Guid>(type: "uuid", maxLength: 100, nullable: false),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    last_modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_roles", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,19 +159,15 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "users",
+                name: "templates",
                 schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    email = table.Column<string>(type: "text", nullable: false),
-                    first_name = table.Column<string>(type: "text", nullable: false),
-                    last_name = table.Column<string>(type: "text", nullable: false),
-                    password_hash = table.Column<string>(type: "text", nullable: false),
-                    role = table.Column<int>(type: "integer", nullable: false),
-                    username = table.Column<string>(type: "text", nullable: false),
-                    phone_number = table.Column<string>(type: "text", nullable: true),
+                    template_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    template_body = table.Column<string>(type: "text", nullable: false),
+                    template_trigger = table.Column<int>(type: "integer", nullable: false),
                     public_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -130,7 +178,7 @@ namespace Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_users", x => x.id);
+                    table.PrimaryKey("pk_templates", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -142,6 +190,8 @@ namespace Infrastructure.Database.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     attachments = table.Column<string>(type: "text", nullable: false),
+                    user_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    user_profile_pic = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     help_request_id = table.Column<int>(type: "integer", nullable: false),
                     public_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -161,6 +211,69 @@ namespace Infrastructure.Database.Migrations
                         principalTable: "help_requests",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                schema: "public",
+                columns: table => new
+                {
+                    role_id = table.Column<int>(type: "integer", nullable: false),
+                    permission_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_role_permissions", x => new { x.role_id, x.permission_id });
+                    table.ForeignKey(
+                        name: "fk_role_permissions_permissions_permission_id",
+                        column: x => x.permission_id,
+                        principalSchema: "public",
+                        principalTable: "Permissions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_role_permissions_roles_role_id",
+                        column: x => x.role_id,
+                        principalSchema: "public",
+                        principalTable: "Roles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    email = table.Column<string>(type: "text", nullable: false),
+                    first_name = table.Column<string>(type: "text", nullable: false),
+                    last_name = table.Column<string>(type: "text", nullable: false),
+                    keycloak_user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    password_hash = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    profile_pic = table.Column<string>(type: "text", nullable: true),
+                    username = table.Column<string>(type: "text", nullable: false),
+                    phone_number = table.Column<string>(type: "text", nullable: true),
+                    role_id = table.Column<int>(type: "integer", nullable: false),
+                    public_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    last_modified_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_users", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_users_roles_role_id",
+                        column: x => x.role_id,
+                        principalSchema: "public",
+                        principalTable: "Roles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -279,6 +392,12 @@ namespace Infrastructure.Database.Migrations
                 column: "help_request_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_role_permissions_permission_id",
+                schema: "public",
+                table: "RolePermissions",
+                column: "permission_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_school_admins_email",
                 schema: "public",
                 table: "school_admins",
@@ -306,6 +425,20 @@ namespace Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_templates_template_name",
+                schema: "public",
+                table: "templates",
+                column: "template_name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_templates_template_trigger",
+                schema: "public",
+                table: "templates",
+                column: "template_trigger",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_todo_items_user_id",
                 schema: "public",
                 table: "todo_items",
@@ -317,6 +450,12 @@ namespace Infrastructure.Database.Migrations
                 table: "users",
                 column: "email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_role_id",
+                schema: "public",
+                table: "users",
+                column: "role_id");
         }
 
         /// <inheritdoc />
@@ -335,7 +474,15 @@ namespace Infrastructure.Database.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
+                name: "RolePermissions",
+                schema: "public");
+
+            migrationBuilder.DropTable(
                 name: "subscriptions",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "templates",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -344,6 +491,10 @@ namespace Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "help_requests",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "Permissions",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -356,6 +507,10 @@ namespace Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "school_admins",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "Roles",
                 schema: "public");
         }
     }

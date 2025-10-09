@@ -25,6 +25,6 @@ internal sealed class GetById : IEndpoint
         })
         .WithTags(Tags.HelpRequests)
         .Produces<HelpRequestDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewHelpRequests"));
+        .RequireAuthorization(new RequirePermissionAttribute("help_request_view"));
     }
 }

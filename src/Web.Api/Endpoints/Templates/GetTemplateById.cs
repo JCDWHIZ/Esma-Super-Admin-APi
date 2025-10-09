@@ -23,6 +23,6 @@ internal sealed class GetTemplateByIdEndpoint : IEndpoint
         })
         .WithTags(Tags.Templates)
         .Produces<TemplateDto>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewEmailTemplates"));
+        .RequireAuthorization(new RequirePermissionAttribute("email_template_view"));
     }
 }

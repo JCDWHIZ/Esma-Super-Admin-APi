@@ -35,6 +35,6 @@ internal sealed class UpdateBlog : IEndpoint
         .WithTags(Tags.Blogs)
         .Produces<string>(StatusCodes.Status200OK)
         .WithAudit("Updated Blog")
-        .RequireAuthorization(new RequirePermissionAttribute("UpdateBlogs"));
+        .RequireAuthorization(new RequirePermissionAttribute("blog_update"));
     }
 }

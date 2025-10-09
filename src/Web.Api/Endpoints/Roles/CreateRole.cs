@@ -25,7 +25,7 @@ internal sealed class CreateRole : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
-            .RequireAuthorization(new RequirePermissionAttribute("CreateRole"))
+            .RequireAuthorization(new RequirePermissionAttribute("role_create"))
             .WithAudit("A role was created")
             .Produces<RoleDto>(StatusCodes.Status200OK)
             .WithTags(Tags.Roles);

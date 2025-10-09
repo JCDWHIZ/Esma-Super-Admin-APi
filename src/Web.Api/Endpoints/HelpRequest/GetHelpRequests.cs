@@ -37,6 +37,6 @@ internal sealed class GetPaginated : IEndpoint
         })
         .WithTags(Tags.HelpRequests)
         .Produces<PaginatedList<HelpRequestDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewHelpRequests"));
+        .RequireAuthorization(new RequirePermissionAttribute("help_request_view"));
     }
 }

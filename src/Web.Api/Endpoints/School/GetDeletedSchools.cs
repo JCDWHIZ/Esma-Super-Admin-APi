@@ -50,6 +50,6 @@ internal sealed class GetDeletedSchools : IEndpoint
         })
         .WithTags(Tags.Schools)
         .Produces<PaginatedList<SchoolItemDto>>(StatusCodes.Status200OK)
-        .RequireAuthorization(new RequirePermissionAttribute("ViewSchool"));
+        .RequireAuthorization(new RequirePermissionAttribute("school_view"));
     }
 }

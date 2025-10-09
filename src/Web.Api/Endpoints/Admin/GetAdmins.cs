@@ -15,7 +15,7 @@ public sealed class GetAdmins : IEndpoint
             int? pageNumber,
             int? pageSize,
             string? username,
-            SharedKernel.Enums.Roles? role,
+            string? role,
             IQueryHandler<GetAdminsQuery, PaginatedList<UserDto>> handler,
             CancellationToken cancellationToken
         ) =>
@@ -25,7 +25,7 @@ public sealed class GetAdmins : IEndpoint
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 Username = username,
-                Role = role
+                RoleName = role
             };
 
             Result<PaginatedList<UserDto>> result = await handler.Handle(query, cancellationToken);
@@ -35,6 +35,6 @@ public sealed class GetAdmins : IEndpoint
         .WithName("GetAdmins")
         .WithTags(Tags.Admin)
         .Produces<PaginatedList<UserDto>>()
-        .RequireAuthorization(new RequirePermissionAttribute("ViewAdmins"));
+        .RequireAuthorization(new RequirePermissionAttribute("admin_view"));
     }
 }
