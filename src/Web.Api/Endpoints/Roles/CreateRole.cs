@@ -12,16 +12,18 @@ internal sealed class CreateRole : IEndpoint
     {
         app.MapPost("roles", async (
                 Request request,
-                ICommandHandler<CreateRoleCommand, RoleDto> handler,
+                ICommandHandler<CreateRoleCommand, string> handler,
                 CancellationToken cancellationToken) =>
             {
                 var command = new CreateRoleCommand
                 {
                     Name = request.Name,
-                    Description = request.Description
+                    Description = request.Description,
+                    IsDefault = request.IsDefault,
+                    PermissionIds = request.PermissionIds
                 };
 
-                Result<RoleDto> result = await handler.Handle(command, cancellationToken);
+                Result<string> result = await handler.Handle(command, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
@@ -31,5 +33,5 @@ internal sealed class CreateRole : IEndpoint
             .WithTags(Tags.Roles);
     }
 
-    public sealed record Request(string Name, string Description);
+    public sealed record Request(string Name, string Description, ICollection<Guid> PermissionIds, bool IsDefault);
 }

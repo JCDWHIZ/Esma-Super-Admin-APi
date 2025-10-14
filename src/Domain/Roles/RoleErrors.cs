@@ -11,6 +11,12 @@ public static class RoleErrors
             "Role.NotFound",
             $"The Role with the ID {id} was not found");
     }
+    public static Error NotFoundList(List<Guid>? ids)
+    {
+        return Error.NotFound(
+       "Role.NotFound",
+       $"The permissions with the PublicId = '{string.Join(", ", ids ?? new List<Guid>())}' was not found.");
+    }
     public static Error NotFound()
     {
         return Error.NotFound(
