@@ -7,7 +7,7 @@ using Domain.Roles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Roles.EditRole;
-internal class EditCommandHandler(IApplicationDbContext _dbContext) : ICommandHandler<EditRoleCommand, string>
+public class EditCommandHandler(IApplicationDbContext _dbContext) : ICommandHandler<EditRoleCommand, string>
 {
     public async Task<Result<string>> Handle(EditRoleCommand command, CancellationToken cancellationToken)
     {

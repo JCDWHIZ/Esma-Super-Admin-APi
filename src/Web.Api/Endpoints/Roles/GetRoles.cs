@@ -22,7 +22,7 @@ internal sealed class GetRoles : IEndpoint
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .WithTags(Tags.Roles)
-            .Produces<PaginatedList<RolesDto>>(StatusCodes.Status200OK)
+            .Produces<List<RolesDto>>(StatusCodes.Status200OK)
             .RequireAuthorization(new RequirePermissionAttribute("role_view"));
     }
 }

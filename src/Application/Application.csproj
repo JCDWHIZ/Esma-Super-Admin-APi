@@ -19,4 +19,8 @@
 	<InternalsVisibleTo Include="Application.UnitTests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Roles\NewFolder1\" />
+  </ItemGroup>
+
 </Project>
