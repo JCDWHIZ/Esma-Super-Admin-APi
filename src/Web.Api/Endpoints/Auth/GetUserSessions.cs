@@ -1,4 +1,5 @@
 ﻿using Application.Auth;
+using Application.Dashboard;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Auth;
@@ -18,6 +19,7 @@ internal sealed class GetUserSessionEndpoint : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auth)
+        .Produces<GetSessionsCommandResponseDto>(StatusCodes.Status200OK)
         .RequireAuthorization();
     }
 }
