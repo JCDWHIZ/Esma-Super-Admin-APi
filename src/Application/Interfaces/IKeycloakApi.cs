@@ -246,7 +246,7 @@ public interface IKeycloakApi
         [Header("Authorization")] string authorization
     );
 
-    [Put("/realms/{realm}/account/credentials/password")]
+    [Post("/auth/realms/{realm}/account/credentials/password")]
     Task<Refit.ApiResponse<HttpResponseMessage>> UpdateAuthenticatedUserPasswordAsync(
        [AliasAs("realm")] string realm,
        [Body] AuthenticatedUserChangePasswordRequest request,
