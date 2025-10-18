@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Abstractions.Authentication;
 using Application.BackgroundJobs;
 using Domain.Roles;
 using Microsoft.Extensions.Configuration;
@@ -15,11 +16,13 @@ public class KeycloakRolesService
     private readonly IConfiguration _configuration;
     private readonly KeycloakService _KeycloakService;
     private readonly IApplicationDbContext _dbContext;
+    private readonly IUserContext _userContext;
     private readonly ILogger<KeycloakRolesService> _logger;
 
     public KeycloakRolesService(
         IKeycloakApi keycloakApi,
         IConfiguration configuration,
+        IUserContext userContext,
         KeycloakService keycloakService,
         IApplicationDbContext dbContext,
         ILogger<KeycloakRolesService> logger)
@@ -27,6 +30,7 @@ public class KeycloakRolesService
         _keycloakApi = keycloakApi;
         _configuration = configuration;
         _KeycloakService = keycloakService;
+        _userContext = userContext;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -342,5 +346,70 @@ public class KeycloakRolesService
 
         _logger.LogError("Failed to retrieve roles for user '{UserId}'. Status: {Status}", userId, response.StatusCode);
         return new List<KeycloakRoleDto>();
+    }
+
+    public async Task<bool> UpdateAuthenticatedUserPasswordAsync(string currentPassword, string newPassword)
+    {
+        try
+        {
+            // Get the user's access token (not admin token)
+            string token = await _KeycloakService.GetAdminAccessTokenAsync();
+            string realm = _configuration["Keycloak:Realm"]!;
+
+            var request = new AuthenticatedUserChangePasswordRequest
+            {
+                CurrentPassword = currentPassword,
+                NewPassword = newPassword,
+                Confirmation = newPassword // Confirmation must match new password
+            };
+
+            Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi
+                .UpdateAuthenticatedUserPasswordAsync(realm, request, $"Bearer {token}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Successfully updated authenticated user's password");
+                return true;
+            }
+
+            _logger.LogError("Failed to update authenticated user's password. Status: {Status}", response.StatusCode);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception occurred while updating authenticated user's password");
+            return false;
+        }
+    }
+    public async Task<List<KeycloakSessionDto>> GetUserSessionsAsync()
+    {
+        try
+        {
+            string? token = _userContext.AccessToken;
+            string userId = _userContext.KeycloakId ?? string.Empty;
+            string realm = _configuration["Keycloak:Realm"]!;
+
+            List<KeycloakSessionDto> response = await _keycloakApi.GetUserSessionsAsync(realm, userId, $"Bearer {token}");
+
+            if (response != null)
+            {
+                _logger.LogInformation("Successfully retrieved {SessionCount} sessions for authenticated user",
+                    response.Count);
+                return response;
+            }
+
+            _logger.LogWarning("No sessions found for authenticated user");
+            return new List<KeycloakSessionDto>();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError(ex, "Unauthorized access when retrieving user sessions");
+            return new List<KeycloakSessionDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while retrieving user sessions");
+            return new List<KeycloakSessionDto>();
+        }
     }
 }

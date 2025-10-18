@@ -23,4 +23,16 @@ internal sealed class UserContext : IUserContext
            .HttpContext?
            .User
            .GetUserRole();
+    public string? KeycloakId => 
+        _httpContextAccessor
+           .HttpContext?
+           .User
+           .GetUserKeycloakId();
+
+    public string? AccessToken =>
+       _httpContextAccessor.HttpContext?
+           .Request?
+           .Headers["Authorization"]
+           .FirstOrDefault()?
+           .Replace("Bearer ", "");
 }

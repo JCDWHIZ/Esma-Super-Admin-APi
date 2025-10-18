@@ -4,4 +4,6 @@ public interface IUserContext
 {
     Guid? UserPublicId { get; }
     string? UserRole { get; }
+    string? AccessToken { get; }
+    string? KeycloakId { get; }
 }

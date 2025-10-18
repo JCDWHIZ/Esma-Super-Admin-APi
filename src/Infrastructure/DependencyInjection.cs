@@ -275,6 +275,9 @@ public static class DependencyInjection
     {
         public Guid? UserPublicId => Guid.Empty;
         public string? UserRole => "FakeRole";
+        public string? AccessToken => "fake toeknasda";
+
+        public string? KeycloakId => "fake id";
     }
 
     public class NoOpAuditingInterceptor : AuditingInterceptor

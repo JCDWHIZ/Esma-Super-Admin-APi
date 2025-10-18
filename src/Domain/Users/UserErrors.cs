@@ -18,6 +18,9 @@ public static class UserErrors
     public static Error Unauthorized() => Error.Failure(
         "Users.Unauthorized",
         "You are not authorized to perform this action.");
+    public static Error InvalidCurrentPassword() => Error.Failure(
+        "Users.InvalidCurrentPassword",
+        "Your current password is invalid");
     public static Error TokenError() => Error.Problem(
             "Users.TokenExpired",
         "The token sent was either Invalid or expired");

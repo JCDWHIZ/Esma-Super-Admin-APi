@@ -245,6 +245,73 @@ public interface IKeycloakApi
         [Body] List<KeycloakRoleDto> roles,
         [Header("Authorization")] string authorization
     );
+
+    [Put("/realms/{realm}/account/credentials/password")]
+    Task<Refit.ApiResponse<HttpResponseMessage>> UpdateAuthenticatedUserPasswordAsync(
+       [AliasAs("realm")] string realm,
+       [Body] AuthenticatedUserChangePasswordRequest request,
+       [Header("Authorization")] string authorization
+   );
+
+    [Get("/admin/realms/{realm}/users/{userId}/sessions")]
+    Task<List<KeycloakSessionDto>> GetUserSessionsAsync(
+    [AliasAs("realm")] string realm,
+    [AliasAs("userId")] string userId,
+    [Header("Authorization")] string authorization
+);
+}
+
+public class AuthenticatedUserChangePasswordRequest
+{
+    public string CurrentPassword { get; set; }
+    public string NewPassword { get; set; }
+    public string Confirmation { get; set; }
+}
+public class KeycloakSessionDto
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("username")]
+    public string? Username { get; set; }
+
+    [JsonPropertyName("userId")]
+    public string? UserId { get; set; }
+
+    [JsonPropertyName("ipAddress")]
+    public string? IpAddress { get; set; }
+
+    [JsonPropertyName("start")]
+    public long? Start { get; set; }
+
+    [JsonPropertyName("lastAccess")]
+    public long? LastAccess { get; set; }
+
+    [JsonPropertyName("rememberMe")]
+    public bool RememberMe { get; set; }
+
+    [JsonPropertyName("clients")]
+    public Dictionary<string, string> Clients { get; set; } = new();
+
+    [JsonPropertyName("transientUser")]
+    public bool TransientUser { get; set; }
+
+    // Computed properties for DateTime
+    [JsonIgnore]
+    public DateTime? StartAt => Start.HasValue
+        ? DateTimeOffset.FromUnixTimeMilliseconds(Start.Value).UtcDateTime
+        : null;
+
+    [JsonIgnore]
+    public DateTime? LastAccessAt => LastAccess.HasValue
+        ? DateTimeOffset.FromUnixTimeMilliseconds(LastAccess.Value).UtcDateTime
+        : null;
+}
+
+// Response wrapper for the sessions API
+public class KeycloakSessionsResponseDto
+{
+    public List<KeycloakSessionDto> Sessions { get; set; } = new();
 }
 
 public class TokenResponseDto
