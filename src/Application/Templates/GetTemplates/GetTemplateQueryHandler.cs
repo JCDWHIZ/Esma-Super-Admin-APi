@@ -19,6 +19,7 @@ public sealed class GetTemplatesWithPaginationQueryHandler(IApplicationDbContext
             PublicId = t.PublicId,
             TemplateName = t.TemplateName,
             LastModified = t.LastModified,
+            ExpectedVariables = t.ExpectedVariables,
             TemplateTrigger = t.TemplateTrigger
         });
 

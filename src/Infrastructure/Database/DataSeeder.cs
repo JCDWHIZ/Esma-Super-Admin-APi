@@ -4,6 +4,7 @@ using Application.Abstractions.Data;
 using Application.Interfaces.Services;
 using Domain.HelpRequests;
 using Domain.Roles;
+using Domain.Templates;
 using Domain.Users;
 using iText.Commons.Actions.Contexts;
 using Microsoft.AspNetCore.Http;
@@ -29,10 +30,56 @@ public sealed class DataSeeder(
             await SeedSuperadmin(cancellationToken);
             //await SyncToKeycloak();
             await SeedHelpRequests(cancellationToken);
+            await SeedTemplates(cancellationToken);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while seeding data");
+        }
+    }
+    private async Task SeedTemplates(CancellationToken cancellationToken)
+    {
+        var templatesToSeed = new List<Template>
+        {
+            Template.Create(
+                "User Registration",
+                "Hi *username*, welcome to *schoolName*!",
+                TriggerType.WELCOME_SCHOOLADMIN_EMAIL,
+                new List<string> { "username", "schoolName" }
+            ),
+            Template.Create(
+                "User Registration",
+                "Hi *username*, welcome to elsoft!",
+                TriggerType.WELCOME_ADMIN_EMAIL,
+                new List<string> { "username" }
+            ),
+            Template.Create(
+                "Password Reset",
+                "Hello *username*, click here to reset your password: *resetLink*",
+                TriggerType.PASSWORD_RESET,
+                new List<string> { "username", "resetLink" }
+            ),
+            Template.Create(
+                "Subscription Expired",
+                "Dear *username*, your subscription expired on *expiryDate*.",
+                TriggerType.SUBSCRIPTION_EXPIRED,
+                new List<string> { "username", "expiryDate" }
+            )
+        };
+
+        List<TriggerType> existingTriggers = await context.Templates
+            .Select(t => t.TemplateTrigger)
+            .ToListAsync(cancellationToken);
+
+        var newTemplates = templatesToSeed
+            .Where(t => !existingTriggers.Contains(t.TemplateTrigger))
+            .ToList();
+
+        if (newTemplates.Any())
+        {
+            await context.Templates.AddRangeAsync(newTemplates, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Added {Count} new templates", newTemplates.Count);
         }
     }
 

@@ -20,6 +20,7 @@ public sealed class GetTemplateByIdQueryHandler(IApplicationDbContext context) :
                 TemplateName = t.TemplateName,
                 TemplateBody = t.TemplateBody,
                 TemplateTrigger = t.TemplateTrigger,
+                ExpectedVariables = t.ExpectedVariables,
                 LastModified = t.LastModified
             })
             .FirstOrDefaultAsync(cancellationToken);

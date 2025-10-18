@@ -30,7 +30,7 @@ public sealed class UpdateTemplateCommandHandler(IApplicationDbContext context) 
 
         template.TemplateName = command.TemplateName;
         template.TemplateBody = command.TemplateBody;
-        template.TemplateTrigger = command.TemplateTrigger;
+        //template.TemplateTrigger = command.TemplateTrigger;
 
         await context.SaveChangesAsync(cancellationToken);
         return Result.Success("Template updated successfully");

@@ -8,10 +8,8 @@ internal sealed class UpdateTemplateEndpoint : IEndpoint
 {
     public sealed class Request
     {
-        public Guid PublicId { get; init; }
         public string TemplateName { get; init; }
         public string TemplateBody { get; init; }
-        public TriggerType TemplateTrigger { get; init; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -25,8 +23,7 @@ internal sealed class UpdateTemplateEndpoint : IEndpoint
             var command = new UpdateTemplateCommand(
                 publicId,
                 request.TemplateName,
-                request.TemplateBody,
-                request.TemplateTrigger);
+                request.TemplateBody);
 
             Result<string> result = await handler.Handle(command, cancellationToken);
 
