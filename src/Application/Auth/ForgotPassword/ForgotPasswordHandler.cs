@@ -1,4 +1,3 @@
-using System;
 using Application.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 
@@ -23,7 +22,7 @@ public sealed class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswor
         {
             User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 
-            if(existingUser == null)
+            if (existingUser == null)
             {
                 return Result.Failure<ForgotPasswordResponseDto>(UserErrors.NotFoundByEmail);
             }

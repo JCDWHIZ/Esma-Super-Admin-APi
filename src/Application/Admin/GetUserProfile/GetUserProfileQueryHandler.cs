@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Abstractions.Authentication;
+﻿using Application.Abstractions.Authentication;
 
 namespace Application.Admin.GetUserProfile;
 public class GetUserProfileQueryHandler(IApplicationDbContext _context, IUserContext userContext) : IQueryHandler<GetUserProfileQuery, UserDto>

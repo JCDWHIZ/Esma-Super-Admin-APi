@@ -1,7 +1,5 @@
-using System;
 using Domain.Blogs;
 using Hangfire;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.BlogModule.CreateBlogCommands.CreateScheduledBlog;
 

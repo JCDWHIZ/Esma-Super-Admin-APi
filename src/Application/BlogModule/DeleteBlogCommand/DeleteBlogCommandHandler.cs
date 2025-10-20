@@ -1,6 +1,4 @@
-using System;
 using Domain.Blogs;
-using Application.Interfaces;
 
 namespace Application.BlogModule.DeleteBlogCommand;
 

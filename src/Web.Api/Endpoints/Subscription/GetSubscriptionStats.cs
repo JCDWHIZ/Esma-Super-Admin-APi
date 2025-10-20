@@ -1,4 +1,3 @@
-using System;
 using Application.Subscription.GetSubscriptionStats;
 using Infrastructure.Authorization;
 

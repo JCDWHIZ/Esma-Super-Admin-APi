@@ -1,7 +1,3 @@
-using System;
-using Application.Interfaces;
-using Application.Abstractions.Models;
-
 namespace Application.BlogModule.GetBlogsWithPagination;
 
 public sealed record GetBlogWithPaginationQuery : IQuery<PaginatedList<BlogItemDto>>

@@ -1,9 +1,7 @@
-using System;
 using Application.Abstractions.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SharedKernel.Models;
-using System.Security.Claims;
 
 
 namespace Infrastructure.Interceptors;

@@ -1,4 +1,3 @@
-using System;
 using Application.Auth.ForgotPassword;
 
 namespace Web.Api.Endpoints.Auth;

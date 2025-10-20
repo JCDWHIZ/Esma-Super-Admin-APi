@@ -1,7 +1,6 @@
 ﻿
 using Application.Dashboard;
 using Infrastructure.Authorization;
-using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Dashboard;
 

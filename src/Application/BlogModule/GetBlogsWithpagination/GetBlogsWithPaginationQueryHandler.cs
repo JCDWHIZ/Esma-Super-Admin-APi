@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.BlogModule.GetBlogsWithPagination;
 
 public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _context) : IQueryHandler<GetBlogWithPaginationQuery, PaginatedList<BlogItemDto>>

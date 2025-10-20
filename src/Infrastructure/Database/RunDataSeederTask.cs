@@ -12,5 +12,5 @@ public sealed class RunDataSeederTask(IServiceProvider serviceProvider) : IHoste
         await seeder.SeedAsync(cancellationToken);
     }
 
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask; 
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

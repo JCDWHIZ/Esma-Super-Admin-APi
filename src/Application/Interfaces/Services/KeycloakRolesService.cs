@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Abstractions.Authentication;
-using Application.BackgroundJobs;
+﻿using Application.Abstractions.Authentication;
 using Domain.Roles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,3 @@
-using System;
 using Application.School.CreateSchool;
 
 namespace Application.Subscription.GetSubscriptionBySchoolId;

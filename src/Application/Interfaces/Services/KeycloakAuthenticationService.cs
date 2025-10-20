@@ -448,17 +448,12 @@
 // //     public string? AccessToken { get; set; }
 // // }
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System;
-using Refit;
-using Application.Abstractions.Models;
-using Application.Interfaces;
-using Application.Auth.Login;
-using Application.Auth.ForgotPassword;
-using System.Security.Claims;
 using Application.Abstractions.Authentication;
+using Application.Abstractions.Models;
+using Application.Auth.ForgotPassword;
+using Application.Auth.Login;
+using Microsoft.Extensions.Configuration;
+using Refit;
 
 
 namespace Application.Interfaces.Services;

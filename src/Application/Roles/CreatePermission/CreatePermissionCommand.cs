@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Roles.CreatePermission;
 
 public sealed class CreatePermissionCommand : ICommand<PermissionDto>

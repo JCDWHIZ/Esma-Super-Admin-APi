@@ -1,5 +1,4 @@
-﻿using SharedKernel;
-using SharedKernel.Models;
+﻿using SharedKernel.Models;
 
 namespace Domain.Todos;
 

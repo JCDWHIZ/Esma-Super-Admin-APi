@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Domain.Roles;
-using static Application.Roles.GetPermissions.GetPermissionQueryHandler;
 
 namespace Application.Roles.GetPermissions;
 public class GetPermissionQueryHandler(IApplicationDbContext context) : IQueryHandler<GetPermissionsQuery, List<GroupedPermissionDto>>

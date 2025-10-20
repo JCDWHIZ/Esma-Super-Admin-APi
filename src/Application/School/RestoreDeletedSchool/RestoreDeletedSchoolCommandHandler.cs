@@ -1,5 +1,3 @@
-using System;
-using Application.Interfaces;
 using Domain.Schools;
 
 namespace Application.School.RestoreDeletedSchool;

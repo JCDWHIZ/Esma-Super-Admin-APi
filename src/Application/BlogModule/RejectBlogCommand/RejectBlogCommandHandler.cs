@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Blogs;
-using Hangfire;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Blogs;
 
 namespace Application.BlogModule.RejectBlogCommand;
 public sealed class RejectBlogCommandHandler(IApplicationDbContext _context) : ICommandHandler<RejectBlogCommand, string>

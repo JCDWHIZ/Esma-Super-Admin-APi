@@ -1,19 +1,13 @@
 using System.Data;
-using System.Threading;
 using Application.Abstractions.Data;
 using Application.Interfaces.Services;
 using Domain.HelpRequests;
 using Domain.Roles;
 using Domain.Templates;
 using Domain.Users;
-using iText.Commons.Actions.Contexts;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
-using SharedKernel;
 using SharedKernel.Enums;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Infrastructure.Data;
 
@@ -847,11 +841,11 @@ public sealed class DataSeeder(
     }
 }
 
- // ADMINISTRATOR,
-        // CARE_GIVER,
-        // SCHEDULER,
-        // SERVICE_USER,
-        // SUPER_ADMIN,
-        // REGULATORY_AUDITOR,
-        // SERVICE_COORDINATOR,
-        // MEDICATION_SUPPORT_WORKER
+// ADMINISTRATOR,
+// CARE_GIVER,
+// SCHEDULER,
+// SERVICE_USER,
+// SUPER_ADMIN,
+// REGULATORY_AUDITOR,
+// SERVICE_COORDINATOR,
+// MEDICATION_SUPPORT_WORKER

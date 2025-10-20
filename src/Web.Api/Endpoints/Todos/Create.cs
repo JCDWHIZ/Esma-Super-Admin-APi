@@ -1,9 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Todos.Create;
+﻿using Application.Todos.Create;
 using Domain.Todos;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Todos;
 

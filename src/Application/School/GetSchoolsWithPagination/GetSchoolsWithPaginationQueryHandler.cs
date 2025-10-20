@@ -1,5 +1,3 @@
-using System;
-using Application;
 using Application.School.CreateSchool;
 using FluentValidation;
 

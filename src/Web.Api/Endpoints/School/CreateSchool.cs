@@ -1,15 +1,5 @@
-using System;
-using Application.Abstractions.Messaging;
-using Application.Admin;
 using Application.School.CreateSchool;
-using Domain.Schools;
-using Domain.Subscriptions;
-using Domain.Users;
 using Infrastructure.Authorization;
-using SharedKernel;
-using SharedKernel.Enums;
-using Web.Api.Infrastructure;
-using UserDto = Application.School.CreateSchool.UserDto;
 
 namespace Web.Api.Endpoints.School;
 

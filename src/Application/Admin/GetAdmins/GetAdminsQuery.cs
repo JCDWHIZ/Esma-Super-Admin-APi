@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Admin.GetAdmins;
 
 public sealed record GetAdminsQuery : IQuery<PaginatedList<UserDto>>

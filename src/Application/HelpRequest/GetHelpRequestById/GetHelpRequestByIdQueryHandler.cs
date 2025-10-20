@@ -1,4 +1,3 @@
-using System;
 using Domain.HelpRequests;
 
 namespace Application.HelpRequest.GetHelpRequestById;

@@ -1,4 +1,3 @@
-using System;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc.Filters;
 

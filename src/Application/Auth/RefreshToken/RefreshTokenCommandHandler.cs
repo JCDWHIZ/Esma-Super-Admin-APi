@@ -1,6 +1,4 @@
-using System;
 using Application.Auth.Login;
-using Application.Interfaces;
 using Application.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 

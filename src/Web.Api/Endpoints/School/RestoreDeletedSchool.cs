@@ -1,4 +1,3 @@
-using System;
 using Application.School.RestoreDeletedSchool;
 
 namespace Web.Api.Endpoints.School;

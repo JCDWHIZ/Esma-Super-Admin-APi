@@ -1,8 +1,6 @@
-﻿using Application;
-using Application.Roles.GetPermissions;
+﻿using Application.Roles.GetPermissions;
 using Domain.Users;
 using Infrastructure.Authorization;
-using static Application.Roles.GetPermissions.GetPermissionQueryHandler;
 namespace Web.Api.Endpoints.Roles;
 
 internal sealed class GetPermissionsEndpoint : IEndpoint

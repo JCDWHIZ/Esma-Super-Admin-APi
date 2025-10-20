@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Dashboard;
+﻿namespace Application.Dashboard;
 public sealed record DashboardStatsQuery : IQuery<DashboardStatsDto>;
 
 public class DashboardStatsDto

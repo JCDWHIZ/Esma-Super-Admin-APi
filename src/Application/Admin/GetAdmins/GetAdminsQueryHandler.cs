@@ -1,6 +1,3 @@
-using System;
-using Application.Interfaces;
-using Application.Abstractions.Models;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 namespace Application.Admin.GetAdmins;

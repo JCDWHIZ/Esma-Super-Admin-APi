@@ -1,6 +1,3 @@
-
-using Application.Interfaces;
-
 namespace Application.School.GetSchoolStats;
 
 public record GetSchoolStatsQuery : IQuery<SchoolStatsCountDto>;

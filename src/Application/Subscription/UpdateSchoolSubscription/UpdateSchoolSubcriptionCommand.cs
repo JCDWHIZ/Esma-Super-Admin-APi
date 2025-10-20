@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Subscription.UpdateSchoolSubscription;
 
 public sealed record UpdateSchoolSubscriptionCommand(

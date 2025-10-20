@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 
 namespace Application.Auth;
 public sealed record GetUserSessionQuery : IQuery<GetSessionsCommandResponseDto>;
 
 
-    public sealed class GetSessionsCommandResponseDto
+public sealed class GetSessionsCommandResponseDto
 {
     public List<KeycloakSessionDto> Sessions { get; init; } = new();
     public int TotalCount { get; init; }

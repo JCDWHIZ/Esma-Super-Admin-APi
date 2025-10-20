@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Auth.Login;
 
 public class LoginCommandResponseDto

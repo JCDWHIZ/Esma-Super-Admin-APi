@@ -1,7 +1,5 @@
-﻿using Application;
-using Application.Roles.GetRoleById;
+﻿using Application.Roles.GetRoleById;
 using Domain.Users;
-using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Roles;
 

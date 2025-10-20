@@ -1,4 +1,3 @@
-using System;
 using Application.Abstractions.Models;
 
 namespace Application.Interfaces;

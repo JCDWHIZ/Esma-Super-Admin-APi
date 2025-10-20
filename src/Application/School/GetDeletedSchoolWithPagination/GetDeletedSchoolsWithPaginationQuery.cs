@@ -1,7 +1,3 @@
-using System;
-using System;
-using Application.Interfaces;
-
 namespace Application.School.GetDeletedSchoolWithPagination;
 
 public sealed record GetDeletedSchoolsWithPaginationQuery : IQuery<PaginatedList<SchoolItemDto>>

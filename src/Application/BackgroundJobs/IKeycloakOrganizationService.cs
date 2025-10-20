@@ -1,16 +1,10 @@
-using System.Globalization;
-using System.Net.Mail;
-using System.Threading;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Models;
 using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.School.CreateSchool;
-using Domain.Schools;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 namespace Application.BackgroundJobs;

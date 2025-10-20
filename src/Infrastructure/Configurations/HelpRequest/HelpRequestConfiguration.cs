@@ -1,7 +1,5 @@
-using Domain.HelpRequests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SharedKernel.Enums;
 
 namespace Infrastructure.Configurations.HelpRequest;
 

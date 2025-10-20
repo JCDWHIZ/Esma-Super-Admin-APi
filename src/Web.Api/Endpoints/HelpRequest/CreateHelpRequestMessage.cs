@@ -1,11 +1,6 @@
-using Application.Abstractions.Messaging;
 using Application.HelpRequest;
 using Application.HelpRequest.CreateHelpReqestMessage;
 using Infrastructure.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.HelpRequest;
 

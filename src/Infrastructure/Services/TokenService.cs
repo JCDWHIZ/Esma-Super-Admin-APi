@@ -1,12 +1,9 @@
-
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Linq;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Options;
 using Application.Interfaces;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Services;
 

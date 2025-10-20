@@ -1,6 +1,5 @@
 ﻿using Application.Admin;
 using Application.Admin.GetUserProfile;
-using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Admin;
 

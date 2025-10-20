@@ -1,6 +1,4 @@
 ﻿using Application.Auth;
-using Application.Dashboard;
-using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Auth;
 

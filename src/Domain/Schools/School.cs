@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Domain.Subscriptions;
 using Domain.Users;
 using SharedKernel.Enums;
 using SharedKernel.Models;

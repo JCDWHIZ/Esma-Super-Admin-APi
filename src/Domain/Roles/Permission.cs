@@ -10,7 +10,7 @@ public class Permission : BaseAuditableEntity
 
     private readonly List<Role> _roles = new();
     public IReadOnlyList<Role> Roles => _roles.AsReadOnly();
-    
+
     public void AddRole(Role role)
     {
         if (!_roles.Contains(role))
@@ -24,7 +24,7 @@ public class Permission : BaseAuditableEntity
         _roles.Remove(role);
     }
     public static Permission Create(string name, string description) =>
-        new () { Name = name, Description = description };
+        new() { Name = name, Description = description };
 }
 
 

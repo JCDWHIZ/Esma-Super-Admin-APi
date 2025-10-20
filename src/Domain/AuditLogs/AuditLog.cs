@@ -1,4 +1,3 @@
-using System;
 using SharedKernel.Models;
 
 namespace Domain.AuditLogs;

@@ -1,8 +1,5 @@
-using System;
-using System.Text;
-using System.Text.Json;
-using Application.Interfaces;
 using Application.Abstractions.Models;
+using Application.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services;

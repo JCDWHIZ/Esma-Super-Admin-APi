@@ -1,8 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Todos.Get;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+﻿using Application.Todos.Get;
 
 namespace Web.Api.Endpoints.Todos;
 

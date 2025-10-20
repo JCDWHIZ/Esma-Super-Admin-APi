@@ -1,8 +1,3 @@
-using System;
-using Application.Interfaces;
-using Application.Abstractions.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace Application.HelpRequest.GetHelpRequestWithPagination;
 
 public sealed class GetHelpRequestWithPaginationQueryHandler(IApplicationDbContext _context) : IQueryHandler<GetHelpRequestWithPaginationQuery, PaginatedList<HelpRequestDto>>
@@ -35,10 +30,10 @@ public sealed class GetHelpRequestWithPaginationQueryHandler(IApplicationDbConte
                  PublicId = s.PublicId,
                  Category = s.Category,
                  TenantHelpRequestId = s.TenantHelpRequestId,
-                SchoolId = s.SchoolId,
-                UserName = s.UserName,
-                UserProfilePic = s.UserProfilePic,
-                CreatedAt = s.Created
+                 SchoolId = s.SchoolId,
+                 UserName = s.UserName,
+                 UserProfilePic = s.UserProfilePic,
+                 CreatedAt = s.Created
                  //Messages = new List<HelpRequestMessageDto>()
              }),
              query.PageNumber ?? 1,

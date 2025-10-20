@@ -1,6 +1,4 @@
 ﻿using Domain.Roles;
-using SharedKernel;
-using SharedKernel.Enums;
 using SharedKernel.Models;
 
 namespace Domain.Users;

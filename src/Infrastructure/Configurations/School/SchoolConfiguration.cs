@@ -1,6 +1,4 @@
-using Domain.Schools;
 using Domain.Subscriptions;
-using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SharedKernel.Enums;

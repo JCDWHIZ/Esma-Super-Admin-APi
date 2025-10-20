@@ -1,4 +1,3 @@
-using System;
 using Application.School.CreateSchool;
 using Application.Subscription.GetSubscriptionBySchoolId;
 using Infrastructure.Authorization;

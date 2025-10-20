@@ -1,5 +1,4 @@
 using Domain.Subscriptions;
-using Domain.Schools;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

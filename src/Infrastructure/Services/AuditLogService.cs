@@ -1,10 +1,7 @@
-using System;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Interfaces;
 using Domain.AuditLogs;
-using Infrastructure.Authentication;
-using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Services;
 

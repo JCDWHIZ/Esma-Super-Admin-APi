@@ -1,4 +1,3 @@
-using System;
 using SharedKernel;
 
 namespace Domain.Schools;

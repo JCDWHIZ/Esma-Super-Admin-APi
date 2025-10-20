@@ -1,15 +1,5 @@
-using System;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Application;
-using Application.Roles.GetRolesWithPermission;
 using Domain.Roles;
-using Domain.Users;
-using Microsoft.EntityFrameworkCore;
-using SharedKernel;
-using static Application.Roles.GetPermissions.GetPermissionQueryHandler;
 
 
 namespace Application.Roles.GetRolesWithPermission;

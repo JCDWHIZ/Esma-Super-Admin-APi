@@ -1,4 +1,3 @@
-using System;
 using Application.Exports;
 
 namespace Web.Api.Endpoints.Exports;

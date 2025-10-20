@@ -1,6 +1,4 @@
-using System;
 using Application.Auth.SetPassword;
-using Application.Interfaces;
 
 namespace Web.Api.Endpoints.Auth;
 

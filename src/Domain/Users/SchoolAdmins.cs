@@ -1,5 +1,3 @@
-using System;
-using SharedKernel.Enums;
 using SharedKernel.Models;
 
 namespace Domain.Users;

@@ -3,11 +3,8 @@ using Domain.Blogs;
 using Domain.HelpRequests;
 using Domain.Schools;
 using Domain.Subscriptions;
-using Domain.Todos;
-using Domain.Roles;
-using Domain.Users;
-using Microsoft.EntityFrameworkCore;
 using Domain.Templates;
+using Domain.Todos;
 
 namespace Application.Abstractions.Data;
 

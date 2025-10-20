@@ -1,6 +1,3 @@
-using System;
-using Application.Interfaces;
-
 namespace Application.Subscription.GetSubscriptionStats;
 
 public sealed record GetSubscriptionStatsQuery : ICommand<SubscriptionStatsDto>;

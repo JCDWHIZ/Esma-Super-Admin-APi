@@ -1,8 +1,6 @@
 
 
 using Application.School.CreateSchool;
-using Domain.Schools;
-using Domain.Subscriptions;
 
 namespace Application.School;
 

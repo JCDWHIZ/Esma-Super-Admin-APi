@@ -1,7 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Serilog.Context;
-using SharedKernel;
 
 namespace Application.Abstractions.Behaviors;
 

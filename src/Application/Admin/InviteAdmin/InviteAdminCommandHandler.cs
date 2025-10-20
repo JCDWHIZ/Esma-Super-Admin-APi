@@ -1,15 +1,7 @@
-using System;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Application.Interfaces;
 using Application.BackgroundJobs;
-using Hangfire;
-using Microsoft.Extensions.Configuration;
-using Domain.Users;
-using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 using Domain.Roles;
+using Hangfire;
+using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
 
 
 // add softdelete and restore for admin endpoint

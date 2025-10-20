@@ -1,4 +1,3 @@
-using System;
 using Application;
 using Application.School;
 using Application.School.GetSchoolsWithPagination;

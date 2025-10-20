@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.BlogModule.CreateBlogCommands.CreateBlogForApproval;
 
 public sealed record CreateBlogForApprovalCommand : ICommand<string>

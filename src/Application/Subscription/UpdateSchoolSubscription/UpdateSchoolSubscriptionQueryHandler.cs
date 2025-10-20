@@ -1,4 +1,3 @@
-using System;
 using Domain.Schools;
 
 namespace Application.Subscription.UpdateSchoolSubscription;

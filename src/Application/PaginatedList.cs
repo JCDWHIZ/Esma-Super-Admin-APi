@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Application;
 
 public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Admin.EditAdmin;
+﻿namespace Application.Admin.EditAdmin;
 public sealed record EditAdminCommand : ICommand<UserDto>
 {
     public Guid PublicId { get; set; }

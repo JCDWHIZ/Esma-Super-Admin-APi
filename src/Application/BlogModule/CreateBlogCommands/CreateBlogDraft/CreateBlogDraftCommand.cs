@@ -1,6 +1,3 @@
-using System;
-using Application.Interfaces;
-
 namespace Application.BlogModule.CreateBlogCommands.CreateBlogDraft;
 
 public sealed record CreateBlogDraftCommand : ICommand<BlogItemDto>

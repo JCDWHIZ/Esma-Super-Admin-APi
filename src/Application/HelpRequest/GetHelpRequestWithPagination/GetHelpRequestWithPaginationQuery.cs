@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.HelpRequest.GetHelpRequestWithPagination;
 
 public record GetHelpRequestWithPaginationQuery : IQuery<PaginatedList<HelpRequestDto>>

@@ -1,5 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Domain.Todos;
+﻿using Domain.Todos;
 
 namespace Application.Todos.Create;
 

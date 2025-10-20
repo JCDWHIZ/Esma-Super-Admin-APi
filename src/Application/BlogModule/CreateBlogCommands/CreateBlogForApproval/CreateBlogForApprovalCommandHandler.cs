@@ -1,4 +1,3 @@
-using System;
 using Domain.Blogs;
 
 namespace Application.BlogModule.CreateBlogCommands.CreateBlogForApproval;

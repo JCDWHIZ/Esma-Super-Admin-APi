@@ -1,5 +1,3 @@
-using System;
-using Application.School.CreateSchool;
 using Application.School.EditSchool;
 using Infrastructure.Authorization;
 using AddressDto = Application.School.EditSchool.AddressDto;

@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Domain.Users;
 
 namespace Application.Abstractions.Authentication;
 

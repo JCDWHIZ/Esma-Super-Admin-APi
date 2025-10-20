@@ -1,9 +1,7 @@
 ﻿using Application;
-using Application.Dashboard;
 using Application.Templates;
 using Application.Templates.GetTemplates;
 using Infrastructure.Authorization;
-using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Templates;
 

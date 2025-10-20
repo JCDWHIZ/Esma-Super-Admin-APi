@@ -1,4 +1,3 @@
-using System;
 using Application;
 using Application.AuditLogModule;
 using Application.AuditLogModule.GetAuditLogs;
@@ -14,8 +13,8 @@ internal sealed class GetAuditLogs : IEndpoint
             string? searchTerm,
             string? action,
             string? role,
-            TimeFilter ? timeFilter,
-            int ? pageNumber,
+            TimeFilter? timeFilter,
+            int? pageNumber,
             int? pageSize,
             IQueryHandler<GetAuditLogsQuery, PaginatedList<AuditLogDto>> handler,
             CancellationToken cancellationToken) =>

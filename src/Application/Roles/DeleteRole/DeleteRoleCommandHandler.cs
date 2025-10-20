@@ -1,4 +1,3 @@
-using System;
 using Domain.Roles;
 
 namespace Application.Roles.DeleteRole;
@@ -14,7 +13,7 @@ public class DeleteRoleCommandHandler(IApplicationDbContext context) : ICommandH
             return Result.Failure<string>(RoleErrors.NotFound(command.PublicId));
         }
 
-        if(entity.IsDefault)
+        if (entity.IsDefault)
         {
             return Result.Failure<string>(RoleErrors.CannotDeleteDefault());
         }

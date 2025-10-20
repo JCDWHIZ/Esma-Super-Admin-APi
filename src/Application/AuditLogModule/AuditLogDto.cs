@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.AuditLogModule;
 
 public class AuditLogDto

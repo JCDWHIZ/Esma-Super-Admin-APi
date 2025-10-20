@@ -1,4 +1,3 @@
-using System;
 using Application.School;
 using Application.School.GetSchoolById;
 using Infrastructure.Authorization;

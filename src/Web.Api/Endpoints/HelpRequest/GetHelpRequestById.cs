@@ -1,10 +1,6 @@
-using Application.Abstractions.Messaging;
 using Application.HelpRequest;
 using Application.HelpRequest.GetHelpRequestById;
 using Infrastructure.Authorization;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.HelpRequest;
 

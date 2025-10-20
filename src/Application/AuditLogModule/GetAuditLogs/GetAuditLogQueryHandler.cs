@@ -1,6 +1,3 @@
-using System;
-using Application.Abstractions.Models;
-
 namespace Application.AuditLogModule.GetAuditLogs;
 
 public sealed class GetAuditLogQueryHandler(IApplicationDbContext _context) : IQueryHandler<GetAuditLogsQuery, PaginatedList<AuditLogDto>>

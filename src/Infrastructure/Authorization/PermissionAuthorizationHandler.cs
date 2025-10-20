@@ -1,7 +1,5 @@
 ﻿using System.Text.Json;
-using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Authorization;
 

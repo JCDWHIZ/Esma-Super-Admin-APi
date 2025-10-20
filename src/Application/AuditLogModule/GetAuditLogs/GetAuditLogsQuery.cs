@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.AuditLogModule.GetAuditLogs;
 
 public record GetAuditLogsQuery : IQuery<PaginatedList<AuditLogDto>>

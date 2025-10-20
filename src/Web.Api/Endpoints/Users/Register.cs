@@ -1,8 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.Register;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+﻿using Application.Users.Register;
 
 namespace Web.Api.Endpoints.Users;
 

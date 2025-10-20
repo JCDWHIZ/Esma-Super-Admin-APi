@@ -1,8 +1,5 @@
-using System;
 using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Web.Api.Filters;
 
 namespace Web.Api.Attributes;
 

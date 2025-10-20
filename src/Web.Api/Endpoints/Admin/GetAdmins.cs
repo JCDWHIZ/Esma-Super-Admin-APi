@@ -1,9 +1,7 @@
-using System;
 using Application;
 using Application.Admin;
 using Application.Admin.GetAdmins;
 using Infrastructure.Authorization;
-using SharedKernel.Enums;
 
 namespace Web.Api.Endpoints.Admin;
 

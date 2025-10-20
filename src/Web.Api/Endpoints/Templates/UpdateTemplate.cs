@@ -1,5 +1,4 @@
-﻿using Application.Dashboard;
-using Application.Templates.UpdateTemplateCommand;
+﻿using Application.Templates.UpdateTemplateCommand;
 using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.Templates;

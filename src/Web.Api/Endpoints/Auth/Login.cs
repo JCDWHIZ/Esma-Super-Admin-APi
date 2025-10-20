@@ -1,7 +1,4 @@
-using System;
 using Application.Auth.Login;
-using Application.Interfaces;
-using Infrastructure.Services;
 using Web.Api.Attributes;
 
 namespace Web.Api.Endpoints.Auth;
@@ -27,7 +24,7 @@ internal sealed class LoginEndpoint : IEndpoint
             );
 
             Result<LoginCommandResponseDto> result = await handler.Handle(command, cancellationToken);
-          
+
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auth)

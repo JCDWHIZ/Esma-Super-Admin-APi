@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.HelpRequest.CreateHelpRequest;
 
 public sealed record CreateHelpRequestCommand : ICommand<HelpRequestDto>

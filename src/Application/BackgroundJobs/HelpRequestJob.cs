@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Application.Abstractions.Models;
-using Application.HelpRequest;
+﻿using Application.HelpRequest;
 using Application.Interfaces;
-using Domain.HelpRequests;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Application.BackgroundJobs;
 

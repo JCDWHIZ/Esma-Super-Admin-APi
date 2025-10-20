@@ -1,4 +1,3 @@
-using System;
 using Application.Subscription.UpdateSchoolSubscription;
 using Infrastructure.Authorization;
 

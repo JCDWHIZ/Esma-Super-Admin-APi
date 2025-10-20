@@ -1,13 +1,9 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Application.Abstractions.Data;
 using Application.Abstractions.Models;
-using Application.Interfaces;
-using Application.Interfaces.Services;
 using Confluent.Kafka;
 using Domain.HelpRequests;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

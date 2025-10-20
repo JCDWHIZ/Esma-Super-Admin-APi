@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Services;
 using Microsoft.OpenApi.Models;
-using Web.Api.Filters;
-using Web.Api.Infrastructure;
 
 namespace Web.Api;
 

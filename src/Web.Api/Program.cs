@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Web.Api;
-using Web.Api.Extensions;
 using Web.Api.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -78,7 +77,7 @@ RecurringJob.AddOrUpdate<SubscriptionCheckJob>(
               "check-subscriptions",
               job => job.CheckSubscriptionsAsync(),
               "0 */5 * * *");
-              //"* * * * *");
+//"* * * * *");
 
 await app.RunAsync();
 

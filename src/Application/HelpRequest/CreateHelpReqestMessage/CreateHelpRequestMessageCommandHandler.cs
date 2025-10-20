@@ -1,7 +1,5 @@
-using System;
 using Application.Abstractions.Authentication;
 using Application.BackgroundJobs;
-using Application.Interfaces;
 using Domain.HelpRequests;
 using Hangfire;
 

@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Roles.CreateRole;
 
 public sealed record CreateRoleCommand : ICommand<string>

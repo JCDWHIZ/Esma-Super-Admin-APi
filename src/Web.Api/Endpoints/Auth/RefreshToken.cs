@@ -1,7 +1,5 @@
-using System;
 using Application.Auth.Login;
 using Application.Auth.RefreshToken;
-using Application.Interfaces;
 
 namespace Web.Api.Endpoints.Auth;
 

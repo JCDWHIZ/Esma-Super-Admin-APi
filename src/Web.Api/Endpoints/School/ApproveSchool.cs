@@ -1,4 +1,3 @@
-using System;
 using Application.School.ApproveSchool;
 using Infrastructure.Authorization;
 
@@ -6,7 +5,8 @@ namespace Web.Api.Endpoints.School;
 
 internal sealed class ApproveSchool : IEndpoint
 {
-    public sealed class Request {
+    public sealed class Request
+    {
         public List<Guid> PublicIds { get; set; }
     }
     public void MapEndpoint(IEndpointRouteBuilder app)

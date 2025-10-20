@@ -1,16 +1,14 @@
-using System;
 using System.Text.Json;
-using Application.Interfaces;
 using Application.Abstractions.Data;
-using Application.Interfaces.Services;
+using Application.Abstractions.Models;
+using Application.Interfaces;
 using Confluent.Kafka;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Application.Abstractions.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 

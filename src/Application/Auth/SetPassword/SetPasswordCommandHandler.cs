@@ -1,7 +1,5 @@
-using System;
 using System.Security.Claims;
 using Application.Abstractions.Authentication;
-using Application.Interfaces;
 using Application.Interfaces.Services;
 using Hangfire;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,4 @@
-﻿using Application.Abstractions.Models;
-
-namespace Application.Interfaces;
+﻿namespace Application.Interfaces;
 
 public interface IIdentityService
 {

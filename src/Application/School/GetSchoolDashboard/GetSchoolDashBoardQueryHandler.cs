@@ -1,5 +1,3 @@
-using Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace Application.School.GetSchoolDashboard;

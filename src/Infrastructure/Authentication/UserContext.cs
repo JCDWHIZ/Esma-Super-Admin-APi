@@ -18,12 +18,12 @@ internal sealed class UserContext : IUserContext
             .User
             .GetUserPublicId();
 
-    public string? UserRole => 
+    public string? UserRole =>
         _httpContextAccessor
            .HttpContext?
            .User
            .GetUserRole();
-    public string? KeycloakId => 
+    public string? KeycloakId =>
         _httpContextAccessor
            .HttpContext?
            .User

@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Abstractions.Models;
 
 public class ApiResponse<T>

@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.HelpRequest;
 
 public class HelpRequestMessageDto

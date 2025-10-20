@@ -1,13 +1,7 @@
-using System.Globalization;
 using Application;
-using Application.Abstractions.Messaging;
 using Application.BlogModule;
 using Application.BlogModule.GetBlogsWithPagination;
 using Infrastructure.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Blog;
 

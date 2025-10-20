@@ -1,4 +1,3 @@
-using System;
 using Application.School.SoftDeleteSchool;
 using Infrastructure.Authorization;
 

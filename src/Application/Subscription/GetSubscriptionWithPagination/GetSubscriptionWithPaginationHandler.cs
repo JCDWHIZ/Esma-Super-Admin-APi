@@ -1,6 +1,3 @@
-using System;
-using Application.Interfaces;
-using Application.Abstractions.Models;
 using Application.School.CreateSchool;
 
 namespace Application.Subscription.GetSubscriptionWithPagination;

@@ -1,8 +1,6 @@
-using System;
-using Application.Interfaces;
-using Hangfire;
 using Application.BackgroundJobs;
 using Domain.Schools;
+using Hangfire;
 
 namespace Application.School.ApproveSchool;
 

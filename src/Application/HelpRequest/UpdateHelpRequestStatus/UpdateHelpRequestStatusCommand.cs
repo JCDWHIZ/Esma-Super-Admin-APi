@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.HelpRequest.UpdateHelpRequestStatus;
 
 public sealed record UpdateHelpRequestStatusCommand : ICommand<HelpRequestDto>

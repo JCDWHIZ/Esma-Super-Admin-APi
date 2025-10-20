@@ -1,8 +1,6 @@
-using System;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Policy;
 using Application.Abstractions.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Api.Middleware;
 

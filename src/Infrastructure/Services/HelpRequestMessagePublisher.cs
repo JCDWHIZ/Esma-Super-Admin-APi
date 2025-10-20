@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Application.Abstractions.Data;
-using Application.Abstractions.Models;
+﻿using Application.Abstractions.Data;
 using Application.HelpRequest;
 using Application.Interfaces;
-using Confluent.Kafka;
 using Domain.HelpRequests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

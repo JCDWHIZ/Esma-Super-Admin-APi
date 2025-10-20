@@ -1,4 +1,3 @@
-using System;
 using Domain.Blogs;
 using Hangfire;
 
@@ -22,9 +21,9 @@ public sealed class ScheduleBlogCommandHandler(IApplicationDbContext _dbContext)
         }
         else
         {
-            Result.Failure<string>(BlogErrors.InvalidPublishDate(command.PublishDate)); 
+            Result.Failure<string>(BlogErrors.InvalidPublishDate(command.PublishDate));
         }
-            await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success("Blog Scheduled");
     }

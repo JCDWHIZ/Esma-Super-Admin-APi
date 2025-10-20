@@ -1,7 +1,6 @@
 ﻿using Application.Admin;
 using Application.Admin.EditAdmin;
 using Infrastructure.Authorization;
-using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.Admin;
 
