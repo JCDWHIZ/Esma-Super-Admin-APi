@@ -3,6 +3,7 @@ using Application;
 using Hangfire;
 using HealthChecks.UI.Client;
 using Infrastructure;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
@@ -73,6 +74,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseHangfireDashboard("/hangfire");
+RecurringJob.AddOrUpdate<SubscriptionCheckJob>(
+              "check-subscriptions",
+              job => job.CheckSubscriptionsAsync(),
+              "0 */5 * * *");
+              //"* * * * *");
 
 await app.RunAsync();
 

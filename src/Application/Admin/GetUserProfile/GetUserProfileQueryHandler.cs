@@ -23,7 +23,7 @@ public class GetUserProfileQueryHandler(IApplicationDbContext _context, IUserCon
             .FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
-            return Result.Failure<UserDto>(UserErrors.NotFound(query.PublicId));
+            return Result.Failure<UserDto>(UserErrors.NotFound(userContext.UserPublicId ?? Guid.Empty));
         }
         return Result.Success(user);
     }
