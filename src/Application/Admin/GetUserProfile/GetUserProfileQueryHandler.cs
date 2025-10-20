@@ -6,13 +6,17 @@ public class GetUserProfileQueryHandler(IApplicationDbContext _context, IUserCon
     public async Task<Result<UserDto>> Handle(GetUserProfileQuery query, CancellationToken cancellationToken)
     {
         UserDto? user = await _context.Users
+            .Include(u => u.Role)
             .Where(u => u.PublicId == userContext.UserPublicId)
             .Select(u => new UserDto
             {
                 PublicId = u.PublicId,
                 Username = u.Username,
                 Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,  
                 PhoneNumber = u.PhoneNumber,
+                RoleName = u.Role.Name,
                 ProfilePic = u.ProfilePic
             })
             .FirstOrDefaultAsync(cancellationToken);
