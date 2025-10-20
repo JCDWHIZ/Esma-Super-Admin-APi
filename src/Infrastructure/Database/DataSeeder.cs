@@ -36,13 +36,13 @@ public sealed class DataSeeder(
         var templatesToSeed = new List<Template>
         {
             Template.Create(
-                "User Registration",
+                "School admin Created",
                 "Hi *username*, welcome to *schoolName*!",
                 TriggerType.WELCOME_SCHOOLADMIN_EMAIL,
                 new List<string> { "username", "schoolName" }
             ),
             Template.Create(
-                "User Registration",
+                "Admin created",
                 "Hi *username*, welcome to elsoft!",
                 TriggerType.WELCOME_ADMIN_EMAIL,
                 new List<string> { "username" }
