@@ -25,9 +25,10 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     private readonly KeycloakService _keycloakService;
     private readonly IMessageProducer _messageProducer;
     private readonly IConfiguration _configuration;
+    private readonly KeycloakRolesService _KeycloakRolesService;
     private readonly ILogger<KeycloakOrganizationService> _logger;
 
-    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider, IEmailService emailService)
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider, IEmailService emailService, KeycloakRolesService keycloakRolesService)
     {
         _dbContext = dbContext;
         _keycloakService = keycloakService;
@@ -36,6 +37,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         _logger = logger;
         _emailService = emailService;
         _tokenProvider = tokenProvider;
+        _KeycloakRolesService = keycloakRolesService;
     }
     public async Task CreateAdmin(int userId, CancellationToken cancellationToken)
     {
@@ -81,9 +83,9 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             {
                 throw new InvalidOperationException("Returned Keycloak ID is not a valid GUID.");
             }
-
             user.KeycloakUserId = keycloakId;
             await _dbContext.SaveChangesAsync(cancellationToken);
+            await _KeycloakRolesService.AssignRoleToUserAsync(keycloakUserId, user.Role.Name);
 
             string resetToken = _tokenProvider.CreateOnboardingToken(user);
             var emailMessage = new EmailMessage
