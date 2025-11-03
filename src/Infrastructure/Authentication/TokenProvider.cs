@@ -72,7 +72,7 @@ internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvid
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddHours(1),
+            Expires = DateTime.UtcNow.AddHours(48),
             IssuedAt = DateTime.UtcNow,
             NotBefore = DateTime.UtcNow,
             SigningCredentials = creds,
