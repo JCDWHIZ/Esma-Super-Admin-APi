@@ -196,6 +196,7 @@ public sealed class DataSeeder(
                     "dashboard_view",
                     "admin_view", "admin_edit", "admin_invite", "admin_delete",
                     "audit_log_view",
+                    "role_view",
                     "auth_enable_2fa",
                 })
             },
