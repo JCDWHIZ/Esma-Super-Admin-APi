@@ -24,8 +24,7 @@ public sealed class InitiatePublishedBlogRequest(IApplicationDbContext _dbContex
             BackdropUrl = entity.BackdropUrl,
             Status = entity.Status,
             PublishDate = entity.PublishDate,
-            CreatedAt = entity.Created,
-            CreatedBy = entity.CreatedBy
+            CreatedAt = entity.Created
         });
     }
 }

@@ -34,8 +34,7 @@ public sealed class CreateScheduledBlogCommandHandler(IApplicationDbContext _dbC
             BackdropUrl = entity.BackdropUrl,
             Status = entity.Status,
             PublishDate = entity.PublishDate,
-            CreatedAt = entity.Created,
-            CreatedBy = entity.CreatedBy
+            CreatedAt = entity.Created
         });
     }
 

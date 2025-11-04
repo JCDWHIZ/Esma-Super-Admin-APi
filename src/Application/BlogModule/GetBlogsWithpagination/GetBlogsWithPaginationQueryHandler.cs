@@ -4,7 +4,29 @@ public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _co
 {
     async Task<Result<PaginatedList<BlogItemDto>>> IQueryHandler<GetBlogWithPaginationQuery, PaginatedList<BlogItemDto>>.Handle(GetBlogWithPaginationQuery query, CancellationToken cancellationToken)
     {
-        IQueryable<Domain.Blogs.Blog> blogQuery = _context.Blog.AsQueryable();
+        IQueryable<BlogItemDto> blogQuery = from b in _context.Blog
+                        join u in _context.Users on b.CreatedBy equals u.PublicId into userJoin
+                        from u in userJoin.DefaultIfEmpty()
+                        select new BlogItemDto
+                        {
+                            PublicId = b.PublicId,
+                            Title = b.Title,
+                            Content = b.Content,
+                            BackdropUrl = b.BackdropUrl,
+                            Status = b.Status,
+                            PublishDate = b.PublishDate,
+                            CreatedAt = b.Created,
+                            RejectReason = b.RejectReason,
+                            CreatedBy = u == null ? null : new CreatorDto
+                            {
+                                PublicId = u.PublicId,
+                                FirstName = u.FirstName,
+                                LastName = u.LastName,
+                                Username = u.Username,
+                                ProfilePic = u.ProfilePic
+                            }
+                        };
+
         if (!string.IsNullOrEmpty(query.Title))
         {
             blogQuery = blogQuery.Where(b => b.Title.Contains(query.Title));
@@ -32,22 +54,11 @@ public sealed class GetBlogsWithPaginationQueryHandler(IApplicationDbContext _co
 
         if (query.UserPublicId.HasValue)
         {
-            blogQuery = blogQuery.Where(b => b.CreatedBy == query.UserPublicId.Value);
+            blogQuery = blogQuery.Where(b => b.CreatedBy != null && b.CreatedBy.PublicId == query.UserPublicId.Value);
         }
 
         PaginatedList<BlogItemDto> blogList = await PaginatedList<BlogItemDto>.CreateAsync(
-            blogQuery.Select(b => new BlogItemDto
-            {
-                PublicId = b.PublicId,
-                Title = b.Title,
-                Content = b.Content,
-                BackdropUrl = b.BackdropUrl,
-                Status = b.Status,
-                PublishDate = b.PublishDate,
-                CreatedAt = b.Created,
-                RejectReason = b.RejectReason,
-                CreatedBy = b.CreatedBy
-            }),
+            blogQuery,
             query.PageNumber ?? 1,
             query.PageSize ?? 10
         );
