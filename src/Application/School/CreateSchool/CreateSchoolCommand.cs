@@ -58,6 +58,7 @@ public record SchoolAdminRequest
 
 public record SubscriptionDto
 {
+    public Guid? SchoolPublicId { get; init; }
     public SubscriptionType SubscriptionType { get; init; }
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }

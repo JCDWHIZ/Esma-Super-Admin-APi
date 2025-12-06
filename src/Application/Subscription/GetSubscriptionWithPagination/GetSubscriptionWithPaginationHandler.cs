@@ -35,6 +35,7 @@ public sealed class GetSubscriptionWithPagination(IApplicationDbContext _context
 
         PaginatedList<SubscriptionDto> paginatedList = await PaginatedList<SubscriptionDto>.CreateAsync(subscriptionQuery.Select(s => new SubscriptionDto
         {
+            SchoolPublicId = s.PublicId,
             SubscriptionType = s.Subscriptions.SubscriptionType,
             StartDate = s.Subscriptions.StartDate,
             EndDate = s.Subscriptions.EndDate,
