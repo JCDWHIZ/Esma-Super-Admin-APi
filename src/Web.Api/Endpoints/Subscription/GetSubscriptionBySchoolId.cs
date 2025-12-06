@@ -8,12 +8,12 @@ public class UpdateSubscriptionBySchoolId : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("subscriptions/by-school-id", async (
-            Guid PublicId,
+        app.MapGet("subscriptions/{schoolPublicId:guid}", async (
+            Guid schoolPublicId,
             IQueryHandler<GetSubscriptionBySchoolIdQuery, SubscriptionDto> handler,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetSubscriptionBySchoolIdQuery(PublicId);
+            var query = new GetSubscriptionBySchoolIdQuery(schoolPublicId);
 
             Result<SubscriptionDto> result = await handler.Handle(query, cancellationToken);
 
