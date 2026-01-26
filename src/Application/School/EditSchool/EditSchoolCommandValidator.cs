@@ -34,9 +34,8 @@ public class EditSchoolCommandValidator : AbstractValidator<EditSchoolCommand>
         RuleFor(x => x.Subscriptions)
             .NotNull();
             
-        When(x => x.Subscriptions != null, () =>
-        {
-            RuleFor(x => x.Subscriptions.SubscriptionType).IsInEnum();
-        });
+        When(x => x.Subscriptions != null, () => RuleFor(x => x.Subscriptions.SubscriptionType).IsInEnum());
+
+        RuleForEach(x => x.Modules).IsInEnum();
     }
 }
