@@ -63,14 +63,14 @@ build-test-dotnet:
 # Build and push Docker image
 docker-build-push:
   stage: build
-  image: docker:24.0.5
+  image: docker:28.0
   services:
-    - docker:24.0.5-dind
+    - docker:28.0-dind
   tags:
     - esma
   variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_CERTDIR: "/"
   before_script:
     - docker run --privileged --rm tonistiigi/binfmt --install all
     - docker buildx create --use
