@@ -71,6 +71,7 @@ docker-build-push:
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://docker:2375
   before_script:
     - docker run --privileged --rm tonistiigi/binfmt --install all
     - docker buildx create --use
