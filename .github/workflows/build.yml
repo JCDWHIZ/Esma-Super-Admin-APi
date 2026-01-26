@@ -73,7 +73,7 @@ docker-build-push:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
   before_script:
-    - docker run --privileged --rm tonistiigi/binfmt --install all
+    - docker run --rm tonistiigi/binfmt --install all
     - docker buildx create --use
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
