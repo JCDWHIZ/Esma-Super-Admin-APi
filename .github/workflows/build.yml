@@ -29,28 +29,35 @@ build-test-dotnet:
 # Build and push Docker image
 docker-build-push:
   stage: build
-  image: docker:28.0
-  services:
-    - docker:28.0-dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   tags:
     - esma
   variables:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    - docker run --privileged --rm tonistiigi/binfmt --install all
-    - docker buildx create --use
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
   script:
-  - |
-    docker buildx build \
-      --platform linux/arm64 \
-      --push \
-      -t $DOCKER_IMAGE:latest \
-      -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
-      -f ./src/Web.Api/Dockerfile \
-      .
-  needs: ["build-test-dotnet"]  # Require tests to pass first
+    - mkdir -p /kaniko/.docker
+    - |
+      cat > /kaniko/.docker/config.json <<EOF
+      {
+        "auths": {
+          "https://index.docker.io/v1/": {
+            "username": "${DOCKER_USERNAME}",
+            "password": "${DOCKER_PASSWORD}"
+          }
+        }
+      }
+      EOF
+    - |
+      /kaniko/executor \
+        --context $CI_PROJECT_DIR \
+        --dockerfile $CI_PROJECT_DIR/src/Web.Api/Dockerfile \
+        --destination $DOCKER_IMAGE:latest \
+        --destination $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
+        --cache=true \
+        --cache-repo=$DOCKER_IMAGE-cache
+  needs: ["build-test-dotnet"]
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
