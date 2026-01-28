@@ -16,9 +16,17 @@ public sealed record CreateSchoolCommand : ICommand<string>
 
     public List<Modules> Modules { get; init; } = new();
 
-    public SubscriptionDto Subscriptions { get; init; } = new();
+    public CreateSubscriptionDto Subscriptions { get; init; } = new();
     public SchoolAdminRequest SchoolAdmin { get; init; } = new();
 
+}
+
+public record CreateSubscriptionDto
+{
+    public SubscriptionType SubscriptionType { get; init; }
+    public DateTime? StartDate { get; init; }
+    public DateTime? EndDate { get; init; }
+    public decimal Amount { get; init; }
 }
 
 public record AddressDto

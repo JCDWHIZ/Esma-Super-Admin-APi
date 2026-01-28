@@ -24,7 +24,7 @@ internal sealed class CreateSchool : IEndpoint
                 PhoneNumber = request.PhoneNumber,
                 DocumentUrl = request.DocumentUrl,
                 Modules = request.Modules,
-                Subscriptions = new SubscriptionDto
+                Subscriptions = new CreateSubscriptionDto
                 {
                     SubscriptionType = request.Subscriptions.SubscriptionType,
                     StartDate = request.Subscriptions.StartDate,
@@ -70,7 +70,7 @@ internal sealed class CreateSchool : IEndpoint
 
         public List<Modules> Modules { get; init; } = new();
 
-        public SubscriptionDto Subscriptions { get; init; } = new();
+        public CreateSubscriptionDto Subscriptions { get; init; } = new();
         public SchoolAdminRequest SchoolAdmin { get; init; } = new();
     };
 }
