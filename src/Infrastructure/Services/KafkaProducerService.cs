@@ -14,7 +14,7 @@ public class KafkaProducer : IMessageProducer, IDisposable
     private readonly KafkaSettings _settings;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = null
     };
     private bool _disposed;
 
