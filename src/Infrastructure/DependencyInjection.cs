@@ -158,6 +158,7 @@ public static class DependencyInjection
         services.AddSingleton<IKafkaAdminService, KafkaAdminService>();
         services.AddHostedService<HelpRequestGetHandler>();
         services.AddHostedService<HelpRequestRespondHandler>();
+        services.AddHostedService<TenantResponseHandlerService>();
 
         return services;
     }

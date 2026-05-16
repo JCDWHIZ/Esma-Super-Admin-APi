@@ -19,7 +19,7 @@ public class HelpRequestRespondHandler : BackgroundService
     private readonly IKafkaAdminService _kafkaAdminService;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = null
     };
 
     public HelpRequestRespondHandler(

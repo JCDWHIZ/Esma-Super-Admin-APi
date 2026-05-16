@@ -20,7 +20,7 @@ public class TenantResponseHandlerService : BackgroundService
     private readonly KafkaSettings _kafkaSettings;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = null
     };
     private readonly IKafkaAdminService _kafkaAdminService;
 
