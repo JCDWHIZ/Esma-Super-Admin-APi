@@ -151,14 +151,14 @@ public class TenantResponseHandlerService : BackgroundService
             ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
             IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            var schoolId = Guid.Parse(message.Data.SchoolId);
+            var schoolId = Guid.Parse(message.Data.SchoolPublicId);
             Domain.Schools.Schools? school = await dbContext.Schools
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.PublicId == schoolId, cancellationToken);
 
             if (school == null)
             {
-                _logger.LogWarning("School not found for ID: {SchoolId}", message.Data.SchoolId);
+                _logger.LogWarning("School not found for ID: {SchoolId}", message.Data.SchoolPublicId);
                 return;
             }
 
@@ -198,12 +198,12 @@ public class TenantResponseHandlerService : BackgroundService
                 await emailService.SendEmailAsync(emailMessage);
 
                 _logger.LogInformation("Welcome email sent for school: {SchoolName} ({SchoolId})",
-                    school.SchoolName, message.Data.SchoolId);
+                    school.SchoolName, message.Data.SchoolPublicId);
             }
             else
             {
                 _logger.LogError("Tenant creation failed for school: {SchoolName} ({SchoolId}). Error: {Error}",
-                    school.SchoolName, message.Data.SchoolId, message.Data.ErrorMessage);
+                    school.SchoolName, message.Data.SchoolPublicId, message.Data.ErrorMessage);
 
                 var errorEmailMessage = new EmailMessage
                 {
