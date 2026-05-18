@@ -179,7 +179,8 @@ public class TenantResponseHandlerService : BackgroundService
                     { "lastName", school.User.LastName },
                     { "role", school.User.Role.ToString() },
                     { "username", school.User.Username },
-                    { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
+                    { "phoneNumber", school.User?.PhoneNumber ?? string.Empty },
+                    { "tenantId", school.TenantId }
                 };
 
                 string token = tokenService.GenerateToken(payload);
