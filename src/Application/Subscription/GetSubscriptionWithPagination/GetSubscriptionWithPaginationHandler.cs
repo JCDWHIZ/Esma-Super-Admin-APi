@@ -1,4 +1,5 @@
 using Application.School.CreateSchool;
+using Application.School;
 
 namespace Application.Subscription.GetSubscriptionWithPagination;
 
@@ -44,7 +45,12 @@ public sealed class GetSubscriptionWithPagination(IApplicationDbContext _context
             SchoolLogo = s.LogoUrl,
             Status = Domain.Subscriptions.Subscriptions.GetStatus(s.Subscriptions.StartDate, s.Subscriptions.EndDate),
             SchoolAdminName = s.User.FirstName + " " + s.User.LastName,
-            SchoolModules = s.Modules
+            SchoolModules = s.Modules.Select(m => new SchoolModuleResponseDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description
+            }).ToList()
         }),
             query.PageNumber ?? 1,
             query.PageSize ?? 10

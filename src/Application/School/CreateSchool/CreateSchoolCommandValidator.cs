@@ -56,6 +56,29 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
             
         When(x => x.Subscriptions != null, () => RuleFor(x => x.Subscriptions.SubscriptionType).IsInEnum());
 
-        RuleForEach(x => x.Modules).IsInEnum();
+        RuleFor(x => x.Modules)
+            .Must(modules => modules.Count > 0)
+            .WithMessage("At least one module key must be provided.");
+
+        RuleFor(x => x.Modules)
+            .MustAsync(async (modules, cancellationToken) =>
+            {
+                var normalized = modules
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .Select(m => m.Trim().ToUpperInvariant())
+                    .Distinct()
+                    .ToList();
+
+                if (normalized.Count != modules.Count)
+                {
+                    return false;
+                }
+
+                int count = await _context.SchoolModules
+                    .CountAsync(m => normalized.Contains(m.Key), cancellationToken);
+
+                return count == normalized.Count;
+            })
+            .WithMessage("One or more module keys are invalid.");
     }
 }

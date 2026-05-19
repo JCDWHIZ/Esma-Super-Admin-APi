@@ -68,7 +68,7 @@ internal sealed class CreateSchool : IEndpoint
 
         public List<string> DocumentUrl { get; init; } = new();
 
-        public List<Modules> Modules { get; init; } = new();
+        public List<string> Modules { get; init; } = new();
 
         public CreateSubscriptionDto Subscriptions { get; init; } = new();
         public SchoolAdminRequest SchoolAdmin { get; init; } = new();

@@ -18,6 +18,19 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
             throw new Exception("School already exists");
         }
 
+        var moduleKeys = command.Modules
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+
+        List<SchoolModule> modules = await _dbContext.SchoolModules
+            .Where(m => moduleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (modules.Count != moduleKeys.Count)
+        {
+            return Result.Failure<string>(SchoolErrors.InvalidModuleKeys);
+        }
+
         // Create school entity
         var schoolEntity = new Schools
         {
@@ -33,7 +46,7 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
             EmailAddress = command.EmailAddress,
             PhoneNumber = command.PhoneNumber,
             DocumentUrl = command.DocumentUrl,
-            Modules = command.Modules,
+            Modules = modules,
             Subscriptions = new Subscriptions
             {
                 SubscriptionType = command.Subscriptions.SubscriptionType,

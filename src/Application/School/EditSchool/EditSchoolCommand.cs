@@ -16,7 +16,7 @@ public sealed record EditSchoolCommand : ICommand<string>
 
     public List<string> DocumentUrl { get; init; } = new();
 
-    public List<Modules> Modules { get; init; } = new();
+    public List<string> Modules { get; init; } = new();
 
     public SubscriptionDto Subscriptions { get; init; } = new();
 }

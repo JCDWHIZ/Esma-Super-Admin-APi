@@ -1,4 +1,5 @@
 using Application.School.CreateSchool;
+using Application.School;
 using Domain.Schools;
 
 namespace Application.Subscription.GetSubscriptionBySchoolId;
@@ -11,6 +12,7 @@ public sealed class GetSubscriptionBySchoolId(IApplicationDbContext _context)
         Domain.Schools.Schools? school = await _context.Schools
             .Include(s => s.Subscriptions)
             .Include(s => s.User)
+            .Include(s => s.Modules)
             .FirstOrDefaultAsync(s => s.PublicId == query.PublicId, cancellationToken);
 
         if (school is null)
@@ -28,7 +30,12 @@ public sealed class GetSubscriptionBySchoolId(IApplicationDbContext _context)
             SchoolLogo = school.LogoUrl,
             Status = Domain.Subscriptions.Subscriptions.GetStatus(school.Subscriptions.StartDate, school.Subscriptions.EndDate),
             SchoolAdminName = $"{school.User.FirstName} {school.User.LastName}",
-            SchoolModules = school.Modules
+            SchoolModules = school.Modules.Select(m => new SchoolModuleResponseDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description
+            }).ToList()
         };
 
         return Result.Success(dto);

@@ -18,7 +18,7 @@ public sealed class Schools : BaseAuditableEntity
     public SchoolStatus Status { get; set; } = SchoolStatus.PENDING;
     public string PhoneNumber { get; set; } = string.Empty;
     public ICollection<string> DocumentUrl { get; set; } = new List<string>();
-    public ICollection<Modules> Modules { get; set; } = new List<Modules>();
+    public ICollection<SchoolModule> Modules { get; set; } = new List<SchoolModule>();
     [JsonIgnore]
     public required Subscriptions.Subscriptions Subscriptions { get; set; }
     public string TenantId { get; set; } = string.Empty;

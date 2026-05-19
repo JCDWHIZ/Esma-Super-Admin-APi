@@ -1,7 +1,7 @@
+using Domain.Schools;
 using Domain.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SharedKernel.Enums;
 
 namespace Infrastructure.Configurations.Schools;
 
@@ -54,13 +54,12 @@ internal sealed class SchoolsConfiguration : IEntityTypeConfiguration<Domain.Sch
                 v => v.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList())
             .HasColumnType("text");
 
-        builder.Property(s => s.Modules)
-            .HasConversion(
-                v => string.Join(';', v.Select(m => m.ToString())),
-                v => v.Split(';', StringSplitOptions.RemoveEmptyEntries)
-                      .Select(m => Enum.Parse<Modules>(m))
-                      .ToList())
-            .HasColumnType("text");
+        builder.HasMany(s => s.Modules)
+            .WithMany(m => m.Schools)
+            .UsingEntity<Dictionary<string, object>>(
+                "school_module_assignments",
+                right => right.HasOne<SchoolModule>().WithMany().HasForeignKey("module_id").OnDelete(DeleteBehavior.Cascade),
+                left => left.HasOne<Domain.Schools.Schools>().WithMany().HasForeignKey("school_id").OnDelete(DeleteBehavior.Cascade));
 
         builder.HasOne(s => s.Subscriptions)
             .WithOne(sub => sub.Schools)

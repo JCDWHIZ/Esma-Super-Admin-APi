@@ -13,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<User> Users { get; }
     DbSet<TodoItem> TodoItems { get; }
     DbSet<Schools> Schools { get; }
+    DbSet<SchoolModule> SchoolModules { get; }
     DbSet<Subscriptions> Subscriptions { get; }
     DbSet<HelpRequests> HelpRequests { get; }
     DbSet<Domain.Roles.Role> Roles { get; }

@@ -49,4 +49,8 @@ public static class SchoolErrors
     public static readonly Error InvalidPhoneNumber = Error.Failure(
         "School.InvalidPhoneNumber",
         "The phone number format is not valid.");
+
+    public static readonly Error InvalidModuleKeys = Error.Failure(
+        "School.InvalidModuleKeys",
+        "One or more module keys are invalid.");
 }

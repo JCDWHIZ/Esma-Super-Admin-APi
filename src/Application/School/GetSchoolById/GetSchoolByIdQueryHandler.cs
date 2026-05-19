@@ -9,11 +9,26 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
     async Task<Result<SchoolItemDto>> IQueryHandler<GetSchoolByIdQuery, SchoolItemDto>.Handle(GetSchoolByIdQuery query, CancellationToken cancellationToken)
     {
         Schools? entity = await _context.Schools
-        .Include(s => s.Subscriptions).FirstOrDefaultAsync(x => x.PublicId == query.PublicId, cancellationToken);
+        .Include(s => s.Subscriptions)
+        .Include(s => s.User)
+        .Include(s => s.Modules)
+        .FirstOrDefaultAsync(x => x.PublicId == query.PublicId, cancellationToken);
         if (entity == null)
         {
             return Result.Failure<SchoolItemDto>(SchoolErrors.NotFound(query.PublicId));
         }
+
+        List<SchoolModuleAvailabilityDto> allModules = await _context.SchoolModules
+            .Select(m => new SchoolModuleAvailabilityDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description,
+                HasModule = entity.Modules.Any(sm => sm.Id == m.Id)
+            })
+            .OrderBy(m => m.Name)
+            .ToListAsync(cancellationToken);
+
         var schoolDto = new SchoolItemDto
         {
             PublicId = entity.PublicId,
@@ -35,7 +50,13 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
                 EndDate = entity.Subscriptions.EndDate ?? DateTime.MinValue,
                 Amount = entity.Subscriptions.Amount
             },
-            Modules = entity.Modules,
+            Modules = entity.Modules.Select(m => new SchoolModuleResponseDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description
+            }).ToList(),
+            ModuleAvailability = allModules,
             DocumentUrl = entity.DocumentUrl,
             User = entity.User == null ? null :
             new UserDto

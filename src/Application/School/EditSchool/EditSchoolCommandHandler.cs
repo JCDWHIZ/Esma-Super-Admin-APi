@@ -12,6 +12,7 @@ public sealed class EditSchoolCommandCommandHandler(IApplicationDbContext _dbCon
     {
         Schools? entity = await _dbContext.Schools
                 .Include(s => s.Subscriptions)
+                .Include(s => s.Modules)
                 .FirstOrDefaultAsync(s => s.PublicId == command.PublicId, cancellationToken);
 
         if (entity == null)
@@ -30,7 +31,18 @@ public sealed class EditSchoolCommandCommandHandler(IApplicationDbContext _dbCon
         };
         entity.EmailAddress = command.EmailAddress;
         entity.PhoneNumber = command.PhoneNumber;
-        entity.Modules = command.Modules;
+        var moduleKeys = command.Modules
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+        List<SchoolModule> modules = await _dbContext.SchoolModules
+            .Where(m => moduleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (modules.Count != moduleKeys.Count)
+        {
+            return Result.Failure<string>(SchoolErrors.InvalidModuleKeys);
+        }
+        entity.Modules = modules;
         entity.DocumentUrl = command.DocumentUrl;
 
         entity.Subscriptions ??= new Subscriptions();

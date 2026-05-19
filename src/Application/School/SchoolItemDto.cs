@@ -19,7 +19,8 @@ public record SchoolItemDto
     public SchoolStatus Status { get; set; } = SchoolStatus.PENDING;
     public string PhoneNumber { get; set; } = string.Empty;
     public ICollection<string>? DocumentUrl { get; set; } = new List<string>();
-    public ICollection<Modules> Modules { get; set; } = new List<Modules>();
+    public ICollection<SchoolModuleResponseDto> Modules { get; set; } = new List<SchoolModuleResponseDto>();
+    public ICollection<SchoolModuleAvailabilityDto> ModuleAvailability { get; set; } = new List<SchoolModuleAvailabilityDto>();
     public required SubscriptionDto? Subscriptions { get; set; }
     public required UserDto? User { get; set; }
     public bool IsDeleted { get; internal set; }

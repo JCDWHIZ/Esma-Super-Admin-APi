@@ -81,7 +81,12 @@ public sealed class GetShoolsWithPaginationQueryHandler(IApplicationDbContext _c
                EmailAddress = s.EmailAddress,
                PhoneNumber = s.PhoneNumber,
                DocumentUrl = s.DocumentUrl,
-               Modules = s.Modules,
+               Modules = s.Modules.Select(m => new SchoolModuleResponseDto
+               {
+                   Name = m.Name,
+                   Key = m.Key,
+                   Description = m.Description
+               }).ToList(),
                Subscribed = s.Subscribed,
                Status = s.Status,
                Subscriptions = s.Subscriptions == null ? null : new SubscriptionDto

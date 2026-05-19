@@ -6,5 +6,5 @@ public sealed record UpdateSchoolSubscriptionCommand(
     DateTime? StartDate,
     DateTime? EndDate,
     decimal Amount,
-    ICollection<Modules> Modules
+    ICollection<string> Modules
 ) : ICommand<string>;

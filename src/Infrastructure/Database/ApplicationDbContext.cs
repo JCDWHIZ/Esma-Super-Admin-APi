@@ -29,6 +29,7 @@ public sealed class ApplicationDbContext(
     public DbSet<TodoItem> TodoItems { get; set; }
 
     public DbSet<Schools> Schools { get; set; }
+    public DbSet<SchoolModule> SchoolModules { get; set; }
     public DbSet<Subscriptions> Subscriptions { get; set; }
     public DbSet<HelpRequests> HelpRequests { get; set; }
     public DbSet<Blog> Blog => Set<Blog>();

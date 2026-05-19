@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Application.Interfaces;
 using Domain.HelpRequests;
 using Domain.Roles;
+using Domain.Schools;
 using Domain.Templates;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public sealed class DataSeeder(
         try
         {
             await SeedPermissions(cancellationToken);
+            await SeedSchoolModules(cancellationToken);
             await SeedRoles(cancellationToken);
             await SeedSuperadmin(cancellationToken);
             //await SyncToKeycloak();
@@ -29,6 +31,49 @@ public sealed class DataSeeder(
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while seeding data");
+        }
+    }
+    private async Task SeedSchoolModules(CancellationToken cancellationToken)
+    {
+        var modulesToSeed = new List<SchoolModule>
+        {
+            new() { Name = "Teachers", Key = "TEACHERS", Description = "Manage teachers and teacher records." },
+            new() { Name = "Dashboard", Key = "DASHBOARD", Description = "View school analytics and high-level metrics." },
+            new() { Name = "Settings", Key = "SETTINGS", Description = "Configure school-level settings and preferences." },
+            new() { Name = "Students", Key = "STUDENTS", Description = "Manage student profiles and enrollment data." },
+            new() { Name = "Parents", Key = "PARENTS", Description = "Manage parent accounts and linked students." },
+            new() { Name = "Support", Key = "SUPPORT", Description = "Access support tickets and help desk tools." },
+            new() { Name = "Suggestion", Key = "SUGGESTION", Description = "Submit and review suggestions." },
+            new() { Name = "Classroom Management", Key = "CLASSROOMMANAGEMENT", Description = "Manage classrooms and class assignments." },
+            new() { Name = "Virtual Classroom", Key = "VIRTUALCLASSROOM", Description = "Conduct and manage virtual classroom activities." },
+            new() { Name = "Assignment", Key = "ASSIGNMENT", Description = "Create, assign, and review assignments." },
+            new() { Name = "Virtual Meeting", Key = "VIRTUALMEETING", Description = "Schedule and manage virtual meetings." },
+            new() { Name = "Exams", Key = "EXAMS", Description = "Manage exam setup, schedules, and grading." },
+            new() { Name = "Lesson Plan", Key = "LESSONPLAN", Description = "Create and manage lesson plans." },
+            new() { Name = "Admissions", Key = "ADMISSIONS", Description = "Manage admission applications and onboarding." },
+            new() { Name = "Library", Key = "LIBRARY", Description = "Manage digital and physical library resources." },
+            new() { Name = "Calendar", Key = "CALENDAR", Description = "Manage school events and schedules." },
+            new() { Name = "Fees", Key = "FEES", Description = "Track fee setup, payments, and balances." },
+            new() { Name = "Account Management", Key = "ACCOUNTMANAGEMENT", Description = "Manage school accounts and account settings." },
+            new() { Name = "Broadcast", Key = "BROADCAST", Description = "Send announcements to school users." },
+            new() { Name = "Messaging", Key = "MESSAGING", Description = "Access internal messaging and communication." },
+            new() { Name = "Configuration", Key = "CONFIGURATION", Description = "Manage advanced system configurations." },
+            new() { Name = "Audit", Key = "AUDIT", Description = "Review audit logs and compliance activities." }
+        };
+
+        List<string> existingKeys = await context.SchoolModules
+            .Select(m => m.Key)
+            .ToListAsync(cancellationToken);
+
+        var newModules = modulesToSeed
+            .Where(m => !existingKeys.Contains(m.Key))
+            .ToList();
+
+        if (newModules.Any())
+        {
+            await context.SchoolModules.AddRangeAsync(newModules, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Added {Count} school modules", newModules.Count);
         }
     }
     private async Task SeedTemplates(CancellationToken cancellationToken)

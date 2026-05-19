@@ -1,6 +1,7 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Models;
 using Application.Interfaces;
+using Application.School;
 using Application.School.CreateSchool;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -208,7 +209,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         Domain.Schools.Schools? school = await _dbContext.Schools
             .Include(s => s.User)
             .Include(s => s.Subscriptions)
-            .Include(s => s.Address)
+            .Include(s => s.Modules)
             .FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
         if (school == null)
         {
@@ -270,7 +271,12 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 },
                 SchoolAdminUsername = school.User.Username,
                 SchoolAdminRole = school.User.Role,
-                Modules = school.Modules,
+                Modules = school.Modules.Select(m => new SchoolModuleResponseDto
+                {
+                    Name = m.Name,
+                    Key = m.Key,
+                    Description = m.Description
+                }).ToList(),
                 Subscriptions = new SubscriptionDto
                 {
                     SubscriptionType = school.Subscriptions.SubscriptionType,
@@ -296,7 +302,6 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 ex);
         }
     }
-
 }
 
 

@@ -1,3 +1,5 @@
+using Application.School;
+
 namespace Application.School.CreateSchool;
 
 public sealed record CreateSchoolCommand : ICommand<string>
@@ -14,7 +16,7 @@ public sealed record CreateSchoolCommand : ICommand<string>
 
     public List<string> DocumentUrl { get; init; } = new();
 
-    public List<Modules> Modules { get; init; } = new();
+    public List<string> Modules { get; init; } = new();
 
     public CreateSubscriptionDto Subscriptions { get; init; } = new();
     public SchoolAdminRequest SchoolAdmin { get; init; } = new();
@@ -74,7 +76,7 @@ public record SubscriptionDto
     public string? SchoolLogo { get; init; }
     public string? SchoolName { get; init; }
     public string? SchoolAdminName { get; init; }
-    public ICollection<Modules>? SchoolModules { get; init; }
+    public ICollection<SchoolModuleResponseDto>? SchoolModules { get; init; }
     public SubscriptionStatus? Status { get; set; }
 }
 

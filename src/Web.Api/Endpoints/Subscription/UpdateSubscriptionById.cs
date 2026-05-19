@@ -12,7 +12,7 @@ public class UpdateSubscriptionById : IEndpoint
         public DateTime? StartDate { get; init; }
         public DateTime? EndDate { get; init; }
         public decimal Amount { get; init; }
-        public ICollection<Modules> Modules { get; init; } = [];
+        public ICollection<string> Modules { get; init; } = [];
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
