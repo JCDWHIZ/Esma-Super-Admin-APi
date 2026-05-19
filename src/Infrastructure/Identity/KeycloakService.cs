@@ -449,30 +449,37 @@
 // // }
 
 using Application.Abstractions.Authentication;
+using Application.Abstractions.Data;
 using Application.Abstractions.Models;
 using Application.Auth.ForgotPassword;
 using Application.Auth.Login;
+using Application.Interfaces;
+using Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Refit;
 
 
-namespace Application.Interfaces.Services;
+namespace Infrastructure.Identity;
 
-public class KeycloakService
+public class KeycloakService : IKeycloakService
 {
     private readonly IKeycloakApi _keycloakApi;
     private readonly IConfiguration _configuration;
     private readonly IApplicationDbContext _dbContext;
     private readonly IEmailService _emailService;
     private readonly ITokenProvider _tokenService;
+    private readonly ILogger<KeycloakService> _logger;
 
-    public KeycloakService(IKeycloakApi keycloakApi, IConfiguration configuration, IApplicationDbContext dbContext, IEmailService emailService, ITokenProvider tokenService)
+    public KeycloakService(IKeycloakApi keycloakApi, IConfiguration configuration, IApplicationDbContext dbContext, IEmailService emailService, ITokenProvider tokenService, ILogger<KeycloakService> logger)
     {
         _keycloakApi = keycloakApi;
         _configuration = configuration;
         _emailService = emailService;
         _tokenService = tokenService;
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public async Task<string> GetAdminAccessTokenAsync()
@@ -530,7 +537,7 @@ public class KeycloakService
             if (locationUrl != null)
             {
                 string orgId = locationUrl.Split('/')[^1];
-                Console.WriteLine($"OrgId {orgId}");
+                _logger.LogInformation("Created Keycloak organization with id {OrganizationId}", orgId);
                 return orgId;
             }
         }
@@ -862,7 +869,7 @@ public class KeycloakService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error sending setup email: {ex.Message}");
+            _logger.LogError(ex, "Error sending setup email");
             return false;
         }
     }
@@ -919,7 +926,7 @@ public class KeycloakService
         }
     }
 
-    public async Task ResetPasswordAsync(Guid KeycloakUserId, string password)
+    public async Task ResetPasswordAsync(Guid keycloakUserId, string password)
     {
         string token = await GetAdminAccessTokenAsync();
         var request = new PasswordResetRequest
@@ -932,13 +939,15 @@ public class KeycloakService
         string authorizationHeader = $"Bearer {token}";
         try
         {
-            await _keycloakApi.ResetPasswordAsync(_configuration["Keycloak:Realm"]!, KeycloakUserId.ToString(), request, authorizationHeader);
-            Console.WriteLine("Password reset successfully for: ." + KeycloakUserId);
+            await _keycloakApi.ResetPasswordAsync(_configuration["Keycloak:Realm"]!, keycloakUserId.ToString(), request, authorizationHeader);
+            _logger.LogInformation("Password reset successfully for user {KeycloakUserId}", keycloakUserId);
         }
         catch (ApiException ex)
         {
-            Console.WriteLine($"Failed to reset password: {ex.Message}");
-            throw;
+            _logger.LogError(ex, "Failed to reset password for user {KeycloakUserId}", keycloakUserId);
+            throw new InvalidOperationException(
+                $"Failed to reset password for user {keycloakUserId}",
+                ex);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Data;
 using Application.Abstractions.Data;
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Domain.HelpRequests;
 using Domain.Roles;
 using Domain.Templates;
@@ -13,7 +13,7 @@ namespace Infrastructure.Data;
 
 public sealed class DataSeeder(
     IApplicationDbContext context,
-    ILogger<DataSeeder> logger, KeycloakRolesService _keycloakRolesService)
+    ILogger<DataSeeder> logger, IKeycloakRolesService _keycloakRolesService)
 {
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
@@ -850,3 +850,4 @@ public sealed class DataSeeder(
 // REGULATORY_AUDITOR,
 // SERVICE_COORDINATOR,
 // MEDICATION_SUPPORT_WORKER
+

@@ -1,14 +1,14 @@
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.Login;
 
 public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCommandResponseDto>
 {
-    private readonly KeycloakService _keycloakService;
+    private readonly IKeycloakService _keycloakService;
     private readonly ILogger<LoginCommandHandler> _logger;
 
-    public LoginCommandHandler(KeycloakService keycloakService, ILogger<LoginCommandHandler> logger)
+    public LoginCommandHandler(IKeycloakService keycloakService, ILogger<LoginCommandHandler> logger)
     {
         _keycloakService = keycloakService;
         _logger = logger;
@@ -37,3 +37,5 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCom
         }
     }
 }
+
+

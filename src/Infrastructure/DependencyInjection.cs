@@ -1,9 +1,8 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.BackgroundJobs;
 using Application.Interfaces;
-using Application.Interfaces.Services;
 using Domain.Schools;
 using Domain.Users;
 using Hangfire;
@@ -14,6 +13,7 @@ using Infrastructure.Data;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Interceptors;
+using Infrastructure.Identity;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Time;
@@ -111,8 +111,8 @@ public static class DependencyInjection
         services.AddScoped<IKeycloakOrganizationService, KeycloakOrganizationService>();
         services.AddScoped<IHelpRequestJobHandler, HelpRequestJob>();
         services.AddScoped<IHelpRequestMessagePublisher, HelpRequestMessagePublisher>();
-        services.AddScoped<KeycloakService>();
-        services.AddScoped<KeycloakRolesService>();
+        services.AddScoped<IKeycloakService, KeycloakService>();
+        services.AddScoped<IKeycloakRolesService, KeycloakRolesService>();
 
         services.AddHangfire(config => config
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -222,8 +222,6 @@ public static class DependencyInjection
     {
         services.AddAuthorization();
 
-        services.AddSingleton<IAuthorizationPolicyProvider, PermissionProvider>();
-
         services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
@@ -288,16 +286,7 @@ public static class DependencyInjection
     private static Task OnTokenValidatedHandler(TokenValidatedContext context)
     {
 
-        if (context.Principal == null || !context.Principal.Identities.Any(identity => identity.IsAuthenticated))
-        {
-            return Task.CompletedTask;
-        }
-        else
-        {
-            var claims = context.Principal.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
-            Console.WriteLine("Claims: " + string.Join(", ", claims));
-        }
-
         return Task.CompletedTask;
     }
 }
+

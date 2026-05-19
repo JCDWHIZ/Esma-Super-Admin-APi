@@ -64,7 +64,6 @@ public class HelpRequestMessagePublisher : IHelpRequestMessagePublisher
         {
             _logger.LogError(ex, "Failed to publish message to Kafka topic {Topic}. MessageId: {MessageId}, HelpRequestId: {HelpRequestId}",
                 _kafkaSettings.HelpRequestRespondTopic, message.Id, helpRequestId);
-            Console.WriteLine($"Error publishing message: {ex}");
         }
     }
 }

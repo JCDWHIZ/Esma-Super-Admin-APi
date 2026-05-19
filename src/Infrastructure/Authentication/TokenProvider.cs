@@ -1,16 +1,17 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Abstractions.Authentication;
 using Domain.Users;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Infrastructure.Authentication;
 
-internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvider
+internal sealed class TokenProvider(IConfiguration configuration, ILogger<TokenProvider> logger) : ITokenProvider
 {
     private readonly SymmetricSecurityKey _securityKey = new(
         Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!));
@@ -82,11 +83,8 @@ internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvid
 
         var tokenHandler = new JwtSecurityTokenHandler();
         SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-        string tokenString = tokenHandler.WriteToken(token);
 
-        Console.WriteLine($"Created token: {tokenString}");
-        Console.WriteLine($"Issued At: {DateTime.UtcNow}, Expires At: {tokenDescriptor.Expires}");
-        Console.WriteLine($"Secret: {Convert.ToBase64String(_securityKey.Key)}, Issuer: {_issuer}, Audience: {_audience}");
+        logger.LogDebug("Created onboarding token for user {UserPublicId}", user.PublicId);
 
         return tokenHandler.WriteToken(token);
     }
@@ -116,15 +114,16 @@ internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvid
                 principal.HasClaim(c => c.Type == "publicId") &&
                 principal.HasClaim(c => c.Type == ClaimTypes.Email);
 
-            Console.WriteLine($"Validated claims: {string.Join(", ", principal.Claims.Select(c => $"{c.Type}: {c.Value}"))}");
+            logger.LogDebug("Validated onboarding token claims");
 
             return hasAllClaims ? principal : null;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Token validation failed: {ex.Message}");
+            logger.LogWarning(ex, "Onboarding token validation failed");
             return null;
         }
     }
 
 }
+

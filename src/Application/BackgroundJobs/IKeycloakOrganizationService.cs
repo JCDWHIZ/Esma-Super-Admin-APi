@@ -1,7 +1,6 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Models;
 using Application.Interfaces;
-using Application.Interfaces.Services;
 using Application.School.CreateSchool;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,13 +21,13 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
     private readonly IApplicationDbContext _dbContext;
     private readonly ITokenProvider _tokenProvider;
     private readonly IEmailService _emailService;
-    private readonly KeycloakService _keycloakService;
+    private readonly IKeycloakService _keycloakService;
     private readonly IMessageProducer _messageProducer;
     private readonly IConfiguration _configuration;
-    private readonly KeycloakRolesService _KeycloakRolesService;
+    private readonly IKeycloakRolesService _keycloakRolesService;
     private readonly ILogger<KeycloakOrganizationService> _logger;
 
-    public KeycloakOrganizationService(IApplicationDbContext dbContext, KeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider, IEmailService emailService, KeycloakRolesService keycloakRolesService)
+    public KeycloakOrganizationService(IApplicationDbContext dbContext, IKeycloakService keycloakService, IConfiguration configuration, IMessageProducer messageProducer, ILogger<KeycloakOrganizationService> logger, ITokenProvider tokenProvider, IEmailService emailService, IKeycloakRolesService keycloakRolesService)
     {
         _dbContext = dbContext;
         _keycloakService = keycloakService;
@@ -37,7 +36,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         _logger = logger;
         _emailService = emailService;
         _tokenProvider = tokenProvider;
-        _KeycloakRolesService = keycloakRolesService;
+        _keycloakRolesService = keycloakRolesService;
     }
     public async Task CreateAdmin(int userId, CancellationToken cancellationToken)
     {
@@ -85,7 +84,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             }
             user.KeycloakUserId = keycloakId;
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await _KeycloakRolesService.AssignRoleToUserAsync(keycloakUserId, user.Role.Name);
+            await _keycloakRolesService.AssignRoleToUserAsync(keycloakUserId, user.Role.Name);
 
             string resetToken = _tokenProvider.CreateOnboardingToken(user);
             var emailMessage = new EmailMessage
@@ -103,7 +102,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+            _logger.LogError(ex, "An error occurred while creating admin in Keycloak");
         }
     }
 
@@ -144,7 +143,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+            _logger.LogError(ex, "An error occurred while creating school admin in Keycloak");
         }
     }
 
@@ -179,7 +178,6 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to update admin in Keycloak");
-            Console.WriteLine(ex);
         }
     }
 
@@ -202,7 +200,6 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to delete admin in Keycloak");
-            Console.WriteLine(ex);
         }
     }
 
@@ -294,12 +291,13 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
         catch (Exception ex)
         {
-            // log the NRE or any other
-            Console.WriteLine($"[Error] CreateOrgForSchool failed: {ex}");
-            throw;
+            throw new InvalidOperationException(
+                $"CreateOrganizationForSchoolAsync failed for school {schoolId}",
+                ex);
         }
     }
 
 }
+
 
 

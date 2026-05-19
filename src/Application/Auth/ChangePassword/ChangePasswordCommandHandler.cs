@@ -1,9 +1,9 @@
-﻿using Application.Abstractions.Authentication;
-using Application.Interfaces.Services;
+using Application.Abstractions.Authentication;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.ChangePassword;
-public class ChangePasswordCommandHandler(KeycloakService _keycloakService, ILogger<ChangePasswordCommandHandler> _logger, IUserContext _userContext) : ICommandHandler<ChangePasswordCommand, string>
+public class ChangePasswordCommandHandler(IKeycloakService _keycloakService, ILogger<ChangePasswordCommandHandler> _logger, IUserContext _userContext) : ICommandHandler<ChangePasswordCommand, string>
 {
     public async Task<Result<string>> Handle(ChangePasswordCommand command, CancellationToken cancellationToken)
     {
@@ -33,3 +33,4 @@ public class ChangePasswordCommandHandler(KeycloakService _keycloakService, ILog
         }
     }
 }
+

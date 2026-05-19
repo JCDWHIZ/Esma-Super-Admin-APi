@@ -109,16 +109,7 @@ public sealed class ApplicationDbContext(
         // 2. Dispatch FIRST
         if (domainEvents.Any())
         {
-            try
-            {
-                await domainEventsDispatcher.DispatchAsync(domainEvents);
-            }
-            catch (Exception ex)
-            {
-                // CRITICAL: Add proper logging here
-                Console.WriteLine($"[DomainEvents] Dispatch failed: {ex}");
-                throw;
-            }
+            await domainEventsDispatcher.DispatchAsync(domainEvents);
         }
 
         // 3. Clear events ONLY after successful dispatch

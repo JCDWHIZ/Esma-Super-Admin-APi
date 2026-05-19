@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Application.Abstractions.Authentication;
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 
@@ -53,7 +53,7 @@ public sealed class SetPasswordCommandHandler : ICommandHandler<SetPasswordComma
                 _logger.LogWarning("KeycloakUserId not set for user: {UserPublicId}", userPublicId);
                 return Result.Failure<string>(UserErrors.NotFound(userPublicId));
             }
-            BackgroundJob.Enqueue<KeycloakService>(
+            BackgroundJob.Enqueue<IKeycloakService>(
             service => service.ResetPasswordAsync(user.KeycloakUserId, command.NewPassword));
             return Result.Success("Password has been reset");
         }

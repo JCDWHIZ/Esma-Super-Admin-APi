@@ -1,9 +1,10 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Authorization;
 
-internal sealed class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+internal sealed class PermissionAuthorizationHandler(ILogger<PermissionAuthorizationHandler> logger) : AuthorizationHandler<PermissionRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
     {
@@ -12,9 +13,8 @@ internal sealed class PermissionAuthorizationHandler : AuthorizationHandler<Perm
             return Task.CompletedTask;
         }
 
-        var roles = new List<string>();
+        List<string> roles = new();
 
-        // 1. Extract roles from realm_access
         System.Security.Claims.Claim? realmAccessClaim = context.User.Claims.FirstOrDefault(c => c.Type == "realm_access");
         if (realmAccessClaim != null)
         {
@@ -28,11 +28,10 @@ internal sealed class PermissionAuthorizationHandler : AuthorizationHandler<Perm
             }
             catch (JsonException ex)
             {
-                Console.WriteLine($"Failed to deserialize realm_access claim: {ex.Message}"); // Replace with your logger
+                logger.LogWarning(ex, "Failed to deserialize realm_access claim");
             }
         }
 
-        // 2. Extract roles from resource_access
         System.Security.Claims.Claim? resourceAccessClaim = context.User.Claims.FirstOrDefault(c => c.Type == "resource_access");
         if (resourceAccessClaim != null)
         {
@@ -52,25 +51,16 @@ internal sealed class PermissionAuthorizationHandler : AuthorizationHandler<Perm
             }
             catch (JsonException ex)
             {
-                Console.WriteLine($"Failed to deserialize resource_access claim: {ex.Message}"); // Replace with your logger
+                logger.LogWarning(ex, "Failed to deserialize resource_access claim");
             }
         }
 
-        // 3. Extract roles from groups claims
         IEnumerable<string> groupClaims = context.User.Claims.Where(c => c.Type == "groups").Select(c => c.Value);
         roles.AddRange(groupClaims);
 
-        // Debugging: Log extracted roles
-        Console.WriteLine($"Extracted roles: {string.Join(", ", roles)}"); // Replace with your logger
-
-        // Check if the required permission is in the roles
         if (roles.Contains(requirement.Permission))
         {
             context.Succeed(requirement);
-        }
-        else
-        {
-            Console.WriteLine($"Permission '{requirement.Permission}' not found in roles."); // Replace with your logger
         }
 
         return Task.CompletedTask;

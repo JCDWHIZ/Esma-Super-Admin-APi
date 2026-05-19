@@ -1,14 +1,17 @@
-﻿using Application.Abstractions.Authentication;
+using Application.Abstractions.Authentication;
+using Application.Abstractions.Data;
+using Application.Interfaces;
 using Domain.Roles;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Interfaces.Services;
-public class KeycloakRolesService
+namespace Infrastructure.Identity;
+public class KeycloakRolesService : IKeycloakRolesService
 {
     private readonly IKeycloakApi _keycloakApi;
     private readonly IConfiguration _configuration;
-    private readonly KeycloakService _KeycloakService;
+    private readonly IKeycloakService _keycloakService;
     private readonly IApplicationDbContext _dbContext;
     private readonly IUserContext _userContext;
     private readonly ILogger<KeycloakRolesService> _logger;
@@ -17,13 +20,13 @@ public class KeycloakRolesService
         IKeycloakApi keycloakApi,
         IConfiguration configuration,
         IUserContext userContext,
-        KeycloakService keycloakService,
+        IKeycloakService keycloakService,
         IApplicationDbContext dbContext,
         ILogger<KeycloakRolesService> logger)
     {
         _keycloakApi = keycloakApi;
         _configuration = configuration;
-        _KeycloakService = keycloakService;
+        _keycloakService = keycloakService;
         _userContext = userContext;
         _dbContext = dbContext;
         _logger = logger;
@@ -32,7 +35,7 @@ public class KeycloakRolesService
 
     public async Task<List<KeycloakRoleDto>> GetAllRealmRolesAsync()
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         Refit.ApiResponse<List<KeycloakRoleDto>> response = await _keycloakApi.GetRealmRolesAsync(realm, $"Bearer {token}");
@@ -48,7 +51,7 @@ public class KeycloakRolesService
 
     public async Task<KeycloakRoleDto?> GetRealmRoleByNameAsync(string roleName)
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         Refit.ApiResponse<KeycloakRoleDto> response = await _keycloakApi.GetRealmRoleByNameAsync(realm, roleName, $"Bearer {token}");
@@ -69,7 +72,7 @@ public class KeycloakRolesService
 
     public async Task<bool> CreateRealmRoleAsync(string name, string description, bool isComposite = false)
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         var createRoleDto = new CreateKeycloakRoleDto
@@ -93,7 +96,7 @@ public class KeycloakRolesService
 
     public async Task<bool> UpdateRealmRoleAsync(string roleName, string description)
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         var updateRoleDto = new UpdateKeycloakRoleDto
@@ -117,7 +120,7 @@ public class KeycloakRolesService
 
     public async Task<bool> DeleteRealmRoleAsync(string roleName)
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.DeleteRealmRoleAsync(realm, roleName, $"Bearer {token}");
@@ -135,7 +138,7 @@ public class KeycloakRolesService
     // Composite Roles Management
     public async Task<bool> AddCompositeRolesAsync(string parentRoleName, List<string> childRoleNames)
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         // First, get the child roles
@@ -283,7 +286,7 @@ public class KeycloakRolesService
             return false;
         }
 
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.AssignRealmRolesToUserAsync(
@@ -309,7 +312,7 @@ public class KeycloakRolesService
             return false;
         }
 
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         Refit.ApiResponse<HttpResponseMessage> response = await _keycloakApi.RemoveRealmRolesFromUserAsync(
@@ -328,7 +331,7 @@ public class KeycloakRolesService
 
     public async Task<List<KeycloakRoleDto>> GetUserRolesAsync(string userId)
     {
-        string token = await _KeycloakService.GetAdminAccessTokenAsync();
+        string token = await _keycloakService.GetAdminAccessTokenAsync();
         string realm = _configuration["Keycloak:Realm"]!;
 
         Refit.ApiResponse<List<KeycloakRoleDto>> response = await _keycloakApi.GetUserRealmRolesAsync(realm, userId, $"Bearer {token}");
@@ -347,7 +350,7 @@ public class KeycloakRolesService
         try
         {
             // Get the user's access token (not admin token)
-            string token = await _KeycloakService.GetAdminAccessTokenAsync();
+            string token = await _keycloakService.GetAdminAccessTokenAsync();
             string realm = _configuration["Keycloak:Realm"]!;
 
             var request = new AuthenticatedUserChangePasswordRequest
@@ -407,3 +410,7 @@ public class KeycloakRolesService
         }
     }
 }
+
+
+
+

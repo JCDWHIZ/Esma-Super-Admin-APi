@@ -1,15 +1,15 @@
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.ForgotPassword;
 
 public sealed class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswordCommand, ForgotPasswordResponseDto>
 {
-    private readonly KeycloakService _keycloakService;
+    private readonly IKeycloakService _keycloakService;
     private readonly ILogger<ForgotPasswordCommandHandler> _logger;
     private readonly IApplicationDbContext _context;
 
-    public ForgotPasswordCommandHandler(KeycloakService keycloakService, ILogger<ForgotPasswordCommandHandler> logger, IApplicationDbContext context)
+    public ForgotPasswordCommandHandler(IKeycloakService keycloakService, ILogger<ForgotPasswordCommandHandler> logger, IApplicationDbContext context)
     {
         _keycloakService = keycloakService;
         _logger = logger;
@@ -49,3 +49,5 @@ public sealed class ForgotPasswordCommandHandler : ICommandHandler<ForgotPasswor
         }
     }
 }
+
+

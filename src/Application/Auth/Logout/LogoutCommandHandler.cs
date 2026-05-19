@@ -1,14 +1,14 @@
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.Logout;
 
 public sealed class LogoutCommandHandler : ICommandHandler<LogoutCommand, bool>
 {
-    private readonly KeycloakService _keycloakService;
+    private readonly IKeycloakService _keycloakService;
     private readonly ILogger<LogoutCommandHandler> _logger;
 
-    public LogoutCommandHandler(KeycloakService keycloakService, ILogger<LogoutCommandHandler> logger)
+    public LogoutCommandHandler(IKeycloakService keycloakService, ILogger<LogoutCommandHandler> logger)
     {
         _keycloakService = keycloakService;
         _logger = logger;
@@ -40,3 +40,4 @@ public sealed class LogoutCommandHandler : ICommandHandler<LogoutCommand, bool>
         }
     }
 }
+

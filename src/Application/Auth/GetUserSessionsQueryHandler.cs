@@ -1,9 +1,8 @@
-﻿using Application.Interfaces;
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth;
-public class GetUserSessionsQueryHandler(ILogger<GetUserSessionsQueryHandler> _logger, KeycloakRolesService _keycloakService) : IQueryHandler<GetUserSessionQuery, GetSessionsCommandResponseDto>
+public class GetUserSessionsQueryHandler(ILogger<GetUserSessionsQueryHandler> _logger, IKeycloakRolesService _keycloakService) : IQueryHandler<GetUserSessionQuery, GetSessionsCommandResponseDto>
 {
     public async Task<Result<GetSessionsCommandResponseDto>> Handle(GetUserSessionQuery query, CancellationToken cancellationToken)
     {
@@ -30,3 +29,4 @@ public class GetUserSessionsQueryHandler(ILogger<GetUserSessionsQueryHandler> _l
         }
     }
 }
+

@@ -1,15 +1,15 @@
 using Application.Auth.Login;
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.RefreshToken;
 
 public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, LoginCommandResponseDto>
 {
-    private readonly KeycloakService _keycloakService;
+    private readonly IKeycloakService _keycloakService;
     private readonly ILogger<RefreshTokenCommandHandler> _logger;
 
-    public RefreshTokenCommandHandler(KeycloakService keycloakService, ILogger<RefreshTokenCommandHandler> logger)
+    public RefreshTokenCommandHandler(IKeycloakService keycloakService, ILogger<RefreshTokenCommandHandler> logger)
     {
         _keycloakService = keycloakService;
         _logger = logger;
@@ -34,3 +34,5 @@ public sealed class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCom
         }
     }
 }
+
+
