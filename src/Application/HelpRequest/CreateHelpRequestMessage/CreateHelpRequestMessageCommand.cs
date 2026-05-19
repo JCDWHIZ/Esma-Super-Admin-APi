@@ -1,4 +1,4 @@
-namespace Application.HelpRequest.CreateHelpReqestMessage;
+namespace Application.HelpRequest.CreateHelpRequestMessage;
 
 public sealed record CreateHelpRequestMessageCommand : ICommand<HelpRequestMessageDto>
 {

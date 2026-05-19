@@ -17,7 +17,7 @@ public static class TemplateErrors
     public static Error AlreadyExists()
     {
         return Error.AlreadyExists(
-            "Tempalte.AlreadyExists",
+            "Template.AlreadyExists",
         "The Template with the specified details already exists");
     }
 }

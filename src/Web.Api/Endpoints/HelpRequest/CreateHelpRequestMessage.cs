@@ -1,5 +1,5 @@
 using Application.HelpRequest;
-using Application.HelpRequest.CreateHelpReqestMessage;
+using Application.HelpRequest.CreateHelpRequestMessage;
 using Infrastructure.Authorization;
 
 namespace Web.Api.Endpoints.HelpRequest;

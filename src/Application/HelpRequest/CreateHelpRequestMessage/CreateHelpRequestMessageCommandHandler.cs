@@ -3,7 +3,7 @@ using Application.BackgroundJobs;
 using Domain.HelpRequests;
 using Hangfire;
 
-namespace Application.HelpRequest.CreateHelpReqestMessage;
+namespace Application.HelpRequest.CreateHelpRequestMessage;
 
 public class AddHelpRequestMessageCommandHandler(IApplicationDbContext _context, IUserContext userContext) : ICommandHandler<CreateHelpRequestMessageCommand, HelpRequestMessageDto>
 {
