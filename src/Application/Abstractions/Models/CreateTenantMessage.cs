@@ -22,3 +22,8 @@ public class CreateTenantMessage
     public ICollection<SchoolModuleResponseDto> Modules { get; set; } = new List<SchoolModuleResponseDto>();
     public SubscriptionDto Subscriptions { get; set; }
 }
+
+public class UpdateTenantPayload : CreateTenantMessage
+{
+    public string TenantId { get; set; } = string.Empty;
+}

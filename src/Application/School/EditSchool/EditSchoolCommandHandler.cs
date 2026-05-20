@@ -1,18 +1,27 @@
 
 using Domain.Schools;
 using Domain.Subscriptions;
+using Application.Abstractions.Models;
+using Application.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Application.School.EditSchool;
 
 
 
-public sealed class EditSchoolCommandCommandHandler(IApplicationDbContext _dbContext) : ICommandHandler<EditSchoolCommand, string>
+public sealed class EditSchoolCommandCommandHandler(
+    IApplicationDbContext _dbContext,
+    IMessageProducer _messageProducer,
+    IConfiguration _configuration,
+    ILogger<EditSchoolCommandCommandHandler> _logger) : ICommandHandler<EditSchoolCommand, string>
 {
     async Task<Result<string>> ICommandHandler<EditSchoolCommand, string>.Handle(EditSchoolCommand command, CancellationToken cancellationToken)
     {
         Schools? entity = await _dbContext.Schools
                 .Include(s => s.Subscriptions)
                 .Include(s => s.Modules)
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.PublicId == command.PublicId, cancellationToken);
 
         if (entity == null)
@@ -53,6 +62,19 @@ public sealed class EditSchoolCommandCommandHandler(IApplicationDbContext _dbCon
         entity.Subscriptions.Amount = command.Subscriptions.Amount;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(entity.TenantId))
+        {
+            _logger.LogWarning("Skipping UpdateTenant publish for school {SchoolPublicId} because TenantId is empty", entity.PublicId);
+            return Result.Success("School updated successfully");
+        }
+
+        var updateTenantPayload = TenantMessageMapper.BuildUpdateTenantPayload(entity);
+        await _messageProducer.SendMessageAsync(
+            "UpdateTenant",
+            updateTenantPayload,
+            _configuration["Kafka:CreateTenantTopic"]);
+
         return Result.Success("School updated successfully");
     }
 }
