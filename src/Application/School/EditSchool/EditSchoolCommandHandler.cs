@@ -69,7 +69,7 @@ public sealed class EditSchoolCommandCommandHandler(
             return Result.Success("School updated successfully");
         }
 
-        var updateTenantPayload = TenantMessageMapper.BuildUpdateTenantPayload(entity);
+        UpdateTenantPayload updateTenantPayload = TenantMessageMapper.BuildUpdateTenantPayload(entity);
         await _messageProducer.SendMessageAsync(
             "UpdateTenant",
             updateTenantPayload,
