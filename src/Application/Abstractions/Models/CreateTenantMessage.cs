@@ -19,7 +19,7 @@ public class CreateTenantMessage
     public string? SchoolPhoneNumber { get; set; }
     public AddressDto? SchoolAddress { get; set; }
     public SharedKernel.Enums.Roles SchoolAdminRole { get; set; }
-    public ICollection<SchoolModuleResponseDto> Modules { get; set; } = new List<SchoolModuleResponseDto>();
+    public ICollection<string> Modules { get; set; } = new List<string>();
     public SubscriptionDto Subscriptions { get; set; }
 }
 

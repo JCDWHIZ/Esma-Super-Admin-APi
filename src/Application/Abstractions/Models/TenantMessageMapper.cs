@@ -30,12 +30,7 @@ public static class TenantMessageMapper
                 Lga = school.Address.LGA ?? string.Empty,
                 StreetAddress = school.Address.StreetAddress ?? string.Empty
             },
-            Modules = school.Modules.Select(m => new SchoolModuleResponseDto
-            {
-                Name = m.Name,
-                Key = m.Key,
-                Description = m.Description
-            }).ToList(),
+            Modules = school.Modules.Select(m => m.Key).ToList(),
             Subscriptions = new SubscriptionDto
             {
                 SubscriptionType = school.Subscriptions.SubscriptionType,
