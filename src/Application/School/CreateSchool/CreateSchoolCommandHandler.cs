@@ -35,6 +35,7 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
         var schoolEntity = new Schools
         {
             SchoolName = command.SchoolName,
+            ShortCode = command.ShortCode.Trim().ToUpperInvariant(),
             LogoUrl = command.LogoUrl,
             Address = new Address
             {

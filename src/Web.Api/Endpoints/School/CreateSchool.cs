@@ -12,6 +12,7 @@ internal sealed class CreateSchool : IEndpoint
             var command = new CreateSchoolCommand
             {
                 SchoolName = request.SchoolName,
+                ShortCode = request.ShortCode,
                 LogoUrl = request.LogoUrl,
                 Address = new AddressDto
                 {
@@ -57,6 +58,7 @@ internal sealed class CreateSchool : IEndpoint
     public sealed class Request()
     {
         public string SchoolName { get; init; } = string.Empty;
+        public string ShortCode { get; init; } = string.Empty;
 
         public string LogoUrl { get; init; } = string.Empty;
 

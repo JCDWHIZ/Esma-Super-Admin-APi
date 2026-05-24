@@ -11,6 +11,7 @@ internal sealed class GetDeletedSchools : IEndpoint
     {
         app.MapGet("schools/deleted", async (
             string? schoolName,
+            string? shortCode,
             string? logoUrl,
             string? addressCountry,
             string? addressState,
@@ -29,6 +30,7 @@ internal sealed class GetDeletedSchools : IEndpoint
             var query = new GetDeletedSchoolsWithPaginationQuery
             {
                 SchoolName = schoolName,
+                ShortCode = shortCode,
                 LogoUrl = logoUrl,
                 AddressCountry = addressCountry,
                 AddressState = addressState,

@@ -8,6 +8,7 @@ namespace Domain.Schools;
 public sealed class Schools : BaseAuditableEntity
 {
     public string SchoolName { get; set; } = string.Empty;
+    public string ShortCode { get; set; } = string.Empty;
     public string LogoUrl { get; set; } = string.Empty;
     public Address Address { get; set; } = new Address();
 

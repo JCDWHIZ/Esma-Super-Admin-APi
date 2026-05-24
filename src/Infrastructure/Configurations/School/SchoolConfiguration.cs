@@ -14,6 +14,10 @@ internal sealed class SchoolsConfiguration : IEntityTypeConfiguration<Domain.Sch
         builder.Property(s => s.SchoolName)
             .HasMaxLength(255);
 
+        builder.Property(s => s.ShortCode)
+            .HasMaxLength(50)
+            .IsRequired();
+
         builder.Property(s => s.LogoUrl)
             .HasMaxLength(500);
 
@@ -70,5 +74,8 @@ internal sealed class SchoolsConfiguration : IEntityTypeConfiguration<Domain.Sch
             .WithMany()
             .HasForeignKey(s => s.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(s => s.ShortCode)
+            .IsUnique();
     }
 }

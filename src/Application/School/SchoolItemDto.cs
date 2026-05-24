@@ -9,6 +9,7 @@ public record SchoolItemDto
     public Guid PublicId { get; set; }
     public int Id { get; set; }
     public string SchoolName { get; set; } = string.Empty;
+    public string ShortCode { get; set; } = string.Empty;
     public string LogoUrl { get; set; } = string.Empty;
     public AddressDto? Address { get; set; } = new AddressDto();
     public string OrganizationId { get; set; } = string.Empty;

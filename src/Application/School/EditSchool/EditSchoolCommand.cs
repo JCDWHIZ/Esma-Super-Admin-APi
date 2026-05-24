@@ -5,6 +5,7 @@ public sealed record EditSchoolCommand : ICommand<string>
 {
     public Guid PublicId { get; init; }
     public string SchoolName { get; init; } = string.Empty;
+    public string ShortCode { get; init; } = string.Empty;
 
     public string LogoUrl { get; init; } = string.Empty;
 

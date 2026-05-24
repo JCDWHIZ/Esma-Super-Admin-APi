@@ -30,6 +30,7 @@ public sealed class EditSchoolCommandCommandHandler(
         }
 
         entity.SchoolName = command.SchoolName;
+        entity.ShortCode = command.ShortCode.Trim().ToUpperInvariant();
         entity.LogoUrl = command.LogoUrl;
         entity.Address = new Address
         {

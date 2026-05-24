@@ -14,6 +14,11 @@ public sealed class GetShoolsWithPaginationQueryHandler(IApplicationDbContext _c
             schoolQuery = schoolQuery.Where(x => x.SchoolName.Contains(query.SchoolName));
         }
 
+        if (!string.IsNullOrEmpty(query.ShortCode))
+        {
+            schoolQuery = schoolQuery.Where(x => x.ShortCode.Contains(query.ShortCode));
+        }
+
         if (!string.IsNullOrEmpty(query.PhoneNumber))
         {
             schoolQuery = schoolQuery.Where(x => x.PhoneNumber.Contains(query.PhoneNumber));
@@ -70,6 +75,7 @@ public sealed class GetShoolsWithPaginationQueryHandler(IApplicationDbContext _c
            {
                PublicId = s.PublicId,
                SchoolName = s.SchoolName,
+               ShortCode = s.ShortCode,
                LogoUrl = s.LogoUrl,
                Address = s.Address == null ? null : new AddressDto
                {

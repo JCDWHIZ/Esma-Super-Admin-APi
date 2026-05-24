@@ -10,6 +10,7 @@ internal sealed class EditSchool : IEndpoint
     public sealed class Request
     {
         public string SchoolName { get; init; } = string.Empty;
+        public string ShortCode { get; init; } = string.Empty;
         public string LogoUrl { get; init; } = string.Empty;
         public AddressDto Address { get; init; } = new();
         public string EmailAddress { get; init; } = string.Empty;
@@ -31,6 +32,7 @@ internal sealed class EditSchool : IEndpoint
             {
                 PublicId = publicId,
                 SchoolName = request.SchoolName,
+                ShortCode = request.ShortCode,
                 LogoUrl = request.LogoUrl,
                 Address = request.Address,
                 EmailAddress = request.EmailAddress,

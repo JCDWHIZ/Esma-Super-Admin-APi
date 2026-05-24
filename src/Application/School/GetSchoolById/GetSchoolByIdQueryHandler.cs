@@ -33,6 +33,7 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
         {
             PublicId = entity.PublicId,
             SchoolName = entity.SchoolName,
+            ShortCode = entity.ShortCode,
             LogoUrl = entity.LogoUrl,
             EmailAddress = entity.EmailAddress,
             PhoneNumber = entity.PhoneNumber,

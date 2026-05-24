@@ -5,6 +5,7 @@ namespace Application.School.CreateSchool;
 public sealed record CreateSchoolCommand : ICommand<string>
 {
     public string SchoolName { get; init; } = string.Empty;
+    public string ShortCode { get; init; } = string.Empty;
 
     public string LogoUrl { get; init; } = string.Empty;
 

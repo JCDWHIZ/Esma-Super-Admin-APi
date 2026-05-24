@@ -15,6 +15,18 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
             .NotEmpty()
             .MaximumLength(200);
 
+        RuleFor(x => x.ShortCode)
+            .NotEmpty()
+            .MaximumLength(50)
+            .MustAsync(async (shortCode, cancellationToken) =>
+            {
+                string normalized = shortCode.Trim().ToUpperInvariant();
+                return !await _context.Schools.AnyAsync(
+                    s => s.ShortCode == normalized,
+                    cancellationToken);
+            })
+            .WithMessage("Short code already exists.");
+
         RuleFor(x => x.EmailAddress)
             .NotEmpty()
             .EmailAddress();

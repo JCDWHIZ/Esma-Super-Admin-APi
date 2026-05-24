@@ -9,6 +9,7 @@ public class CreateTenantMessage
     public string OrganizationId { get; set; }
     public Guid SchoolPublicId { get; set; }
     public string SchoolName { get; set; }
+    public string ShortCode { get; set; }
     public string SchoolAdminEmail { get; set; }
     public string SchoolAdminFirstName { get; set; }
     public string SchoolAdminLastName { get; set; }

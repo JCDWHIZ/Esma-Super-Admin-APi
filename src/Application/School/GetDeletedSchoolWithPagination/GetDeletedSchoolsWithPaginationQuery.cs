@@ -3,6 +3,7 @@ namespace Application.School.GetDeletedSchoolWithPagination;
 public sealed record GetDeletedSchoolsWithPaginationQuery : IQuery<PaginatedList<SchoolItemDto>>
 {
     public string? SchoolName { get; set; }
+    public string? ShortCode { get; set; }
     public string? LogoUrl { get; set; }
     public string? AddressCountry { get; set; }
     public string? AddressState { get; set; }

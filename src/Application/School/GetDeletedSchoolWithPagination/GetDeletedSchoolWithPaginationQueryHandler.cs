@@ -13,6 +13,11 @@ public sealed class GetDeletedSchoolsWithPaginationQueryHandler(IApplicationDbCo
             Schoolquery = Schoolquery.Where(x => x.SchoolName.Contains(query.SchoolName));
         }
 
+        if (!string.IsNullOrEmpty(query.ShortCode))
+        {
+            Schoolquery = Schoolquery.Where(x => x.ShortCode.Contains(query.ShortCode));
+        }
+
         if (!string.IsNullOrEmpty(query.PhoneNumber))
         {
             Schoolquery = Schoolquery.Where(x => x.PhoneNumber.Contains(query.PhoneNumber));
@@ -69,6 +74,7 @@ public sealed class GetDeletedSchoolsWithPaginationQueryHandler(IApplicationDbCo
             {
                 PublicId = s.PublicId,
                 SchoolName = s.SchoolName,
+                ShortCode = s.ShortCode,
                 LogoUrl = s.LogoUrl,
                 Address = s.Address == null ? null : new AddressDto
                 {

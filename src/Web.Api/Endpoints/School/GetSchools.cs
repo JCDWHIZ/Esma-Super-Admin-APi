@@ -11,6 +11,7 @@ internal sealed class GetSchools : IEndpoint
     {
         app.MapGet("schools", async (
             string? schoolName,
+            string? shortCode,
             string? logoUrl,
             string? addressCountry,
             string? addressState,
@@ -29,6 +30,7 @@ internal sealed class GetSchools : IEndpoint
             var query = new GetSchoolsWithPaginationQuery
             {
                 SchoolName = schoolName,
+                ShortCode = shortCode,
                 LogoUrl = logoUrl,
                 AddressCountry = addressCountry,
                 AddressState = addressState,
