@@ -24,7 +24,7 @@ public class TokenService : ITokenService
     public TokenService(IOptions<JwtSettings> jwtOptions)
     {
         _jwtSettings = jwtOptions.Value;
-        _key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+        _key = Convert.FromBase64String(_jwtSettings.Secret);
     }
 
     public string GenerateToken(IDictionary<string, object> claims)
