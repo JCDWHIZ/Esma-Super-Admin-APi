@@ -166,7 +166,7 @@ public class TenantResponseHandlerService : BackgroundService
                 { "schoolId", school.Id },
                 { "schoolPublicId", school.PublicId },
                 { "organizationId", school.OrganizationId ?? string.Empty },
-                { "schoolName", school.SchoolName },
+                { "schoolName", school.User.Email },
                 { "email", school.EmailAddress },
                 { "firstName", school.User.FirstName },
                 { "lastName", school.User.LastName },
@@ -180,7 +180,7 @@ public class TenantResponseHandlerService : BackgroundService
 
             var emailMessage = new EmailMessage
             {
-                Email = school.EmailAddress,
+                Email = school.User?.Email ?? school.EmailAddress,
                 Title = "Your School Organization is Ready",
                 Name = school.SchoolName,
                 Description = "We've successfully onboarded your school to our platform. We're excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard-we're looking forward to growing with you.",
