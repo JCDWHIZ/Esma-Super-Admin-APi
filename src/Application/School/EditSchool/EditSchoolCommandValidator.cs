@@ -17,6 +17,7 @@ public class EditSchoolCommandValidator : AbstractValidator<EditSchoolCommand>
             .MaximumLength(200);
 
         RuleFor(x => x.ShortCode)
+            .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .MaximumLength(50)
             .MustAsync(async (command, shortCode, cancellationToken) =>

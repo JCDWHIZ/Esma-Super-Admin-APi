@@ -16,6 +16,7 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
             .MaximumLength(200);
 
         RuleFor(x => x.ShortCode)
+            .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .MaximumLength(50)
             .MustAsync(async (shortCode, cancellationToken) =>
@@ -52,14 +53,30 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
         {
             RuleFor(x => x.SchoolAdmin.FirstName).NotEmpty();
             RuleFor(x => x.SchoolAdmin.LastName).NotEmpty();
-            RuleFor(x => x.SchoolAdmin.Email).NotEmpty().EmailAddress()
-                .MustAsync(async (email, cancellationToken) => 
-                    !await _context.Users.AnyAsync(u => u.Email == email, cancellationToken))
-                .WithMessage("Email already exists.");
-            RuleFor(x => x.SchoolAdmin.Username).NotEmpty()
-                .MustAsync(async (username, cancellationToken) => 
-                    !await _context.Users.AnyAsync(u => u.Username == username, cancellationToken))
-                .WithMessage("Username already exists.");
+            RuleFor(x => x.SchoolAdmin.Email)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .EmailAddress()
+                .MustAsync(async (email, cancellationToken) =>
+                {
+                    string normalized = email.Trim();
+                    return !await _context.SchoolAdmins.AnyAsync(
+                        schoolAdmin => schoolAdmin.Email == normalized,
+                        cancellationToken);
+                })
+                .WithMessage("School admin email already exists.");
+
+            RuleFor(x => x.SchoolAdmin.Username)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .MustAsync(async (username, cancellationToken) =>
+                {
+                    string normalized = username.Trim();
+                    return !await _context.SchoolAdmins.AnyAsync(
+                        schoolAdmin => schoolAdmin.Username == normalized,
+                        cancellationToken);
+                })
+                .WithMessage("School admin username already exists.");
             RuleFor(x => x.SchoolAdmin.Role).IsInEnum();
         });
         
