@@ -53,4 +53,12 @@ public static class SchoolErrors
     public static readonly Error InvalidModuleKeys = Error.Failure(
         "School.InvalidModuleKeys",
         "One or more module keys are invalid.");
+
+    public static readonly Error NotFoundTenantId = Error.Failure(
+        "School.NotFoundTenantId",
+        "Tenant Id not found in School");
+
+    public static Error ErrorOccured() => Error.Problem(
+        "Users.ErrorOccured",
+        "An error occured during the process");
 }
