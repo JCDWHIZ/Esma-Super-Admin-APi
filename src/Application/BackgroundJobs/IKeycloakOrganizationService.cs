@@ -3,6 +3,7 @@ using Application.Abstractions.Models;
 using Application.Interfaces;
 using Application.School;
 using Application.School.CreateSchool;
+using Domain.Schools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using IApplicationDbContext = Application.Abstractions.Data.IApplicationDbContext;
@@ -11,10 +12,11 @@ namespace Application.BackgroundJobs;
 
 public interface IKeycloakOrganizationService
 {
-    Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken);
+    Task SendSchoolCreateTenantMessageAsync(int schoolId, CancellationToken cancellationToken);
     Task CreateAdmin(int userId, CancellationToken cancellationToken);
     Task EditAdmin(int userId, CancellationToken cancellationToken);
     Task DeleteAdmin(int userId, CancellationToken cancellationToken);
+    Task CreateKeycloackSchool(Schools school, CancellationToken cancellationToken)
 }
 
 public class KeycloakOrganizationService : IKeycloakOrganizationService
@@ -204,7 +206,7 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
     }
 
-    public async Task CreateOrganizationForSchoolAsync(int schoolId, CancellationToken cancellationToken)
+    public async Task SendSchoolCreateTenantMessageAsync(int schoolId, CancellationToken cancellationToken)
     {
         Domain.Schools.Schools? school = await _dbContext.Schools
             .Include(s => s.User)
@@ -218,38 +220,6 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
 
         try
         {
-            string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
-            school.OrganizationId = organizationId;
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            await CreateSchoolAdmin(school.User.Id, schoolId, cancellationToken);
-            //     var payload = new Dictionary<string, object>
-            // {
-            //     { "schoolId", school.Id },
-            //     { "schoolPublicId", school.PublicId },
-            //     { "organizationId", organizationId },
-            //     { "schoolName", school.SchoolName },
-            //     { "email", school.EmailAddress },
-            //     { "firstName", school.User.FirstName },
-            //     { "lastName",  school.User.LastName },
-            //     { "role",      school.User.Role.ToString() },
-            //     { "username",  school.User.Username },
-            //     { "phoneNumber", school.User?.PhoneNumber ?? string.Empty }
-            // };
-
-            //     string token = _tokenService.GenerateToken(payload);
-            //     var message = new EmailMessage
-            //     {
-            //         Email = school.EmailAddress,
-            //         Title = "Your School Organization is Ready",
-            //         SchoolName = school.SchoolName,
-            //         Description = "We've successfully onboarded your school to our platform. We’re excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard—we’re looking forward to growing with you.",
-            //         EmailButton = true,
-            //         ButtonLink = $"{_configuration["Frontend:BaseUrl"]}/onboarding?token={token}",
-            //         ButtonText = "Complete Your Setup"
-            //     };
-            //     await _emailService.SendEmailAsync(message);
-
-            // send message to kafak for tenant service creation
             CreateTenantMessage tenantMessage = TenantMessageMapper.BuildCreateTenantMessage(school);
 
             await _messageProducer.SendMessageAsync(
@@ -257,13 +227,32 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 tenantMessage,
                 _configuration["Kafka:CreateTenantTopic"]);
 
-            _logger.LogInformation("Organization created and tenant creation task enqueued for school: {SchoolId}",
+            _logger.LogInformation("tenant creation task enqueued for school: {SchoolId}",
                 school.Id);
         }
         catch (Exception ex)
         {
             throw new InvalidOperationException(
                 $"CreateOrganizationForSchoolAsync failed for school {schoolId}",
+                ex);
+        }
+    }
+
+    public async Task CreateKeycloackSchool(Schools school, CancellationToken cancellationToken)
+    {
+        try
+        {
+            string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
+            school.OrganizationId = organizationId;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            await CreateSchoolAdmin(school.User.Id, school.Id, cancellationToken);
+            _logger.LogInformation("Organization created for school: {SchoolId}",
+                school.Id);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"CreateOrganizationForSchoolAsync failed for school {school.Id}",
                 ex);
         }
     }

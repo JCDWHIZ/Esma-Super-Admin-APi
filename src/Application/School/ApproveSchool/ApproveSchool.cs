@@ -35,7 +35,7 @@ public class ApproveSchoolsHandler(IApplicationDbContext context)
         foreach (Schools school in schools)
         {
             BackgroundJob.Enqueue<IKeycloakOrganizationService>(
-                service => service.CreateOrganizationForSchoolAsync(school.Id, cancellationToken)
+                service => service.SendSchoolCreateTenantMessageAsync(school.Id, cancellationToken)
             );
         }
 

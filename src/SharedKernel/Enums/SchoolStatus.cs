@@ -10,5 +10,6 @@ public enum SchoolStatus
     ACTIVE,
     INACTIVE,
     SUSPENDED,
-    PROCESSING
+    PROCESSING,
+    FAILED
 }

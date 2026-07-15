@@ -6,7 +6,7 @@ namespace Application.Abstractions.Models;
 public class CreateTenantMessage
 {
     public int SchoolId { get; set; }
-    public string OrganizationId { get; set; }
+    //public string OrganizationId { get; set; }
     public Guid SchoolPublicId { get; set; }
     public string SchoolName { get; set; }
     public string ShortCode { get; set; }
