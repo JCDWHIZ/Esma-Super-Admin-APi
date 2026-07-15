@@ -75,7 +75,7 @@ deploy-to-server:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
   script:
-    - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && ./restart"
+    - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && dos2unix restart && ./restart esma-admin-api-v2"
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       needs: ["docker-build-push"]
@@ -95,7 +95,7 @@ manual-deploy:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
   script:
-    - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && ./restart"
+    - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && dos2unix restart && ./restart esma-admin-api-v2"
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
