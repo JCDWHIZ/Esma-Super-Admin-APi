@@ -130,8 +130,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
                 Enabled = true,
                 //Attributes = new()
                 //{
-                //    { "internal_user_id", new() { user.PublicId.ToString() } },
-                //    {"internal_user_role", new() { user.Role.ToString() } }
+                //    { "internal_user_id", new() { school.User.PublicId.ToString() } },
+                //    {"internal_user_role", new() { school.User.Role.ToString() } }
                 //},
             };
             string keycloakUserId = await _keycloakService.CreateUserAsync(inviteRequest);
@@ -140,8 +140,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             //{
             //    throw new InvalidOperationException("Returned Keycloak ID is not a valid GUID.");
             //}
-
-            //user.KeycloakUserId = keycloakId;
+            SchoolAdmins? user = await _dbContext.SchoolAdmins.FirstOrDefaultAsync(s => s.Id == school.User.Id, cancellationToken) ?? throw new InvalidOperationException($"School admin with ID {school.User.Id} not found.");
+            user.KeycloakUserId = keycloakUserId;
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
@@ -244,8 +244,8 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         {
             string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
             school.OrganizationId = organizationId;
-            await _dbContext.SaveChangesAsync(cancellationToken);
             await CreateSchoolAdmin(school.User.Id, school.Id, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Organization created for school: {SchoolId}",
                 school.Id);
         }
