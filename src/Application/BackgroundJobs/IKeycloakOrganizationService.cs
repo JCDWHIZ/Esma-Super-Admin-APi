@@ -16,7 +16,7 @@ public interface IKeycloakOrganizationService
     Task CreateAdmin(int userId, CancellationToken cancellationToken);
     Task EditAdmin(int userId, CancellationToken cancellationToken);
     Task DeleteAdmin(int userId, CancellationToken cancellationToken);
-    Task CreateKeycloackSchool(Schools school, CancellationToken cancellationToken)
+    Task CreateKeycloackSchool(Schools school, CancellationToken cancellationToken);
 }
 
 public class KeycloakOrganizationService : IKeycloakOrganizationService
