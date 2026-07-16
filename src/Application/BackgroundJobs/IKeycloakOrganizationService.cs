@@ -16,7 +16,8 @@ public interface IKeycloakOrganizationService
     Task CreateAdmin(int userId, CancellationToken cancellationToken);
     Task EditAdmin(int userId, CancellationToken cancellationToken);
     Task DeleteAdmin(int userId, CancellationToken cancellationToken);
-    Task CreateKeycloackSchool(Schools school, CancellationToken cancellationToken);
+    Task<string> CreateSchoolAdmin(int userId, int schoolId, CancellationToken cancellationToken);
+    Task<string> CreateKeycloackSchool(Schools school, CancellationToken cancellationToken);
 }
 
 public class KeycloakOrganizationService : IKeycloakOrganizationService
@@ -109,13 +110,13 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
     }
 
-    public async Task CreateSchoolAdmin(int userId, int schoolId, CancellationToken cancellationToken)
+    public async Task<string> CreateSchoolAdmin(int userId, int schoolId, CancellationToken cancellationToken)
     {
 
         Domain.Schools.Schools? school = await _dbContext.Schools.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == schoolId, cancellationToken);
         if (school == null)
         {
-            return;
+            return string.Empty;
         }
 
         try
@@ -143,10 +144,12 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
             SchoolAdmins? user = await _dbContext.SchoolAdmins.FirstOrDefaultAsync(s => s.Id == school.User.Id, cancellationToken) ?? throw new InvalidOperationException($"School admin with ID {school.User.Id} not found.");
             user.KeycloakUserId = keycloakUserId;
             await _dbContext.SaveChangesAsync(cancellationToken);
+            return keycloakUserId ?? string.Empty;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while creating school admin in Keycloak");
+            return string.Empty;
         }
     }
 
@@ -238,16 +241,17 @@ public class KeycloakOrganizationService : IKeycloakOrganizationService
         }
     }
 
-    public async Task CreateKeycloackSchool(Schools school, CancellationToken cancellationToken)
+    public async Task<string> CreateKeycloackSchool(Schools school, CancellationToken cancellationToken)
     {
         try
         {
             string organizationId = await _keycloakService.CreateOrganizationAsync(school.SchoolName);
             school.OrganizationId = organizationId;
-            await CreateSchoolAdmin(school.User.Id, school.Id, cancellationToken);
+            string keycloakcUserId = await CreateSchoolAdmin(school.User.Id, school.Id, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Organization created for school: {SchoolId}",
                 school.Id);
+            return keycloakcUserId;
         }
         catch (Exception ex)
         {

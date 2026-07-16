@@ -74,7 +74,7 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
 
         _dbContext.Schools.Add(schoolEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return Result.Success("School Created Succesfully");
+        return Result.Success($"School Created Successfully: {schoolEntity.PublicId}");
     }
 
     // async Task<SchoolItemDto> ICommandHandler<IntiateSchoolRequestCommand, SchoolItemDto>.Handle(IntiateSchoolRequestCommand request, CancellationToken cancellationToken)

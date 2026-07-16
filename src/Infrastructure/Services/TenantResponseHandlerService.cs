@@ -162,10 +162,11 @@ public class TenantResponseHandlerService : BackgroundService
 
         if (tenantCreated.Success)
         {
+            string? keycloakUserId = null;
 
             try
             {
-                await keycloakOrgService.CreateKeycloackSchool(school, cancellationToken);
+                keycloakUserId = await keycloakOrgService.CreateKeycloackSchool(school, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -189,7 +190,7 @@ public class TenantResponseHandlerService : BackgroundService
                 { "username", school.User.Username },
                 { "phoneNumber", school.User?.PhoneNumber ?? string.Empty },
                 { "tenantId", school.TenantId },
-                { "schoolAdminKeycloakId", school.User?.KeycloakUserId ?? string.Empty }
+                { "schoolAdminKeycloakId", keycloakUserId ?? string.Empty }
             };
 
             string token = tokenService.GenerateToken(payload);

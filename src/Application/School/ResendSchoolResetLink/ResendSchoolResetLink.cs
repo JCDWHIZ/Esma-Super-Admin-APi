@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 namespace Application.School.ResendSchoolResetLink;
 
 public sealed record ResendSchoolResetLinkCommand(Guid SchoolPublicId) : ICommand<string>;
-public class ResendSchoolResetLinkCommandHandler(IApplicationDbContext context, ILogger<ResendSchoolResetLinkCommandHandler> _logger, IEmailService _emailService, ITokenService _tokenService, IConfiguration _configuration)
+public class ResendSchoolResetLinkCommandHandler(IApplicationDbContext context, ILogger<ResendSchoolResetLinkCommandHandler> _logger, IEmailService _emailService, ITokenService _tokenService)
     : ICommandHandler<ResendSchoolResetLinkCommand, string>
 {
     public async Task<Result<string>> Handle(ResendSchoolResetLinkCommand command, CancellationToken cancellationToken)
@@ -48,7 +48,8 @@ public class ResendSchoolResetLinkCommandHandler(IApplicationDbContext context, 
                 { "role", school.User.Role.ToString() },
                 { "username", school.User.Username },
                 { "phoneNumber", school.User?.PhoneNumber ?? string.Empty },
-                { "tenantId", school.TenantId }
+                { "tenantId", school.TenantId },
+                { "schoolAdminKeycloakId", school.User?.KeycloakUserId ?? string.Empty }
             };
 
             string token = _tokenService.GenerateToken(payload);
@@ -60,7 +61,7 @@ public class ResendSchoolResetLinkCommandHandler(IApplicationDbContext context, 
                 Name = school.SchoolName,
                 Description = "We've successfully onboarded your school to our platform. We're excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard-we're looking forward to growing with you.",
                 EmailButton = true,
-                ButtonLink = $"{_configuration["Frontend:TenantBaseUrl"]}/auth/set-password?token={token}",
+                ButtonLink = $"{school.ShortCode}.esma.dev.elsoft.ng/auth/set-password?token={token}",
                 ButtonText = "Complete Your Setup"
             };
 
