@@ -148,6 +148,7 @@ public class TenantResponseHandlerService : BackgroundService
         IEmailService emailService = scope.ServiceProvider.GetRequiredService<IEmailService>(); 
         IKeycloakOrganizationService keycloakOrgService = scope.ServiceProvider.GetRequiredService<IKeycloakOrganizationService>(); 
         ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
+        IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
         var schoolId = Guid.Parse(tenantCreated.SchoolPublicId);
         Domain.Schools.Schools? school = await dbContext.Schools
@@ -162,6 +163,46 @@ public class TenantResponseHandlerService : BackgroundService
 
         if (tenantCreated.Success)
         {
+
+            if(school.Status == SchoolStatus.ACTIVE)
+            {
+                _logger.LogInformation("School {SchoolName} ({SchoolId}) is already active. Skipping tenant creation handling.", school.SchoolName, tenantCreated.SchoolPublicId);
+
+                var emailPayload = new Dictionary<string, object>
+                {
+                    { "schoolId", school.Id },
+                    { "schoolPublicId", school.PublicId },
+                    { "organizationId", school.OrganizationId ?? string.Empty },
+                    { "schoolName", school.SchoolName },
+                    { "email", school.User.Email },
+                    { "firstName", school.User.FirstName },
+                    { "lastName", school.User.LastName },
+                    { "role", school.User.Role.ToString() },
+                    { "username", school.User.Username },
+                    { "phoneNumber", school.User?.PhoneNumber ?? string.Empty },
+                    { "tenantId", school.TenantId },
+                    { "schoolAdminKeycloakId", school.User?.KeycloakUserId ?? string.Empty }
+                };
+
+                string resetToken = tokenService.GenerateToken(emailPayload);
+
+                var welcomeEmailMessage = new EmailMessage
+                {
+                    Email = school.User?.Email ?? school.EmailAddress,
+                    Title = "Your School Organization is Ready",
+                    Name = school.SchoolName,
+                    Description = "We've successfully onboarded your school to our platform. We're excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard-we're looking forward to growing with you.",
+                    EmailButton = true,
+                    ButtonLink = $"{configuration["Frontend:TenantBaseUrl"]}/auth/set-password?token={resetToken}",
+                    ButtonText = "Complete Your Setup"
+                };
+
+                await emailService.SendEmailAsync(welcomeEmailMessage);
+
+                _logger.LogInformation("Welcome email sent for school: {SchoolName} ({SchoolId})",
+                    school.SchoolName, tenantCreated.SchoolPublicId);
+                return;
+            }
             string? keycloakUserId = null;
 
             try
@@ -202,7 +243,7 @@ public class TenantResponseHandlerService : BackgroundService
                 Name = school.SchoolName,
                 Description = "We've successfully onboarded your school to our platform. We're excited to share that your school has been successfully added to our platform! This marks the beginning of a seamless, integrated experience designed to empower your institution with the tools and support needed to thrive. Welcome aboard-we're looking forward to growing with you.",
                 EmailButton = true,
-                ButtonLink = $"{school.ShortCode}.esma.dev.elsoft.ng/auth/set-password?token={token}",
+                ButtonLink = $"{configuration["Frontend:TenantBaseUrl"]}/auth/set-password?token={token}",
                 ButtonText = "Complete Your Setup"
             };
 
