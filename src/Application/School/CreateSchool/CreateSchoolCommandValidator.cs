@@ -109,5 +109,57 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
                 return count == normalized.Count;
             })
             .WithMessage("One or more module keys are invalid.");
+
+        RuleFor(x => x.SisModules)
+            .MustAsync(async (modules, cancellationToken) =>
+            {
+                if (modules.Count == 0)
+                {
+                    return true;
+                }
+
+                var normalized = modules
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .Select(m => m.Trim().ToUpperInvariant())
+                    .Distinct()
+                    .ToList();
+
+                if (normalized.Count != modules.Count)
+                {
+                    return false;
+                }
+
+                int count = await _context.SisModules
+                    .CountAsync(m => normalized.Contains(m.Key), cancellationToken);
+
+                return count == normalized.Count;
+            })
+            .WithMessage("One or more SIS module keys are invalid.");
+
+        RuleFor(x => x.LmsModules)
+            .MustAsync(async (modules, cancellationToken) =>
+            {
+                if (modules.Count == 0)
+                {
+                    return true;
+                }
+
+                var normalized = modules
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .Select(m => m.Trim().ToUpperInvariant())
+                    .Distinct()
+                    .ToList();
+
+                if (normalized.Count != modules.Count)
+                {
+                    return false;
+                }
+
+                int count = await _context.LmsModules
+                    .CountAsync(m => normalized.Contains(m.Key), cancellationToken);
+
+                return count == normalized.Count;
+            })
+            .WithMessage("One or more LMS module keys are invalid.");
     }
 }

@@ -12,6 +12,8 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
         .Include(s => s.Subscriptions)
         .Include(s => s.User)
         .Include(s => s.Modules)
+        .Include(s => s.SisModules)
+        .Include(s => s.LmsModules)
         .FirstOrDefaultAsync(x => x.PublicId == query.PublicId, cancellationToken);
         if (entity == null)
         {
@@ -25,6 +27,28 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
                 Key = m.Key,
                 Description = m.Description,
                 HasModule = entity.Modules.Any(sm => sm.Id == m.Id)
+            })
+            .OrderBy(m => m.Name)
+            .ToListAsync(cancellationToken);
+
+        List<SisModuleAvailabilityDto> allSisModules = await _context.SisModules
+            .Select(m => new SisModuleAvailabilityDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description,
+                HasModule = entity.SisModules.Any(sm => sm.Id == m.Id)
+            })
+            .OrderBy(m => m.Name)
+            .ToListAsync(cancellationToken);
+
+        List<LmsModuleAvailabilityDto> allLmsModules = await _context.LmsModules
+            .Select(m => new LmsModuleAvailabilityDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description,
+                HasModule = entity.LmsModules.Any(sm => sm.Id == m.Id)
             })
             .OrderBy(m => m.Name)
             .ToListAsync(cancellationToken);
@@ -58,6 +82,20 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
                 Description = m.Description
             }).ToList(),
             ModuleAvailability = allModules,
+            SisModules = entity.SisModules.Select(m => new SisModuleResponseDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description
+            }).ToList(),
+            SisModuleAvailability = allSisModules,
+            LmsModules = entity.LmsModules.Select(m => new LmsModuleResponseDto
+            {
+                Name = m.Name,
+                Key = m.Key,
+                Description = m.Description
+            }).ToList(),
+            LmsModuleAvailability = allLmsModules,
             DocumentUrl = entity.DocumentUrl,
             User = entity.User == null ? null :
             new UserDto

@@ -31,6 +31,32 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
             return Result.Failure<string>(SchoolErrors.InvalidModuleKeys);
         }
 
+        var sisModuleKeys = command.SisModules
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+
+        List<SisModule> sisModules = await _dbContext.SisModules
+            .Where(m => sisModuleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (sisModules.Count != sisModuleKeys.Count)
+        {
+            return Result.Failure<string>(SchoolErrors.InvalidSisModuleKeys);
+        }
+
+        var lmsModuleKeys = command.LmsModules
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+
+        List<LmsModule> lmsModules = await _dbContext.LmsModules
+            .Where(m => lmsModuleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (lmsModules.Count != lmsModuleKeys.Count)
+        {
+            return Result.Failure<string>(SchoolErrors.InvalidLmsModuleKeys);
+        }
+
         // Create school entity
         var schoolEntity = new Schools
         {
@@ -48,6 +74,8 @@ public sealed class InitiateSchoolRequestHandler(IApplicationDbContext _dbContex
             PhoneNumber = command.PhoneNumber,
             DocumentUrl = command.DocumentUrl,
             Modules = modules,
+            SisModules = sisModules,
+            LmsModules = lmsModules,
             Subscriptions = new Subscriptions
             {
                 SubscriptionType = command.Subscriptions.SubscriptionType,

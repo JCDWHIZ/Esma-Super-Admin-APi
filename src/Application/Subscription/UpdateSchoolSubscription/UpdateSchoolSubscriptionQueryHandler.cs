@@ -18,6 +18,8 @@ public sealed class UpdateSchoolSubscriptionHandler(
         Schools? school = await _context.Schools
             .Include(s => s.Subscriptions)
             .Include(s => s.Modules)
+            .Include(s => s.SisModules)
+            .Include(s => s.LmsModules)
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.PublicId == command.SchoolId, cancellationToken);
 
@@ -44,6 +46,12 @@ public sealed class UpdateSchoolSubscriptionHandler(
         }
         school.Modules = modules;
 
+        Error? productModuleError = await AssignProductModulesAsync(school, command, cancellationToken);
+        if (productModuleError is not null)
+        {
+            return Result.Failure<bool>(productModuleError);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
         await PublishUpdateTenantMessageAsync(school);
 
@@ -55,6 +63,8 @@ public sealed class UpdateSchoolSubscriptionHandler(
         Schools? school = await _context.Schools
             .Include(s => s.Subscriptions)
             .Include(s => s.Modules)
+            .Include(s => s.SisModules)
+            .Include(s => s.LmsModules)
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.PublicId == command.SchoolId, cancellationToken);
 
@@ -81,10 +91,50 @@ public sealed class UpdateSchoolSubscriptionHandler(
         }
         school.Modules = modules;
 
+        Error? productModuleError = await AssignProductModulesAsync(school, command, cancellationToken);
+        if (productModuleError is not null)
+        {
+            return Result.Failure<string>(productModuleError);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
         await PublishUpdateTenantMessageAsync(school);
 
         return Result.Success("suscription updated successfully");
+    }
+
+    private async Task<Error?> AssignProductModulesAsync(
+        Schools school,
+        UpdateSchoolSubscriptionCommand command,
+        CancellationToken cancellationToken)
+    {
+        var sisModuleKeys = (command.SisModules ?? [])
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+        List<SisModule> sisModules = await _context.SisModules
+            .Where(m => sisModuleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (sisModules.Count != sisModuleKeys.Count)
+        {
+            return SchoolErrors.InvalidSisModuleKeys;
+        }
+        school.SisModules = sisModules;
+
+        var lmsModuleKeys = (command.LmsModules ?? [])
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+        List<LmsModule> lmsModules = await _context.LmsModules
+            .Where(m => lmsModuleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (lmsModules.Count != lmsModuleKeys.Count)
+        {
+            return SchoolErrors.InvalidLmsModuleKeys;
+        }
+        school.LmsModules = lmsModules;
+
+        return null;
     }
 
     private async Task PublishUpdateTenantMessageAsync(Schools school)

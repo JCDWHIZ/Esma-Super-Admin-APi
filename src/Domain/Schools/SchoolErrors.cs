@@ -54,6 +54,14 @@ public static class SchoolErrors
         "School.InvalidModuleKeys",
         "One or more module keys are invalid.");
 
+    public static readonly Error InvalidSisModuleKeys = Error.Failure(
+        "School.InvalidSisModuleKeys",
+        "One or more SIS module keys are invalid.");
+
+    public static readonly Error InvalidLmsModuleKeys = Error.Failure(
+        "School.InvalidLmsModuleKeys",
+        "One or more LMS module keys are invalid.");
+
     public static readonly Error NotFoundTenantId = Error.Failure(
         "School.NotFoundTenantId",
         "Tenant Id not found in School");

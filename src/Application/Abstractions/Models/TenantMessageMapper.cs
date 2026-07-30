@@ -32,6 +32,11 @@ public static class TenantMessageMapper
                 StreetAddress = school.Address.StreetAddress ?? string.Empty
             },
             Modules = school.Modules.Select(m => m.Key).ToList(),
+            SisModules = school.SisModules.Select(m => m.Key).ToList(),
+            LmsModules = school.LmsModules.Select(m => m.Key).ToList(),
+            Products = school.LmsModules.Any()
+                ? new List<string> { "SIS", "LMS" }
+                : new List<string> { "SIS" },
             Subscriptions = new SubscriptionDto
             {
                 SubscriptionType = school.Subscriptions.SubscriptionType,
@@ -63,6 +68,9 @@ public static class TenantMessageMapper
             SchoolPhoneNumber = payload.SchoolPhoneNumber,
             SchoolAddress = payload.SchoolAddress,
             Modules = payload.Modules,
+            SisModules = payload.SisModules,
+            LmsModules = payload.LmsModules,
+            Products = payload.Products,
             Subscriptions = payload.Subscriptions,
             TenantId = school.TenantId ?? string.Empty
         };

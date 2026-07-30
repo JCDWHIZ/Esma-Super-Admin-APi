@@ -21,6 +21,8 @@ public sealed class EditSchoolCommandCommandHandler(
         Schools? entity = await _dbContext.Schools
                 .Include(s => s.Subscriptions)
                 .Include(s => s.Modules)
+                .Include(s => s.SisModules)
+                .Include(s => s.LmsModules)
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.PublicId == command.PublicId, cancellationToken);
 
@@ -53,6 +55,33 @@ public sealed class EditSchoolCommandCommandHandler(
             return Result.Failure<string>(SchoolErrors.InvalidModuleKeys);
         }
         entity.Modules = modules;
+
+        var sisModuleKeys = command.SisModules
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+        List<SisModule> sisModules = await _dbContext.SisModules
+            .Where(m => sisModuleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (sisModules.Count != sisModuleKeys.Count)
+        {
+            return Result.Failure<string>(SchoolErrors.InvalidSisModuleKeys);
+        }
+        entity.SisModules = sisModules;
+
+        var lmsModuleKeys = command.LmsModules
+            .Select(m => m.Trim().ToUpperInvariant())
+            .Distinct()
+            .ToList();
+        List<LmsModule> lmsModules = await _dbContext.LmsModules
+            .Where(m => lmsModuleKeys.Contains(m.Key))
+            .ToListAsync(cancellationToken);
+        if (lmsModules.Count != lmsModuleKeys.Count)
+        {
+            return Result.Failure<string>(SchoolErrors.InvalidLmsModuleKeys);
+        }
+        entity.LmsModules = lmsModules;
+
         entity.DocumentUrl = command.DocumentUrl;
 
         entity.Subscriptions ??= new Subscriptions();

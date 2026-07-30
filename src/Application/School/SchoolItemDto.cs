@@ -22,6 +22,10 @@ public record SchoolItemDto
     public ICollection<string>? DocumentUrl { get; set; } = new List<string>();
     public ICollection<SchoolModuleResponseDto> Modules { get; set; } = new List<SchoolModuleResponseDto>();
     public ICollection<SchoolModuleAvailabilityDto> ModuleAvailability { get; set; } = new List<SchoolModuleAvailabilityDto>();
+    public ICollection<SisModuleResponseDto> SisModules { get; set; } = new List<SisModuleResponseDto>();
+    public ICollection<SisModuleAvailabilityDto> SisModuleAvailability { get; set; } = new List<SisModuleAvailabilityDto>();
+    public ICollection<LmsModuleResponseDto> LmsModules { get; set; } = new List<LmsModuleResponseDto>();
+    public ICollection<LmsModuleAvailabilityDto> LmsModuleAvailability { get; set; } = new List<LmsModuleAvailabilityDto>();
     public required SubscriptionDto? Subscriptions { get; set; }
     public required UserDto? User { get; set; }
     public bool IsDeleted { get; internal set; }
