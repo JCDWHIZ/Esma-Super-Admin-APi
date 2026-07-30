@@ -65,6 +65,20 @@ internal sealed class SchoolsConfiguration : IEntityTypeConfiguration<Domain.Sch
                 right => right.HasOne<SchoolModule>().WithMany().HasForeignKey("module_id").OnDelete(DeleteBehavior.Cascade),
                 left => left.HasOne<Domain.Schools.Schools>().WithMany().HasForeignKey("school_id").OnDelete(DeleteBehavior.Cascade));
 
+        builder.HasMany(s => s.SisModules)
+            .WithMany(m => m.Schools)
+            .UsingEntity<Dictionary<string, object>>(
+                "sis_module_assignments",
+                right => right.HasOne<SisModule>().WithMany().HasForeignKey("module_id").OnDelete(DeleteBehavior.Cascade),
+                left => left.HasOne<Domain.Schools.Schools>().WithMany().HasForeignKey("school_id").OnDelete(DeleteBehavior.Cascade));
+
+        builder.HasMany(s => s.LmsModules)
+            .WithMany(m => m.Schools)
+            .UsingEntity<Dictionary<string, object>>(
+                "lms_module_assignments",
+                right => right.HasOne<LmsModule>().WithMany().HasForeignKey("module_id").OnDelete(DeleteBehavior.Cascade),
+                left => left.HasOne<Domain.Schools.Schools>().WithMany().HasForeignKey("school_id").OnDelete(DeleteBehavior.Cascade));
+
         builder.HasOne(s => s.Subscriptions)
             .WithOne(sub => sub.Schools)
             .HasForeignKey<Subscriptions>(sub => sub.SchoolId)

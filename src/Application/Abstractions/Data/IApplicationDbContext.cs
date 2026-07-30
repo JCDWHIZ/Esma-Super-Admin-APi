@@ -14,6 +14,8 @@ public interface IApplicationDbContext
     DbSet<TodoItem> TodoItems { get; }
     DbSet<Schools> Schools { get; }
     DbSet<SchoolModule> SchoolModules { get; }
+    DbSet<SisModule> SisModules { get; }
+    DbSet<LmsModule> LmsModules { get; }
     DbSet<Subscriptions> Subscriptions { get; }
     DbSet<HelpRequests> HelpRequests { get; }
     DbSet<Domain.Roles.Role> Roles { get; }

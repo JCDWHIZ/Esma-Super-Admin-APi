@@ -20,6 +20,8 @@ public sealed class Schools : BaseAuditableEntity
     public string PhoneNumber { get; set; } = string.Empty;
     public ICollection<string> DocumentUrl { get; set; } = new List<string>();
     public ICollection<SchoolModule> Modules { get; set; } = new List<SchoolModule>();
+    public ICollection<SisModule> SisModules { get; set; } = new List<SisModule>();
+    public ICollection<LmsModule> LmsModules { get; set; } = new List<LmsModule>();
     [JsonIgnore]
     public required Subscriptions.Subscriptions Subscriptions { get; set; }
     public string TenantId { get; set; } = string.Empty;

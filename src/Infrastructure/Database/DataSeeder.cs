@@ -22,6 +22,8 @@ public sealed class DataSeeder(
         {
             await SeedPermissions(cancellationToken);
             await SeedSchoolModules(cancellationToken);
+            await SeedSisModules(cancellationToken);
+            await SeedLmsModules(cancellationToken);
             await SeedRoles(cancellationToken);
             await SeedSuperadmin(cancellationToken);
             //await SyncToKeycloak();
@@ -76,6 +78,96 @@ public sealed class DataSeeder(
             logger.LogInformation("Added {Count} school modules", newModules.Count);
         }
     }
+    private async Task SeedSisModules(CancellationToken cancellationToken)
+    {
+        var modulesToSeed = new List<SisModule>
+        {
+            new() { Name = "Academics", Key = "ACADEMICS", Description = "Manage academic sessions, terms and curricula." },
+            new() { Name = "AI", Key = "AI", Description = "AI-powered features and assistants." },
+            new() { Name = "Auth", Key = "AUTH", Description = "Authentication and access control." },
+            new() { Name = "Branch Management", Key = "BRANCH_MANAGEMENT", Description = "Manage school branches and locations." },
+            new() { Name = "Calendar", Key = "CALENDAR", Description = "Manage school calendar and important dates." },
+            new() { Name = "Dashboard", Key = "DASHBOARD", Description = "View school analytics and high-level metrics." },
+            new() { Name = "Data Jobs", Key = "DATA_JOBS", Description = "Manage background data processing jobs." },
+            new() { Name = "Directory", Key = "DIRECTORY", Description = "Manage school directory of students, staff and contacts." },
+            new() { Name = "Eligibility", Key = "ELIGIBILITY", Description = "Manage eligibility rules and checks." },
+            new() { Name = "Events", Key = "EVENTS", Description = "Manage school events." },
+            new() { Name = "Finance", Key = "FINANCE", Description = "Manage fees, payments and financial records." },
+            new() { Name = "Geocoding", Key = "GEOCODING", Description = "Resolve and manage location/address data." },
+            new() { Name = "Grading", Key = "GRADING", Description = "Manage grading and results." },
+            new() { Name = "Holiday", Key = "HOLIDAY", Description = "Manage holidays and non-instructional days." },
+            new() { Name = "Integration", Key = "INTEGRATION", Description = "Manage third-party integrations." },
+            new() { Name = "Inventory", Key = "INVENTORY", Description = "Manage school inventory and assets." },
+            new() { Name = "Library", Key = "LIBRARY", Description = "Manage library resources and lending." },
+            new() { Name = "Lifecycle", Key = "LIFECYCLE", Description = "Manage tenant/school lifecycle operations." },
+            new() { Name = "Logs", Key = "LOGS", Description = "View system logs." },
+            new() { Name = "Medical", Key = "MEDICAL", Description = "Manage medical records and health-related events." },
+            new() { Name = "Messaging", Key = "MESSAGING", Description = "Manage messaging and communication channels." },
+            new() { Name = "Onboarding", Key = "ONBOARDING", Description = "Manage onboarding flows and initial setup." },
+            new() { Name = "Parent Portal", Key = "PARENT_PORTAL", Description = "Manage parent portal access and linked students." },
+            new() { Name = "Policy", Key = "POLICY", Description = "Manage school policies." },
+            new() { Name = "Report Card", Key = "REPORT_CARD", Description = "Generate and manage student report cards." },
+            new() { Name = "Reporting", Key = "REPORTING", Description = "Manage reporting configuration." },
+            new() { Name = "Reports", Key = "REPORTS", Description = "Generate and view system reports and analytics." },
+            new() { Name = "Scheduler", Key = "SCHEDULER", Description = "Manage schedules and timetabling jobs." },
+            new() { Name = "School Configuration", Key = "SCHOOL_CONFIGURATION", Description = "Configure school-level settings and preferences." },
+            new() { Name = "Subject", Key = "SUBJECT", Description = "Create and maintain subjects and curricula." },
+            new() { Name = "Support", Key = "SUPPORT", Description = "Manage support and help requests." },
+            new() { Name = "Timetable", Key = "TIMETABLE", Description = "Create and manage timetables and schedules." },
+            new() { Name = "Transportation", Key = "TRANSPORTATION", Description = "Manage transportation and routes." },
+            new() { Name = "User Management", Key = "USER_MANAGEMENT", Description = "Manage users, roles and permissions." }
+        };
+
+        List<string> existingKeys = await context.SisModules
+            .Select(m => m.Key)
+            .ToListAsync(cancellationToken);
+
+        var newModules = modulesToSeed
+            .Where(m => !existingKeys.Contains(m.Key))
+            .ToList();
+
+        if (newModules.Any())
+        {
+            await context.SisModules.AddRangeAsync(newModules, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Added {Count} SIS modules", newModules.Count);
+        }
+    }
+
+    private async Task SeedLmsModules(CancellationToken cancellationToken)
+    {
+        var modulesToSeed = new List<LmsModule>
+        {
+            new() { Name = "AI", Key = "AI", Description = "AI-powered features and assistants." },
+            new() { Name = "Analytics", Key = "ANALYTICS", Description = "View learning analytics and metrics." },
+            new() { Name = "Assessment", Key = "ASSESSMENT", Description = "Manage assessments, quizzes and grading." },
+            new() { Name = "Curriculum", Key = "CURRICULUM", Description = "Manage courses and curricula." },
+            new() { Name = "Engagement", Key = "ENGAGEMENT", Description = "Track and drive learner engagement." },
+            new() { Name = "Enrollment", Key = "ENROLLMENT", Description = "Manage learner enrollment." },
+            new() { Name = "Gateway", Key = "GATEWAY", Description = "Manage API gateway and routing." },
+            new() { Name = "Identity", Key = "IDENTITY", Description = "Manage identity and access." },
+            new() { Name = "Integration", Key = "INTEGRATION", Description = "Manage third-party integrations." },
+            new() { Name = "Notification", Key = "NOTIFICATION", Description = "Manage notifications and alerts." },
+            new() { Name = "Platform Admin", Key = "PLATFORM_ADMIN", Description = "Manage platform administration settings." },
+            new() { Name = "Progress", Key = "PROGRESS", Description = "Track learner progress." }
+        };
+
+        List<string> existingKeys = await context.LmsModules
+            .Select(m => m.Key)
+            .ToListAsync(cancellationToken);
+
+        var newModules = modulesToSeed
+            .Where(m => !existingKeys.Contains(m.Key))
+            .ToList();
+
+        if (newModules.Any())
+        {
+            await context.LmsModules.AddRangeAsync(newModules, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Added {Count} LMS modules", newModules.Count);
+        }
+    }
+
     private async Task SeedTemplates(CancellationToken cancellationToken)
     {
         var templatesToSeed = new List<Template>
