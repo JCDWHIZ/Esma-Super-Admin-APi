@@ -126,7 +126,7 @@ jobs:
   # ────────────────────────────────────────────────────────────────────────────
   build-test-dotnet:
     name: Build & Test .NET 9
-    runs-on: ubuntu-latest  # Replace with [self-hosted, esma] if using a specific runner tag
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -152,7 +152,7 @@ jobs:
 
       - name: Upload Test Results Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3   # v4 is not supported on Gitea/GHES
         with:
           name: dotnet-test-results
           path: "**/TestResults/*.trx"
@@ -217,4 +217,3 @@ jobs:
             chmod +x ./restart
             dos2unix restart
             ./restart esma-admin-api-v2
-
