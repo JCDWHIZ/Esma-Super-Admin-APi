@@ -192,8 +192,8 @@ jobs:
           tags: |
             ${{ vars.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
             ${{ vars.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ vars.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ vars.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
 
   # ────────────────────────────────────────────────────────────────────────────
   # 3. DEPLOY TO SERVER VIA SSH
