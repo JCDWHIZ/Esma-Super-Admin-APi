@@ -1,102 +1,219 @@
-stages:
-  - build
-  - deploy
+# stages:
+#   - build
+#   - deploy
 
-variables:
-  DOCKER_REGISTRY: "docker.io"
+# variables:
+#   DOCKER_REGISTRY: "docker.io"
+#   IMAGE_NAME: "admin-service-v2"
+#   DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
+#   SOLUTION_FILE: "CleanArchitecture.sln"   # Correct solution name
+
+# # Build and test .NET application
+# build-test-dotnet:
+#   stage: build
+#   image: mcr.microsoft.com/dotnet/sdk:9.0
+#   tags:
+#     - esma
+#   script:
+#     - dotnet restore $SOLUTION_FILE
+#     - dotnet build $SOLUTION_FILE --no-restore -c Release
+#     - dotnet test $SOLUTION_FILE --no-build -c Release -m:4 --logger "trx;LogFileName=test-results.trx"
+#   artifacts:
+#     paths:
+#       - "**/TestResults/*.trx"   # Capture test results
+#     when: always
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "main"
+#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+
+# # Build and push Docker image
+# docker-build-push:
+#   stage: build
+#   image:
+#     name: gcr.io/kaniko-project/executor:debug
+#     entrypoint: [""]
+#   tags:
+#     - esma
+#   variables:
+#     DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
+#   script:
+#     - mkdir -p /kaniko/.docker
+#     - |
+#       cat > /kaniko/.docker/config.json <<EOF
+#       {
+#         "auths": {
+#           "https://index.docker.io/v1/": {
+#             "username": "${DOCKER_USERNAME}",
+#             "password": "${DOCKER_PASSWORD}"
+#           }
+#         }
+#       }
+#       EOF
+#     - |
+#       /kaniko/executor \
+#         --context $CI_PROJECT_DIR \
+#         --dockerfile $CI_PROJECT_DIR/src/Web.Api/Dockerfile \
+#         --destination $DOCKER_IMAGE:latest \
+#         --destination $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
+#         --cache=true \
+#         --cache-repo=$DOCKER_IMAGE-cache
+#   needs: ["build-test-dotnet"]
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "main"
+
+# # Auto-deploy to server
+# deploy-to-server:
+#   stage: deploy
+#   image: alpine:latest
+#   tags:
+#     - esma
+#   before_script:
+#     - apk add --no-cache openssh-client
+#     - eval $(ssh-agent -s)
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#     - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+#   script:
+#     - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && dos2unix restart && ./restart esma-admin-api-v2"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "main"
+#       needs: ["docker-build-push"]
+#   when: on_success
+
+# # Manual deployment trigger
+# manual-deploy:
+#   stage: deploy
+#   image: alpine:latest
+#   tags:
+#     - esma
+#   before_script:
+#     - apk add --no-cache openssh-client
+#     - eval $(ssh-agent -s)
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#     - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+#   script:
+#     - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && dos2unix restart && ./restart esma-admin-api-v2"
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "web"
+#       when: manual
+#   allow_failure: false
+# =====================================================
+# Gitlab CICD Above
+# =====================================================
+
+name: Build, Test and Deploy Admin Service V2
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  # Enables manual trigger ("Run workflow" button) in Gitea UI
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE: "CleanArchitecture.sln"
   IMAGE_NAME: "admin-service-v2"
-  DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
-  SOLUTION_FILE: "CleanArchitecture.sln"   # Correct solution name
 
-# Build and test .NET application
-build-test-dotnet:
-  stage: build
-  image: mcr.microsoft.com/dotnet/sdk:9.0
-  tags:
-    - esma
-  script:
-    - dotnet restore $SOLUTION_FILE
-    - dotnet build $SOLUTION_FILE --no-restore -c Release
-    - dotnet test $SOLUTION_FILE --no-build -c Release -m:4 --logger "trx;LogFileName=test-results.trx"
-  artifacts:
-    paths:
-      - "**/TestResults/*.trx"   # Capture test results
-    when: always
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  # 1. BUILD & TEST .NET APPLICATION
+  # ────────────────────────────────────────────────────────────────────────────
+  build-test-dotnet:
+    name: Build & Test .NET 9
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-# Build and push Docker image
-docker-build-push:
-  stage: build
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  tags:
-    - esma
-  variables:
-    DOCKER_IMAGE: ${DOCKER_USERNAME}/${IMAGE_NAME}
-  script:
-    - mkdir -p /kaniko/.docker
-    - |
-      cat > /kaniko/.docker/config.json <<EOF
-      {
-        "auths": {
-          "https://index.docker.io/v1/": {
-            "username": "${DOCKER_USERNAME}",
-            "password": "${DOCKER_PASSWORD}"
-          }
-        }
-      }
-      EOF
-    - |
-      /kaniko/executor \
-        --context $CI_PROJECT_DIR \
-        --dockerfile $CI_PROJECT_DIR/src/Web.Api/Dockerfile \
-        --destination $DOCKER_IMAGE:latest \
-        --destination $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
-        --cache=true \
-        --cache-repo=$DOCKER_IMAGE-cache
-  needs: ["build-test-dotnet"]
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+      - name: Setup .NET SDK 9.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
 
-# Auto-deploy to server
-deploy-to-server:
-  stage: deploy
-  image: alpine:latest
-  tags:
-    - esma
-  before_script:
-    - apk add --no-cache openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
-  script:
-    - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && dos2unix restart && ./restart esma-admin-api-v2"
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-      needs: ["docker-build-push"]
-  when: on_success
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }}
 
-# Manual deployment trigger
-manual-deploy:
-  stage: deploy
-  image: alpine:latest
-  tags:
-    - esma
-  before_script:
-    - apk add --no-cache openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
-  script:
-    - ssh $SSH_USER@$SSH_HOST "cd ~/server-setup/esma && chmod +x ./restart && dos2unix restart && ./restart esma-admin-api-v2"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: manual
-  allow_failure: false
+      - name: Build solution
+        run: dotnet build ${{ env.SOLUTION_FILE }} --no-restore -c Release
+
+      - name: Run unit tests
+        run: |
+          dotnet test ${{ env.SOLUTION_FILE }} \
+            --no-build \
+            -c Release \
+            -m:4 \
+            --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload Test Results Artifact
+        if: always()
+        uses: actions/upload-artifact@v3   # v4 is not supported on Gitea/GHES
+        with:
+          name: dotnet-test-results
+          path: "**/TestResults/*.trx"
+          retention-days: 7
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 2. BUILD & PUSH DOCKER IMAGE
+  # ────────────────────────────────────────────────────────────────────────────
+  docker-build-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: build-test-dotnet
+    if: gitea.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Short Commit SHA
+        id: vars
+        run: echo "short_sha=$(echo ${{ gitea.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ vars.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/Web.Api/Dockerfile
+          push: true
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            ${{ vars.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 3. DEPLOY TO SERVER VIA SSH
+  # ────────────────────────────────────────────────────────────────────────────
+  deploy-to-server:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+    if: |
+      (gitea.ref == 'refs/heads/main') ||
+      (gitea.event_name == 'workflow_dispatch')
+    steps:
+      - name: Execute deployment commands via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ vars.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/server-setup/esma
+            chmod +x ./restart
+            dos2unix restart
+            ./restart esma-admin-api-v2
