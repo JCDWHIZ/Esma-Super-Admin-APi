@@ -95,7 +95,7 @@ public class SubscriptionCheckJob
 
         var message = new UpdateTenantStatusMessage
         {
-            SchoolPublicId = schoolPublicId.ToString(),
+            esmaSchoolPublicId = schoolPublicId.ToString(),
             TenantId = tenantId,
             Action = action
         };

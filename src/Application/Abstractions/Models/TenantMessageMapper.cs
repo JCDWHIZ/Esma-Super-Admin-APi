@@ -10,8 +10,8 @@ public static class TenantMessageMapper
     {
         return new CreateTenantMessage
         {
-            SchoolId = school.Id,
-            SchoolPublicId = school.PublicId,
+            ExternalSchoolPublicId = school.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            EsmaSchoolPublicId = school.PublicId,
             SchoolName = school.SchoolName,
             ShortCode = school.ShortCode,
             //OrganizationId = school.OrganizationId ?? string.Empty,

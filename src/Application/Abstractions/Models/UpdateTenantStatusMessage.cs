@@ -12,7 +12,7 @@ public enum TenantUpdateAction
 
 public class UpdateTenantStatusMessage
 {
-    public string SchoolPublicId { get; set; } = string.Empty;
+    public string esmaSchoolPublicId { get; set; } = string.Empty;
     public string TenantId { get; set; } = string.Empty;
     public TenantUpdateAction Action { get; set; }
 }

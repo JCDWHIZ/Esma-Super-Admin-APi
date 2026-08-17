@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Application.School.CreateSchool;
 using Application.School;
 
@@ -5,9 +6,26 @@ namespace Application.Abstractions.Models;
 
 public class CreateTenantMessage
 {
-    public int SchoolId { get; set; }
-    //public string OrganizationId { get; set; }
-    public Guid SchoolPublicId { get; set; }
+    [JsonPropertyName("ExternalSchoolPublicId")]
+    public string? ExternalSchoolPublicId { get; set; }
+
+    [JsonPropertyName("EsmaSchoolPublicId")]
+    public Guid EsmaSchoolPublicId { get; set; }
+
+    [JsonIgnore]
+    public int SchoolId
+    {
+        get => int.TryParse(ExternalSchoolPublicId, out int id) ? id : 0;
+        set => ExternalSchoolPublicId = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    [JsonIgnore]
+    public Guid SchoolPublicId
+    {
+        get => EsmaSchoolPublicId;
+        set => EsmaSchoolPublicId = value;
+    }
+
     public string SchoolName { get; set; }
     public string ShortCode { get; set; }
     public string SchoolAdminEmail { get; set; }
@@ -35,7 +53,10 @@ public class CreateTenantMessage
     public string? LmsLearningDomainTemplateId { get; set; }
 
     public AddressDto? SchoolAddress { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SharedKernel.Enums.Roles SchoolAdminRole { get; set; }
+
     public SubscriptionDto Subscriptions { get; set; }
 
     /// <summary>
