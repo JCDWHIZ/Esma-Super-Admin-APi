@@ -20,13 +20,17 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
             return Result.Failure<SchoolItemDto>(SchoolErrors.NotFound(query.PublicId));
         }
 
+        var assignedModuleIds = entity.Modules.Select(sm => sm.Id).ToHashSet();
+        var assignedSisModuleIds = entity.SisModules.Select(sm => sm.Id).ToHashSet();
+        var assignedLmsModuleIds = entity.LmsModules.Select(sm => sm.Id).ToHashSet();
+
         List<SchoolModuleAvailabilityDto> allModules = await _context.SchoolModules
             .Select(m => new SchoolModuleAvailabilityDto
             {
                 Name = m.Name,
                 Key = m.Key,
                 Description = m.Description,
-                HasModule = entity.Modules.Any(sm => sm.Id == m.Id)
+                HasModule = assignedModuleIds.Contains(m.Id)
             })
             .OrderBy(m => m.Name)
             .ToListAsync(cancellationToken);
@@ -37,7 +41,7 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
                 Name = m.Name,
                 Key = m.Key,
                 Description = m.Description,
-                HasModule = entity.SisModules.Any(sm => sm.Id == m.Id)
+                HasModule = assignedSisModuleIds.Contains(m.Id)
             })
             .OrderBy(m => m.Name)
             .ToListAsync(cancellationToken);
@@ -48,7 +52,7 @@ public sealed class GetSchoolsWithByIdQueryHandler(IApplicationDbContext _contex
                 Name = m.Name,
                 Key = m.Key,
                 Description = m.Description,
-                HasModule = entity.LmsModules.Any(sm => sm.Id == m.Id)
+                HasModule = assignedLmsModuleIds.Contains(m.Id)
             })
             .OrderBy(m => m.Name)
             .ToListAsync(cancellationToken);
